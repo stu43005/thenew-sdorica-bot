@@ -1,6 +1,6 @@
+import config from 'config';
 import { ActivityType, ShardingManager } from 'discord.js';
 import { createRequire } from 'node:module';
-
 import { CustomClient } from '../extensions/index.js';
 import { BotSite } from '../models/config-models.js';
 import { HttpService, Lang, Logger } from '../services/index.js';
@@ -8,19 +8,17 @@ import { ShardUtils } from '../utils/index.js';
 import { Job } from './index.js';
 
 const require = createRequire(import.meta.url);
-let BotSites: BotSite[] = require('../../config/bot-sites.json');
-let Config = require('../../config/config.json');
 let Logs = require('../../lang/logs.json');
 
 export class UpdateServerCountJob implements Job {
     public name = 'Update Server Count';
-    public schedule: string = Config.jobs.updateServerCount.schedule;
-    public log: boolean = Config.jobs.updateServerCount.log;
+    public schedule: string = config.get('jobs.updateServerCount.schedule');
+    public log: boolean = config.get('jobs.updateServerCount.log');
 
     private botSites: BotSite[];
 
     constructor(private shardManager: ShardingManager, private httpService: HttpService) {
-        this.botSites = BotSites.filter(botSite => botSite.enabled);
+        this.botSites = config.get<BotSite[]>('bot-sites').filter(botSite => botSite.enabled);
     }
 
     public async run(): Promise<void> {

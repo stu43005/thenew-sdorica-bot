@@ -1,15 +1,10 @@
+import config from 'config';
 import { CommandInteraction, GuildChannel, GuildMember, Permissions } from 'discord.js';
-import { createRequire } from 'node:module';
-
 import { Command } from '../commands/index.js';
 import { Permission } from '../models/enum-helpers/index.js';
 import { EventData } from '../models/internal-models.js';
 import { Lang } from '../services/index.js';
 import { FormatUtils, InteractionUtils } from './index.js';
-
-const require = createRequire(import.meta.url);
-let Config = require('../../config/config.json');
-let Debug = require('../../config/debug.json');
 
 export class CommandUtils {
     public static async runChecks(
@@ -31,7 +26,7 @@ export class CommandUtils {
             }
         }
 
-        if (command.requireDev && !Config.developers.includes(intr.user.id)) {
+        if (command.requireDev && !config.get<string[]>('developers').includes(intr.user.id)) {
             await InteractionUtils.send(
                 intr,
                 Lang.getEmbed('validationEmbeds.devOnlyCommand', data.lang())
@@ -76,7 +71,7 @@ export class CommandUtils {
 
     private static hasPermission(member: GuildMember, command: Command): boolean {
         // Debug option to bypass permission checks
-        if (Debug.skip.checkPerms) {
+        if (config.get('debug.skip.checkPerms')) {
             return true;
         }
 
@@ -84,7 +79,7 @@ export class CommandUtils {
         if (
             member.guild.ownerId === member.id ||
             member.permissions.has(Permissions.FLAGS.MANAGE_GUILD) ||
-            Config.developers.includes(member.id)
+            config.get<string[]>('developers').includes(member.id)
         ) {
             return true;
         }

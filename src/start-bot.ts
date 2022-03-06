@@ -1,17 +1,12 @@
 import { REST } from '@discordjs/rest';
+import config from 'config';
 import { Routes } from 'discord-api-types/v9';
 import { Options } from 'discord.js';
 import { createRequire } from 'node:module';
-
 import { Button } from './buttons/index.js';
 import {
     Command,
-    DevCommand,
-    HelpCommand,
-    InfoCommand,
-    LinkCommand,
-    TestCommand,
-    TranslateCommand,
+    commands
 } from './commands/index.js';
 import {
     ButtonHandler,
@@ -20,7 +15,7 @@ import {
     GuildLeaveHandler,
     MessageHandler,
     ReactionHandler,
-    TriggerHandler,
+    TriggerHandler
 } from './events/index.js';
 import { CustomClient } from './extensions/index.js';
 import { Job } from './jobs/index.js';
@@ -30,32 +25,20 @@ import { JobService, Logger } from './services/index.js';
 import { Trigger } from './triggers/index.js';
 
 const require = createRequire(import.meta.url);
-let Config = require('../config/config.json');
 let Logs = require('../lang/logs.json');
 
 async function start(): Promise<void> {
     // Client
     let client = new CustomClient({
-        intents: Config.client.intents,
-        partials: Config.client.partials,
+        intents: config.get('client.intents'),
+        partials: config.get('client.partials'),
         makeCache: Options.cacheWithLimits({
             // Keep default caching behavior
             ...Options.defaultMakeCacheSettings,
             // Override specific options from config
-            ...Config.client.caches,
+            ...config.get('client.caches'),
         }),
     });
-
-    // Commands
-    let commands: Command[] = [
-        new DevCommand(),
-        new HelpCommand(),
-        new InfoCommand(),
-        new LinkCommand(),
-        new TestCommand(),
-        new TranslateCommand(),
-        // TODO: Add new commands here
-    ].sort((a, b) => (a.metadata.name > b.metadata.name ? 1 : -1));
 
     // Buttons
     let buttons: Button[] = [
@@ -88,7 +71,7 @@ async function start(): Promise<void> {
 
     // Bot
     let bot = new Bot(
-        Config.client.token,
+        config.get('client.token'),
         client,
         guildJoinHandler,
         guildLeaveHandler,
@@ -123,9 +106,9 @@ async function registerCommands(commands: Command[]): Promise<void> {
     );
 
     try {
-        let rest = new REST({ version: '9' }).setToken(Config.client.token);
-        await rest.put(Routes.applicationCommands(Config.client.id), { body: [] });
-        await rest.put(Routes.applicationCommands(Config.client.id), { body: cmdDatas });
+        let rest = new REST({ version: '9' }).setToken(config.get('client.token'));
+        await rest.put(Routes.applicationCommands(config.get('client.id')), { body: [] });
+        await rest.put(Routes.applicationCommands(config.get('client.id')), { body: cmdDatas });
     } catch (error) {
         Logger.error(Logs.error.commandsRegistering, error);
         return;
@@ -138,8 +121,8 @@ async function clearCommands(): Promise<void> {
     Logger.info(Logs.info.commandsClearing);
 
     try {
-        let rest = new REST({ version: '9' }).setToken(Config.client.token);
-        await rest.put(Routes.applicationCommands(Config.client.id), { body: [] });
+        let rest = new REST({ version: '9' }).setToken(config.get('client.token'));
+        await rest.put(Routes.applicationCommands(config.get('client.id')), { body: [] });
     } catch (error) {
         Logger.error(Logs.error.commandsClearing, error);
         return;

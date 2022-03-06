@@ -1,7 +1,7 @@
+import config from 'config';
 import { ShardingManager } from 'discord.js';
 import { createRequire } from 'node:module';
 import 'reflect-metadata';
-
 import { GuildsController, RootController, ShardsController } from './controllers/index.js';
 import { Job, UpdateServerCountJob } from './jobs/index.js';
 import { Api } from './models/api.js';
@@ -10,8 +10,6 @@ import { HttpService, JobService, Logger, MasterApiService } from './services/in
 import { MathUtils, ShardUtils } from './utils/index.js';
 
 const require = createRequire(import.meta.url);
-let Config = require('../config/config.json');
-let Debug = require('../config/debug.json');
 let Logs = require('../lang/logs.json');
 
 async function start(): Promise<void> {
@@ -20,7 +18,7 @@ async function start(): Promise<void> {
     // Dependencies
     let httpService = new HttpService();
     let masterApiService = new MasterApiService(httpService);
-    if (Config.clustering.enabled) {
+    if (config.get('clustering.enabled')) {
         await masterApiService.register();
     }
 
@@ -28,15 +26,15 @@ async function start(): Promise<void> {
     let shardList: number[];
     let totalShards: number;
     try {
-        if (Config.clustering.enabled) {
+        if (config.get('clustering.enabled')) {
             let resBody = await masterApiService.login();
             shardList = resBody.shardList;
-            let requiredShards = await ShardUtils.requiredShardCount(Config.client.token);
+            let requiredShards = await ShardUtils.requiredShardCount(config.get('client.token'));
             totalShards = Math.max(requiredShards, resBody.totalShards);
         } else {
             let recommendedShards = await ShardUtils.recommendedShardCount(
-                Config.client.token,
-                Config.sharding.serversPerShard
+                config.get('client.token'),
+                config.get('sharding.serversPerShard')
             );
             shardList = MathUtils.range(0, recommendedShards);
             totalShards = recommendedShards;
@@ -52,8 +50,8 @@ async function start(): Promise<void> {
     }
 
     let shardManager = new ShardingManager('dist/start-bot.js', {
-        token: Config.client.token,
-        mode: Debug.override.shardMode.enabled ? Debug.override.shardMode.value : 'worker',
+        token: config.get('client.token'),
+        mode: config.get('debug.override.shardMode.enabled') ? config.get('debug.override.shardMode.value') : 'worker',
         respawn: true,
         totalShards,
         shardList,
@@ -61,7 +59,7 @@ async function start(): Promise<void> {
 
     // Jobs
     let jobs: Job[] = [
-        Config.clustering.enabled ? undefined : new UpdateServerCountJob(shardManager, httpService),
+        config.get('clustering.enabled') ? undefined : new UpdateServerCountJob(shardManager, httpService),
         // TODO: Add new jobs here
     ].filter(Boolean);
 
@@ -76,7 +74,7 @@ async function start(): Promise<void> {
     // Start
     await manager.start();
     await api.start();
-    if (Config.clustering.enabled) {
+    if (config.get('clustering.enabled')) {
         await masterApiService.ready();
     }
 }

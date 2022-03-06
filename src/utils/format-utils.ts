@@ -1,3 +1,4 @@
+import { codeBlock } from '@discordjs/builders';
 import { Guild } from 'discord.js';
 import { Duration } from 'luxon'; // TODO: Missing types
 
@@ -44,5 +45,9 @@ export class FormatUtils {
                 ).filter(([_, value]) => !!value) // Remove units that are 0
             )
         ).toHuman({ maximumFractionDigits: 0 });
+    }
+
+    public static jsonBlock(obj: any): string {
+        return codeBlock('json', JSON.stringify(obj, null, 2));
     }
 }

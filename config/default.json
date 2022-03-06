@@ -1,0 +1,169 @@
+{
+    "developers": [
+        "198437688255184897"
+    ],
+    "client": {
+        "id": "",
+        "token": "",
+        "intents": [
+            "GUILDS",
+            "GUILD_MESSAGES",
+            "GUILD_MESSAGE_REACTIONS",
+            "DIRECT_MESSAGES",
+            "DIRECT_MESSAGE_REACTIONS"
+        ],
+        "partials": [
+            "MESSAGE",
+            "CHANNEL",
+            "REACTION"
+        ],
+        "caches": {
+            "BaseGuildEmojiManager": 0,
+            "GuildBanManager": 0,
+            "GuildInviteManager": 0,
+            "GuildStickerManager": 0,
+            "MessageManager": 200,
+            "PresenceManager": 0,
+            "StageInstanceManager": 0,
+            "ThreadManager": 0,
+            "ThreadMemberManager": 0,
+            "VoiceStateManager": 0
+        }
+    },
+    "api": {
+        "port": 8080,
+        "secret": "00000000-0000-0000-0000-000000000000"
+    },
+    "sharding": {
+        "spawnDelay": 5,
+        "spawnTimeout": 300,
+        "serversPerShard": 1000
+    },
+    "clustering": {
+        "enabled": false,
+        "shardCount": 16,
+        "callbackUrl": "http://localhost:8080/",
+        "masterApi": {
+            "url": "http://localhost:5000/",
+            "token": "00000000-0000-0000-0000-000000000000"
+        }
+    },
+    "jobs": {
+        "updateServerCount": {
+            "schedule": "0 */10 * * * *",
+            "log": false
+        }
+    },
+    "rateLimiting": {
+        "commands": {
+            "amount": 10,
+            "interval": 30
+        },
+        "buttons": {
+            "amount": 10,
+            "interval": 30
+        },
+        "triggers": {
+            "amount": 10,
+            "interval": 30
+        },
+        "reactions": {
+            "amount": 10,
+            "interval": 30
+        }
+    },
+    "logging": {
+        "pretty": true,
+        "rateLimit": {
+            "minTimeout": 30
+        },
+        "discordWebhook": {
+            "enabled": true,
+            "id": "",
+            "token": ""
+        }
+    },
+    "debug": {
+        "skip": {
+            "checkPerms": false
+        },
+        "override": {
+            "shardMode": {
+                "enabled": false,
+                "value": "process"
+            }
+        },
+        "dummyMode": {
+            "enabled": false,
+            "whitelist": [
+                "212772875793334272",
+                "478288246858711040"
+            ]
+        }
+    },
+    "bot-sites": [
+        {
+            "name": "top.gg",
+            "enabled": false,
+            "url": "https://top.gg/api/bots/<BOT_ID>/stats",
+            "authorization": "<TOKEN>",
+            "body": "{\"server_count\":{{SERVER_COUNT}}}"
+        },
+        {
+            "name": "bots.ondiscord.xyz",
+            "enabled": false,
+            "url": "https://bots.ondiscord.xyz/bot-api/bots/<BOT_ID>/guilds",
+            "authorization": "<TOKEN>",
+            "body": "{\"guildCount\":{{SERVER_COUNT}}}"
+        },
+        {
+            "name": "discord.bots.gg",
+            "enabled": false,
+            "url": "https://discord.bots.gg/api/v1/bots/<BOT_ID>/stats",
+            "authorization": "<TOKEN>",
+            "body": "{\"guildCount\":{{SERVER_COUNT}}}"
+        },
+        {
+            "name": "discordbotlist.com",
+            "enabled": false,
+            "url": "https://discordbotlist.com/api/bots/<BOT_ID>/stats",
+            "authorization": "Bot <TOKEN>",
+            "body": "{\"guilds\":{{SERVER_COUNT}}}"
+        },
+        {
+            "name": "bots.discordlabs.org",
+            "enabled": false,
+            "url": "https://bots.discordlabs.org/v2/bot/<BOT_ID>/stats",
+            "authorization": null,
+            "body": "{\"token\":\"discordlabs.org-<TOKEN>\",\"server_count\":\"{{SERVER_COUNT}}\"}"
+        },
+        {
+            "name": "discords.com",
+            "enabled": false,
+            "url": "https://discords.com/bots/api/bot/<BOT_ID>",
+            "authorization": "<TOKEN>",
+            "body": "{\"server_count\":{{SERVER_COUNT}}}"
+        },
+        {
+            "name": "discord.boats",
+            "enabled": false,
+            "url": "https://discord.boats/api/bot/<BOT_ID>",
+            "authorization": "<TOKEN>",
+            "body": "{\"server_count\":{{SERVER_COUNT}}}"
+        },
+        {
+            "name": "disforge.com",
+            "enabled": false,
+            "url": "https://disforge.com/api/botstats/<BOT_ID>",
+            "authorization": "<TOKEN>",
+            "body": "{\"servers\":{{SERVER_COUNT}}}"
+        },
+        {
+            "name": "discordlist.space",
+            "enabled": false,
+            "url": "https://api.discordlist.space/v2/bots/<BOT_ID>",
+            "authorization": "<TOKEN>",
+            "body": "{\"serverCount\":{{SERVER_COUNT}}}"
+        }
+    ]
+}

@@ -66,7 +66,7 @@
                     ["builtin", "external", "object", "type"],
                     ["internal", "parent", "sibling", "index"]
                 ],
-                "newlines-between": "always"
+                "newlines-between": "ignore"
             }
         ],
         "no-return-await": "off",

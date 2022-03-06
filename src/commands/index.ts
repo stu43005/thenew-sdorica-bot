@@ -1,7 +1,21 @@
+import { Command } from './command.js';
+import { DevCommand } from './dev-command.js';
+import { HitokotoCommand } from './fun/hitokoto.js';
+import { HelpCommand } from './help-command.js';
+import { InfoCommand } from './info-command.js';
+import { LinkCommand } from './link-command.js';
+import { TestCommand } from './test-command.js';
+import { TranslateCommand } from './translate-command.js';
+
 export { Command, CommandDeferType } from './command.js';
-export { DevCommand } from './dev-command.js';
-export { HelpCommand } from './help-command.js';
-export { InfoCommand } from './info-command.js';
-export { LinkCommand } from './link-command.js';
-export { TestCommand } from './test-command.js';
-export { TranslateCommand } from './translate-command.js';
+
+export const commands: Command[] = [
+    new DevCommand(),
+    new HelpCommand(),
+    new InfoCommand(),
+    new LinkCommand(),
+    new TestCommand(),
+    new TranslateCommand(),
+    // TODO: Add new commands here
+    new HitokotoCommand(),
+].sort((a, b) => (a.metadata.name > b.metadata.name ? 1 : -1));

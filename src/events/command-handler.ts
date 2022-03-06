@@ -1,7 +1,7 @@
+import config from 'config';
 import { CommandInteraction, NewsChannel, TextChannel, ThreadChannel } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { createRequire } from 'node:module';
-
 import { Command, CommandDeferType } from '../commands/index.js';
 import { EventData } from '../models/internal-models.js';
 import { Lang, Logger } from '../services/index.js';
@@ -9,16 +9,15 @@ import { CommandUtils, InteractionUtils } from '../utils/index.js';
 import { EventHandler } from './index.js';
 
 const require = createRequire(import.meta.url);
-let Config = require('../../config/config.json');
 let Logs = require('../../lang/logs.json');
 
 export class CommandHandler implements EventHandler {
     private rateLimiter = new RateLimiter(
-        Config.rateLimiting.commands.amount,
-        Config.rateLimiting.commands.interval * 1000
+        config.get<number>('rateLimiting.commands.amount'),
+        config.get<number>('rateLimiting.commands.interval') * 1000
     );
 
-    constructor(public commands: Command[]) {}
+    constructor(public commands: Command[]) { }
 
     public async process(intr: CommandInteraction): Promise<void> {
         // Don't respond to self, or other bots
@@ -80,19 +79,19 @@ export class CommandHandler implements EventHandler {
                     intr.channel instanceof NewsChannel ||
                     intr.channel instanceof ThreadChannel
                     ? Logs.error.commandGuild
-                          .replaceAll('{INTERACTION_ID}', intr.id)
-                          .replaceAll('{COMMAND_NAME}', command.metadata.name)
-                          .replaceAll('{USER_TAG}', intr.user.tag)
-                          .replaceAll('{USER_ID}', intr.user.id)
-                          .replaceAll('{CHANNEL_NAME}', intr.channel.name)
-                          .replaceAll('{CHANNEL_ID}', intr.channel.id)
-                          .replaceAll('{GUILD_NAME}', intr.guild?.name)
-                          .replaceAll('{GUILD_ID}', intr.guild?.id)
+                        .replaceAll('{INTERACTION_ID}', intr.id)
+                        .replaceAll('{COMMAND_NAME}', command.metadata.name)
+                        .replaceAll('{USER_TAG}', intr.user.tag)
+                        .replaceAll('{USER_ID}', intr.user.id)
+                        .replaceAll('{CHANNEL_NAME}', intr.channel.name)
+                        .replaceAll('{CHANNEL_ID}', intr.channel.id)
+                        .replaceAll('{GUILD_NAME}', intr.guild?.name)
+                        .replaceAll('{GUILD_ID}', intr.guild?.id)
                     : Logs.error.commandOther
-                          .replaceAll('{INTERACTION_ID}', intr.id)
-                          .replaceAll('{COMMAND_NAME}', command.metadata.name)
-                          .replaceAll('{USER_TAG}', intr.user.tag)
-                          .replaceAll('{USER_ID}', intr.user.id),
+                        .replaceAll('{INTERACTION_ID}', intr.id)
+                        .replaceAll('{COMMAND_NAME}', command.metadata.name)
+                        .replaceAll('{USER_TAG}', intr.user.tag)
+                        .replaceAll('{USER_ID}', intr.user.id),
                 error
             );
         }

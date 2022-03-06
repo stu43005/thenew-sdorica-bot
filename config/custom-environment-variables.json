@@ -1,0 +1,24 @@
+{
+	"client": {
+		"id": "DISCORD_ID",
+		"token": "DISCORD_TOKEN"
+	},
+	"logging": {
+		"discordWebhook": {
+			"id": "LOG_WEBHOOK_ID",
+			"token": "LOG_WEBHOOK_TOKEN"
+		}
+	},
+	"firebaseAdmin": {
+		"cert": {
+			"__name": "FIREBASE_ADMIN_CERT",
+			"__format": "json"
+		},
+		"databaseURL": "FIREBASE_ADMIN_DATABASE"
+	},
+	"measurementProtocol": {
+		"measurementId": "MP_MEASUREMENT_ID",
+		"apiSecret": "MP_API_SECRET"
+	},
+	"googleCalendarApiKey": "GOOGLE_CALENDAR_API_KEY"
+}
