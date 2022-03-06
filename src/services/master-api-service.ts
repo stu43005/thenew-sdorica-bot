@@ -8,7 +8,7 @@ import {
 import { HttpService } from './index.js';
 
 export class MasterApiService {
-    private clusterId: string;
+    private clusterId: string | undefined;
 
     constructor(private httpService: HttpService) { }
 

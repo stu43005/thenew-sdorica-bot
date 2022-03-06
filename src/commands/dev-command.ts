@@ -33,7 +33,7 @@ export class DevCommand implements Command {
         if (intr.client.shard) {
             try {
                 serverCount = await ShardUtils.serverCount(intr.client.shard);
-            } catch (error) {
+            } catch (error: any) {
                 // SHARDING_IN_PROCESS: Shards are still being spawned.
                 if (error.name.includes('SHARDING_IN_PROCESS')) {
                     await InteractionUtils.send(
@@ -78,7 +78,7 @@ export class DevCommand implements Command {
                 HOSTNAME: os.hostname(),
                 SHARD_ID: (intr.guild?.shardId ?? 0).toString(),
                 SERVER_ID: intr.guild?.id ?? Lang.getRef('other.na', data.lang()),
-                BOT_ID: intr.client.user?.id,
+                BOT_ID: intr.client.user?.id || '',
                 USER_ID: intr.user.id,
             })
         );

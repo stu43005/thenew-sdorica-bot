@@ -21,7 +21,7 @@ export interface ShardInfo {
 export class SetShardPresencesRequest {
     @IsDefined()
     @IsEnum(Constants.ActivityTypes)
-    type: ActivityType;
+    type: Exclude<ActivityType, 'CUSTOM'>;
 
     @IsDefined()
     @IsString()
@@ -31,4 +31,10 @@ export class SetShardPresencesRequest {
     @IsDefined()
     @IsUrl()
     url: string;
+
+    constructor(type: Exclude<ActivityType, 'CUSTOM'>, name: string, url: string) {
+        this.type = type;
+        this.name = name;
+        this.url = url;
+    }
 }

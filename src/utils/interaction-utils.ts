@@ -54,7 +54,7 @@ export class InteractionUtils {
         intr: CommandInteraction | MessageComponentInteraction,
         content: string | MessageEmbed | MessageOptions,
         hidden: boolean = false
-    ): Promise<Message> {
+    ): Promise<Message | undefined> {
         try {
             let msgOptions = MessageUtils.messageOptions(content);
 
@@ -82,7 +82,7 @@ export class InteractionUtils {
     public static async editReply(
         intr: CommandInteraction | MessageComponentInteraction,
         content: string | MessageEmbed | MessageOptions
-    ): Promise<Message> {
+    ): Promise<Message | undefined> {
         try {
             let msgOptions = MessageUtils.messageOptions(content);
             return (await intr.editReply({
@@ -100,7 +100,7 @@ export class InteractionUtils {
     public static async update(
         intr: MessageComponentInteraction,
         content: string | MessageEmbed | MessageOptions
-    ): Promise<Message> {
+    ): Promise<Message | undefined> {
         try {
             let msgOptions = MessageUtils.messageOptions(content);
             return (await intr.update({

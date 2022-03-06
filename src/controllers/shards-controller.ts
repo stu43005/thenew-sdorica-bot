@@ -3,7 +3,6 @@ import { ShardingManager } from 'discord.js';
 import { Request, Response, Router } from 'express';
 import router from 'express-promise-router';
 import { createRequire } from 'node:module';
-import { CustomClient } from '../extensions/index.js';
 import { mapClass } from '../middleware/index.js';
 import {
     GetShardsResponse,
@@ -68,8 +67,16 @@ export class ShardsController implements Controller {
         let reqBody: SetShardPresencesRequest = res.locals.input;
 
         await this.shardManager.broadcastEval(
-            (client: CustomClient, context) => {
-                return client.setPresence(context.type, context.name, context.url);
+            (client, context) => {
+                return client.user?.setPresence({
+                    activities: [
+                        {
+                            type: context.type,
+                            name: context.name,
+                            url: context.url,
+                        },
+                    ],
+                });
             },
             { context: { type: reqBody.type, name: reqBody.name, url: reqBody.url } }
         );

@@ -26,7 +26,7 @@ export class MessageUtils {
     public static async send(
         target: User | TextBasedChannel,
         content: string | MessageEmbed | MessageOptions
-    ): Promise<Message> {
+    ): Promise<Message | undefined> {
         try {
             let msgOptions = this.messageOptions(content);
             return await target.send(msgOptions);
@@ -42,7 +42,7 @@ export class MessageUtils {
     public static async reply(
         msg: Message,
         content: string | MessageEmbed | MessageOptions
-    ): Promise<Message> {
+    ): Promise<Message | undefined> {
         try {
             let msgOptions = this.messageOptions(content);
             return await msg.reply(msgOptions);
@@ -58,7 +58,7 @@ export class MessageUtils {
     public static async edit(
         msg: Message,
         content: string | MessageEmbed | MessageOptions
-    ): Promise<Message> {
+    ): Promise<Message | undefined> {
         try {
             let msgOptions = this.messageOptions(content);
             return await msg.edit(msgOptions);
@@ -71,7 +71,7 @@ export class MessageUtils {
         }
     }
 
-    public static async react(msg: Message, emoji: EmojiResolvable): Promise<MessageReaction> {
+    public static async react(msg: Message, emoji: EmojiResolvable): Promise<MessageReaction | undefined> {
         try {
             return await msg.react(emoji);
         } catch (error) {
@@ -83,7 +83,7 @@ export class MessageUtils {
         }
     }
 
-    public static async pin(msg: Message): Promise<Message> {
+    public static async pin(msg: Message): Promise<Message | undefined> {
         try {
             return await msg.pin();
         } catch (error) {
@@ -95,7 +95,7 @@ export class MessageUtils {
         }
     }
 
-    public static async unpin(msg: Message): Promise<Message> {
+    public static async unpin(msg: Message): Promise<Message | undefined> {
         try {
             return await msg.unpin();
         } catch (error) {
@@ -110,7 +110,7 @@ export class MessageUtils {
     public static async startThread(
         msg: Message,
         options: StartThreadOptions
-    ): Promise<ThreadChannel> {
+    ): Promise<ThreadChannel | undefined> {
         try {
             return await msg.startThread(options);
         } catch (error) {
@@ -122,7 +122,7 @@ export class MessageUtils {
         }
     }
 
-    public static async delete(msg: Message): Promise<Message> {
+    public static async delete(msg: Message): Promise<Message | undefined> {
         try {
             return await msg.delete();
         } catch (error) {

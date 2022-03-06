@@ -22,7 +22,7 @@ export class CommandUtils {
                         INTERVAL: FormatUtils.duration(command.cooldown.interval, data.lang()),
                     })
                 );
-                return;
+                return false;
             }
         }
 
@@ -44,7 +44,8 @@ export class CommandUtils {
 
         if (
             intr.channel instanceof GuildChannel &&
-            !intr.channel.permissionsFor(intr.client.user).has(command.requireClientPerms)
+            intr.client.user &&
+            !intr.channel.permissionsFor(intr.client.user)?.has(command.requireClientPerms)
         ) {
             await InteractionUtils.send(
                 intr,

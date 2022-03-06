@@ -5,7 +5,7 @@ export class CustomClient extends Client {
         super(clientOptions);
     }
 
-    public setPresence(type: ActivityType, name: string, url: string): Presence {
+    public setPresence(type: ActivityType, name: string, url: string): Presence | undefined {
         return this.user?.setPresence({
             activities: [
                 {

@@ -1,6 +1,6 @@
 import { Command } from './command.js';
 import { DevCommand } from './dev-command.js';
-import { HitokotoCommand } from './fun/hitokoto.js';
+import { funCommands } from './fun/index.js';
 import { HelpCommand } from './help-command.js';
 import { InfoCommand } from './info-command.js';
 import { LinkCommand } from './link-command.js';
@@ -17,5 +17,5 @@ export const commands: Command[] = [
     new TestCommand(),
     new TranslateCommand(),
     // TODO: Add new commands here
-    new HitokotoCommand(),
+    ...funCommands,
 ].sort((a, b) => (a.metadata.name > b.metadata.name ? 1 : -1));

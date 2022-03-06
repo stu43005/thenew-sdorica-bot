@@ -59,9 +59,9 @@ async function start(): Promise<void> {
 
     // Jobs
     let jobs: Job[] = [
-        config.get('clustering.enabled') ? undefined : new UpdateServerCountJob(shardManager, httpService),
+        ...(config.get('clustering.enabled') ? [] : [new UpdateServerCountJob(shardManager, httpService)]),
         // TODO: Add new jobs here
-    ].filter(Boolean);
+    ];
 
     let manager = new Manager(shardManager, new JobService(jobs));
 

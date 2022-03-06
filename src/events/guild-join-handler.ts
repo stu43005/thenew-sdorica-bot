@@ -28,7 +28,7 @@ export class GuildJoinHandler implements EventHandler {
                 notifyChannel,
                 Lang.getEmbed('displayEmbeds.welcome', guildLang).setAuthor({
                     name: guild.name,
-                    iconURL: guild.iconURL(),
+                    iconURL: guild.iconURL() || undefined,
                 })
             );
         }
@@ -42,7 +42,7 @@ export class GuildJoinHandler implements EventHandler {
                 owner.user,
                 Lang.getEmbed('displayEmbeds.welcome', ownerLang).setAuthor({
                     name: guild.name,
-                    iconURL: guild.iconURL(),
+                    iconURL: guild.iconURL() || undefined,
                 })
             );
         }

@@ -20,8 +20,8 @@ import { PermissionUtils, RegexUtils } from './index.js';
 const FETCH_MEMBER_LIMIT = 20;
 
 export class ClientUtils {
-    public static async getUser(client: Client, discordId: string): Promise<User> {
-        discordId = RegexUtils.discordId(discordId);
+    public static async getUser(client: Client, input: string): Promise<User | undefined> {
+        const discordId = RegexUtils.discordId(input);
         if (!discordId) {
             return;
         }
@@ -40,8 +40,8 @@ export class ClientUtils {
         }
     }
 
-    public static async getChannel(client: Client, discordId: string): Promise<AnyChannel> {
-        discordId = RegexUtils.discordId(discordId);
+    public static async getChannel(client: Client, input: string): Promise<AnyChannel | null | undefined> {
+        const discordId = RegexUtils.discordId(input);
         if (!discordId) {
             return;
         }
@@ -60,7 +60,7 @@ export class ClientUtils {
         }
     }
 
-    public static async findMember(guild: Guild, input: string): Promise<GuildMember> {
+    public static async findMember(guild: Guild, input: string): Promise<GuildMember | undefined> {
         try {
             let discordId = RegexUtils.discordId(input);
             if (discordId) {
@@ -71,7 +71,7 @@ export class ClientUtils {
             if (tag) {
                 return (
                     await guild.members.fetch({ query: tag.username, limit: FETCH_MEMBER_LIMIT })
-                ).find(member => member.user.discriminator === tag.discriminator);
+                ).find(member => member.user.discriminator === tag?.discriminator);
             }
 
             return (await guild.members.fetch({ query: input, limit: 1 })).first();
@@ -87,7 +87,7 @@ export class ClientUtils {
         }
     }
 
-    public static async findRole(guild: Guild, input: string): Promise<Role> {
+    public static async findRole(guild: Guild, input: string): Promise<Role | null | undefined> {
         try {
             let discordId = RegexUtils.discordId(input);
             if (discordId) {
@@ -113,7 +113,7 @@ export class ClientUtils {
     public static async findTextChannel(
         guild: Guild,
         input: string
-    ): Promise<NewsChannel | TextChannel> {
+    ): Promise<NewsChannel | TextChannel | undefined> {
         try {
             let discordId = RegexUtils.discordId(input);
             if (discordId) {
@@ -145,7 +145,7 @@ export class ClientUtils {
     public static async findVoiceChannel(
         guild: Guild,
         input: string
-    ): Promise<StageChannel | VoiceChannel> {
+    ): Promise<StageChannel | VoiceChannel | undefined> {
         try {
             let discordId = RegexUtils.discordId(input);
             if (discordId) {
@@ -179,7 +179,7 @@ export class ClientUtils {
     public static async findNotifyChannel(
         guild: Guild,
         langCode: LangCode
-    ): Promise<TextChannel | NewsChannel> {
+    ): Promise<TextChannel | NewsChannel | undefined> {
         // Prefer the system channel
         let systemChannel = guild.systemChannel;
         if (systemChannel && PermissionUtils.canSend(systemChannel, true)) {

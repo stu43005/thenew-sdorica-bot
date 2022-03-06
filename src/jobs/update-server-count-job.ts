@@ -1,7 +1,6 @@
 import config from 'config';
 import { ActivityType, ShardingManager } from 'discord.js';
 import { createRequire } from 'node:module';
-import { CustomClient } from '../extensions/index.js';
 import { BotSite } from '../models/config-models.js';
 import { HttpService, Lang, Logger } from '../services/index.js';
 import { ShardUtils } from '../utils/index.js';
@@ -29,8 +28,16 @@ export class UpdateServerCountJob implements Job {
         let url = Lang.getCom('links.stream');
 
         await this.shardManager.broadcastEval(
-            (client: CustomClient, context) => {
-                return client.setPresence(context.type, context.name, context.url);
+            (client, context) => {
+                return client.user?.setPresence({
+                    activities: [
+                        {
+                            type: context.type,
+                            name: context.name,
+                            url: context.url,
+                        },
+                    ],
+                });
             },
             { context: { type, name, url } }
         );

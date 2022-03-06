@@ -22,7 +22,7 @@ import { Job } from './jobs/index.js';
 import { Bot } from './models/bot.js';
 import { Reaction } from './reactions/index.js';
 import { JobService, Logger } from './services/index.js';
-import { Trigger } from './triggers/index.js';
+import { triggers } from './triggers/index.js';
 
 const require = createRequire(import.meta.url);
 let Logs = require('../lang/logs.json');
@@ -48,11 +48,6 @@ async function start(): Promise<void> {
     // Reactions
     let reactions: Reaction[] = [
         // TODO: Add new reactions here
-    ];
-
-    // Triggers
-    let triggers: Trigger[] = [
-        // TODO: Add new triggers here
     ];
 
     // Event handlers

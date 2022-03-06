@@ -3,10 +3,17 @@ import config from 'config';
 import { DiscordAPIError, MessageEmbed, WebhookClient } from 'discord.js';
 import { Response } from 'node-fetch';
 import { Transform } from 'node:stream';
-import pino, { DestinationStream, Level, StreamEntry } from 'pino';
+import pino, { DestinationStream, Level, LoggerOptions, StreamEntry } from 'pino';
 import build, { OnUnknown } from 'pino-abstract-transport';
 import { FormatUtils } from '../utils/format-utils.js';
 
+const loggerOption: LoggerOptions = {
+    formatters: {
+        level: label => {
+            return { level: label };
+        },
+    },
+};
 const streams: (DestinationStream | StreamEntry)[] = [
     ...(config.get('logging.pretty')
         ? [pino.transport({
@@ -17,24 +24,17 @@ const streams: (DestinationStream | StreamEntry)[] = [
                 translateTime: 'yyyy-mm-dd HH:MM:ss.l',
             },
         })]
-        : undefined),
+        : []),
     ...(config.get('logging.discordWebhook.enabled')
         ? [await discordWebhookTransport({
             id: config.get('logging.discordWebhook.id'),
             token: config.get('logging.discordWebhook.token'),
         })]
-        : undefined),
+        : []),
 ];
-let logger = pino(
-    {
-        formatters: {
-            level: label => {
-                return { level: label };
-            },
-        },
-    },
-    streams.length ? pino.multistream(streams) : undefined
-);
+let logger = streams.length
+    ? pino(loggerOption, pino.multistream(streams))
+    : pino(loggerOption);
 
 export interface DiscordWebhookTransportOptions {
     id: string;
@@ -96,6 +96,10 @@ export async function discordWebhookTransport(opts: DiscordWebhookTransportOptio
 export class Logger {
     private static shardId: number;
 
+    public static debug(message: string, obj?: any): void {
+        obj ? logger.debug(obj, message) : logger.debug(message);
+    }
+
     public static info(message: string, obj?: any): void {
         obj ? logger.info(obj, message) : logger.info(message);
     }
@@ -119,7 +123,7 @@ export class Logger {
                 })
                 .error(message);
         } else if (obj instanceof Response) {
-            let resText: string;
+            let resText = '';
             try {
                 resText = await obj.text();
             } catch {

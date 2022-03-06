@@ -55,7 +55,7 @@ export class Lang {
                 url: jsonValue.thumbnail,
             },
             description: Utils.join(jsonValue.description, '\n'),
-            fields: jsonValue.fields?.map(field => ({
+            fields: jsonValue.fields?.map((field: any) => ({
                 name: Utils.join(field.name, '\n'),
                 value: Utils.join(field.value, '\n'),
                 inline: field.inline ? field.inline : false,

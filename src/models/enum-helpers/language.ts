@@ -22,7 +22,7 @@ export class Language {
         return Lang.getRef('meta.translators', langCode);
     }
 
-    public static find(input: string): LangCode {
+    public static find(input: string): LangCode | undefined {
         for (let langCode of Object.values(LangCode)) {
             if (this.regex(langCode).test(input)) {
                 return langCode;

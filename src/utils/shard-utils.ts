@@ -23,6 +23,8 @@ export class ShardUtils {
             return shardInterface.shards.map(shard => shard.id);
         } else if (shardInterface instanceof ShardClientUtil) {
             return shardInterface.ids;
+        } else {
+            return [];
         }
     }
 
