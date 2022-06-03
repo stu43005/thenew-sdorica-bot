@@ -3,6 +3,9 @@
 		"id": "DISCORD_ID",
 		"token": "DISCORD_TOKEN"
 	},
+	"api": {
+		"secret": "API_SECRET"
+	},
 	"logging": {
 		"discordWebhook": {
 			"id": "LOG_WEBHOOK_ID",
