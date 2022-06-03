@@ -14,7 +14,7 @@ import {
 import { Controller } from './index.js';
 
 const require = createRequire(import.meta.url);
-const Logs = require('../../lang/logs.json');
+const Logs = require('../../../lang/logs.json');
 
 export class ShardsController implements Controller {
     public path = '/shards';
