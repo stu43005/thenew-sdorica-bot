@@ -2,7 +2,7 @@ import config from 'config';
 import { CommandInteraction, GuildChannel, GuildMember, Permissions } from 'discord.js';
 import { Command } from '../commands/index.js';
 import { Permission } from '../models/enum-helpers/index.js';
-import { EventData } from '../models/internal-models.js';
+import { EventData } from '../models/event-data.js';
 import { Lang } from '../services/index.js';
 import { FormatUtils, InteractionUtils } from './index.js';
 
@@ -13,7 +13,7 @@ export class CommandUtils {
         data: EventData
     ): Promise<boolean> {
         if (command.cooldown) {
-            let limited = command.cooldown.take(intr.user.id);
+            const limited = command.cooldown.take(intr.user.id);
             if (limited) {
                 await InteractionUtils.send(
                     intr,

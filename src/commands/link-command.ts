@@ -6,7 +6,7 @@ import {
     PermissionString,
 } from 'discord.js';
 
-import { EventData } from '../models/internal-models.js';
+import { EventData } from '../models/event-data.js';
 import { Lang } from '../services/index.js';
 import { InteractionUtils } from '../utils/index.js';
 import { Command, CommandDeferType } from './index.js';
@@ -53,7 +53,7 @@ export class LinkCommand implements Command {
     public requireUserPerms: PermissionString[] = [];
 
     public async execute(intr: CommandInteraction, data: EventData): Promise<void> {
-        let link = intr.options.getString(Lang.getCom('arguments.link'));
+        const link = intr.options.getString(Lang.getCom('arguments.link'));
 
         let embed: MessageEmbed;
         switch (link) {

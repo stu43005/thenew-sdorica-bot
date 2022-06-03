@@ -1,34 +1,33 @@
 import djs, {
     ChatInputApplicationCommandData,
     CommandInteraction,
-    PermissionString,
+    PermissionString
 } from 'discord.js';
 import fileSize from 'filesize';
 import { createRequire } from 'node:module';
 import os from 'node:os';
 import typescript from 'typescript';
-
-import { EventData } from '../models/internal-models.js';
+import { EventData } from '../models/event-data.js';
 import { Lang } from '../services/index.js';
 import { InteractionUtils, ShardUtils } from '../utils/index.js';
 import { Command, CommandDeferType } from './index.js';
 
 const require = createRequire(import.meta.url);
-let TsConfig = require('../../tsconfig.json');
+const TsConfig = require('../../tsconfig.json');
 
 export class DevCommand implements Command {
     public metadata: ChatInputApplicationCommandData = {
         name: Lang.getCom('commands.dev'),
         description: Lang.getRef('commandDescs.dev', Lang.Default),
     };
-    public deferType = CommandDeferType.PUBLIC;
+    public deferType = CommandDeferType.HIDDEN;
     public requireDev = true;
     public requireGuild = false;
     public requireClientPerms: PermissionString[] = [];
     public requireUserPerms: PermissionString[] = [];
 
     public async execute(intr: CommandInteraction, data: EventData): Promise<void> {
-        let shardCount = intr.client.shard?.count ?? 1;
+        const shardCount = intr.client.shard?.count ?? 1;
         let serverCount: number;
         if (intr.client.shard) {
             try {
@@ -49,7 +48,7 @@ export class DevCommand implements Command {
             serverCount = intr.client.guilds.cache.size;
         }
 
-        let memory = process.memoryUsage();
+        const memory = process.memoryUsage();
         await InteractionUtils.send(
             intr,
             Lang.getEmbed('displayEmbeds.dev', data.lang(), {

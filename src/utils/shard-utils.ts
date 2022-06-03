@@ -38,7 +38,7 @@ export class ShardUtils {
     public static async serverCount(
         shardInterface: ShardingManager | ShardClientUtil
     ): Promise<number> {
-        let shardGuildCounts = (await shardInterface.fetchClientValues(
+        const shardGuildCounts = (await shardInterface.fetchClientValues(
             'guilds.cache.size'
         )) as number[];
         return MathUtils.sum(shardGuildCounts);

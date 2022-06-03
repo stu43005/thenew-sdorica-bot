@@ -1,9 +1,6 @@
 import config from 'config';
 import {
-    ButtonInteraction,
-    Client,
-    CommandInteraction,
-    Constants,
+    Client, Constants,
     Guild,
     Interaction,
     Message,
@@ -14,6 +11,7 @@ import {
     User
 } from 'discord.js';
 import { createRequire } from 'node:module';
+import { customEvents } from '../custom-events/index.js';
 import {
     ButtonHandler,
     CommandHandler,
@@ -23,10 +21,11 @@ import {
     ReactionHandler
 } from '../events/index.js';
 import { JobService, Logger } from '../services/index.js';
+import { ConfigUtils } from '../utils/config-utils.js';
 import { PartialUtils } from '../utils/index.js';
 
 const require = createRequire(import.meta.url);
-let Logs = require('../../lang/logs.json');
+const Logs = require('../../lang/logs.json');
 
 export class Bot {
     private ready = false;
@@ -64,11 +63,22 @@ export class Bot {
         this.client.on(
             Constants.Events.MESSAGE_REACTION_ADD,
             (messageReaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) =>
-                this.onReaction(messageReaction, user)
+                this.onReaction(messageReaction, user, false)
+        );
+        this.client.on(
+            Constants.Events.MESSAGE_REACTION_REMOVE,
+            (messageReaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) =>
+                this.onReaction(messageReaction, user, true)
         );
         this.client.on(Constants.Events.RATE_LIMIT, (rateLimitData: RateLimitData) =>
             this.onRateLimit(rateLimitData)
         );
+
+        for (const custom of customEvents) {
+            this.client.on(custom.event, (...args) =>
+                custom.process(...args)
+            );
+        }
     }
 
     private async login(token: string): Promise<void> {
@@ -81,7 +91,7 @@ export class Bot {
     }
 
     private async onReady(): Promise<void> {
-        let userTag = this.client.user?.tag;
+        const userTag = this.client.user?.tag;
         Logger.info(Logs.info.clientLogin.replaceAll('{USER_TAG}', userTag));
 
         if (!config.get('debug.dummyMode.enabled')) {
@@ -89,7 +99,9 @@ export class Bot {
         }
 
         this.ready = true;
-        Logger.info(Logs.info.clientReady);
+        Logger.info(Logs.info.clientReady, {
+            debug: ConfigUtils.isDevMode(),
+        });
     }
 
     private onShardReady(shardId: number, _unavailableGuilds?: Set<string>): void {
@@ -148,13 +160,13 @@ export class Bot {
             return;
         }
 
-        if (intr instanceof CommandInteraction) {
+        if (intr.isCommand()) {
             try {
                 await this.commandHandler.process(intr);
             } catch (error) {
                 Logger.error(Logs.error.command, error);
             }
-        } else if (intr instanceof ButtonInteraction) {
+        } else if (intr.isButton()) {
             try {
                 await this.buttonHandler.process(intr, intr.message as Message);
             } catch (error) {
@@ -165,7 +177,8 @@ export class Bot {
 
     private async onReaction(
         msgReaction: MessageReaction | PartialMessageReaction,
-        reactor: User | PartialUser
+        reactor: User | PartialUser,
+        remove: boolean,
     ): Promise<void> {
         if (
             !this.ready ||
@@ -188,7 +201,8 @@ export class Bot {
             await this.reactionHandler.process(
                 fullMsgReaction,
                 fullMsgReaction.message,
-                fullReactor
+                fullReactor,
+                remove,
             );
         } catch (error) {
             Logger.error(Logs.error.reaction, error);

@@ -1,4 +1,4 @@
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 import { ApplicationCommandOptionType } from 'discord-api-types/v9';
 import { ChatInputApplicationCommandData, CommandInteraction, MessageEmbed, PermissionString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
@@ -7,7 +7,7 @@ import { Logger } from '../../services/logger.js';
 import { InteractionUtils } from '../../utils/index.js';
 import { Command, CommandDeferType } from '../index.js';
 
-const urlRegex = /((?:https?:)?\/\/)?((?:www\.ptt\.cc))\/bbs\/([\w-]+)\/((?:M\.)([\d]+)(?:\.A\.)([\w]+))(?:\.html)/g;
+export const pttUrlRegex = /((?:https?:)?\/\/)?((?:www\.ptt\.cc))\/bbs\/([\w-]+)\/((?:M\.)([\d]+)(?:\.A\.)([\w]+))(?:\.html)/g;
 
 export class PttCommand implements Command {
     public metadata: ChatInputApplicationCommandData = {
@@ -43,7 +43,7 @@ export class PttCommand implements Command {
 
 export async function pttAutoEmbed(content: string): Promise<MessageEmbed | null> {
     let result: RegExpExecArray | null;
-    while ((result = urlRegex.exec(content)) !== null) {
+    while ((result = pttUrlRegex.exec(content)) !== null) {
         const url = result[0];
         const metaline = await getPttMetaline(url);
 
@@ -63,6 +63,7 @@ export async function pttAutoEmbed(content: string): Promise<MessageEmbed | null
                 text: '※ 發信站: 批踢踢實業坊(ptt.cc)',
             });
             embed.setTimestamp(new Date(`${metaline['時間']} GMT+0800`));
+            Logger.debug('[ptt] embed =', embed);
             return embed;
         }
     }

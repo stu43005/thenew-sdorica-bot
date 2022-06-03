@@ -17,7 +17,7 @@ export class GuildsController implements Controller {
     }
 
     private async getGuilds(req: Request, res: Response): Promise<void> {
-        let guilds: string[] = [
+        const guilds: string[] = [
             ...new Set(
                 (
                     await this.shardManager.broadcastEval(client => [...client.guilds.cache.keys()])
@@ -25,7 +25,7 @@ export class GuildsController implements Controller {
             ),
         ];
 
-        let resBody: GetGuildsResponse = {
+        const resBody: GetGuildsResponse = {
             guilds,
         };
         res.status(200).json(resBody);

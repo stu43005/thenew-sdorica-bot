@@ -69,9 +69,15 @@
                 "newlines-between": "ignore"
             }
         ],
+        "no-empty": [
+            "error",
+            {
+                "allowEmptyCatch": true
+            }
+        ],
         "no-return-await": "off",
         "no-unused-vars": "off",
-        "prefer-const": "off",
+        "prefer-const": "error",
         "quotes": [
             "error",
             "single",

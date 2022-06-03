@@ -1,7 +1,9 @@
 import config from 'config';
 import { Message } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
-import { EventData } from '../models/internal-models.js';
+import { getGuildRepository } from '../database/entities/guild.js';
+import { getUserRepository } from '../database/entities/user.js';
+import { EventData } from '../models/event-data.js';
 import { Trigger } from '../triggers/index.js';
 
 export class TriggerHandler {
@@ -14,13 +16,13 @@ export class TriggerHandler {
 
     public async process(msg: Message): Promise<void> {
         // Check if user is rate limited
-        let limited = this.rateLimiter.take(msg.author.id);
+        const limited = this.rateLimiter.take(msg.author.id);
         if (limited) {
             return;
         }
 
         // Find triggers caused by this message
-        let triggers = this.triggers.filter(trigger => {
+        const triggers = this.triggers.filter(trigger => {
             if (trigger.requireGuild && !msg.guild) {
                 return false;
             }
@@ -37,11 +39,13 @@ export class TriggerHandler {
             return;
         }
 
-        // TODO: Get data from database
-        let data = new EventData();
+        const data = new EventData(
+            await getUserRepository().findById(msg.author.id),
+            msg.guild ? await getGuildRepository().findById(msg.guild.id) : undefined
+        );
 
         // Execute triggers
-        for (let trigger of triggers) {
+        for (const trigger of triggers) {
             await trigger.execute(msg, data);
         }
     }

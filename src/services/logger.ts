@@ -5,6 +5,7 @@ import { Response } from 'node-fetch';
 import { Transform } from 'node:stream';
 import pino, { DestinationStream, Level, LoggerOptions, StreamEntry } from 'pino';
 import build, { OnUnknown } from 'pino-abstract-transport';
+import { ConfigUtils } from '../utils/config-utils.js';
 import { FormatUtils } from '../utils/format-utils.js';
 
 const loggerOption: LoggerOptions = {
@@ -13,23 +14,30 @@ const loggerOption: LoggerOptions = {
             return { level: label };
         },
     },
+    level: ConfigUtils.isDevMode() ? 'debug' : 'info',
 };
 const streams: (DestinationStream | StreamEntry)[] = [
     ...(config.get('logging.pretty')
-        ? [pino.transport({
-            target: 'pino-pretty',
-            options: {
-                colorize: true,
-                ignore: 'pid,hostname',
-                translateTime: 'yyyy-mm-dd HH:MM:ss.l',
-            },
-        })]
+        ? [{
+            stream: pino.transport({
+                target: 'pino-pretty',
+                options: {
+                    colorize: true,
+                    ignore: 'pid,hostname',
+                    translateTime: 'yyyy-mm-dd HH:MM:ss.l',
+                },
+            }),
+            level: 'debug',
+        } as const]
         : []),
     ...(config.get('logging.discordWebhook.enabled')
-        ? [await discordWebhookTransport({
-            id: config.get('logging.discordWebhook.id'),
-            token: config.get('logging.discordWebhook.token'),
-        })]
+        ? [{
+            stream: await discordWebhookTransport({
+                id: config.get('logging.discordWebhook.id'),
+                token: config.get('logging.discordWebhook.token'),
+            }),
+            level: 'info',
+        } as const]
         : []),
 ];
 let logger = streams.length
@@ -76,7 +84,7 @@ export async function discordWebhookTransport(opts: DiscordWebhookTransportOptio
     }
 
     return build(async (source: Transform & OnUnknown) => {
-        for await (let obj of source) {
+        for await (const obj of source) {
             const [color, emoji] = getLevel(obj.level);
             if (!color) continue;
 

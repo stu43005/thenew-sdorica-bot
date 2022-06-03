@@ -2,7 +2,9 @@ import config from 'config';
 import { ButtonInteraction, Message } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { Button, ButtonDeferType } from '../buttons/index.js';
-import { EventData } from '../models/internal-models.js';
+import { getGuildRepository } from '../database/entities/guild.js';
+import { getUserRepository } from '../database/entities/user.js';
+import { EventData } from '../models/event-data.js';
 import { InteractionUtils } from '../utils/index.js';
 import { EventHandler } from './index.js';
 
@@ -21,13 +23,13 @@ export class ButtonHandler implements EventHandler {
         }
 
         // Check if user is rate limited
-        let limited = this.rateLimiter.take(intr.user.id);
+        const limited = this.rateLimiter.take(intr.user.id);
         if (limited) {
             return;
         }
 
         // Try to find the button the user wants
-        let button = this.findButton(intr.customId);
+        const button = this.findButton(intr.customId);
         if (!button) {
             return;
         }
@@ -59,8 +61,10 @@ export class ButtonHandler implements EventHandler {
             return;
         }
 
-        // TODO: Get data from database
-        let data = new EventData();
+        const data = new EventData(
+            await getUserRepository().findById(intr.user.id),
+            intr.guild ? await getGuildRepository().findById(intr.guild.id) : undefined
+        );
 
         // Execute the button
         await button.execute(intr, msg, data);

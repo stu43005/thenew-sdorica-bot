@@ -2,14 +2,17 @@ import { RESTJSONErrorCodes as DiscordApiErrors } from 'discord-api-types/v9';
 import {
     DiscordAPIError,
     EmojiResolvable,
+    GuildMember,
     Message,
+    MessageEditOptions,
     MessageEmbed,
     MessageOptions,
     MessageReaction,
+    MessageReactionResolvable,
     StartThreadOptions,
     TextBasedChannel,
     ThreadChannel,
-    User,
+    User
 } from 'discord.js';
 
 const IGNORED_ERRORS = [
@@ -28,7 +31,7 @@ export class MessageUtils {
         content: string | MessageEmbed | MessageOptions
     ): Promise<Message | undefined> {
         try {
-            let msgOptions = this.messageOptions(content);
+            const msgOptions = this.messageOptions(content);
             return await target.send(msgOptions);
         } catch (error) {
             if (error instanceof DiscordAPIError && IGNORED_ERRORS.includes(error.code)) {
@@ -44,7 +47,7 @@ export class MessageUtils {
         content: string | MessageEmbed | MessageOptions
     ): Promise<Message | undefined> {
         try {
-            let msgOptions = this.messageOptions(content);
+            const msgOptions = this.messageOptions(content);
             return await msg.reply(msgOptions);
         } catch (error) {
             if (error instanceof DiscordAPIError && IGNORED_ERRORS.includes(error.code)) {
@@ -60,7 +63,7 @@ export class MessageUtils {
         content: string | MessageEmbed | MessageOptions
     ): Promise<Message | undefined> {
         try {
-            let msgOptions = this.messageOptions(content);
+            const msgOptions = this.messageOptions(content) as MessageEditOptions;
             return await msg.edit(msgOptions);
         } catch (error) {
             if (error instanceof DiscordAPIError && IGNORED_ERRORS.includes(error.code)) {
@@ -74,6 +77,24 @@ export class MessageUtils {
     public static async react(msg: Message, emoji: EmojiResolvable): Promise<MessageReaction | undefined> {
         try {
             return await msg.react(emoji);
+        } catch (error) {
+            if (error instanceof DiscordAPIError && IGNORED_ERRORS.includes(error.code)) {
+                return;
+            } else {
+                throw error;
+            }
+        }
+    }
+
+    public static async unreact(msg: Message, emoji: MessageReactionResolvable, user?: User | GuildMember | string): Promise<MessageReaction | undefined> {
+        try {
+            const reaction = msg.reactions.resolve(emoji);
+            if (reaction && msg.channel.type !== 'DM') {
+                if (user === 'all') {
+                    return await reaction.remove();
+                }
+                return await reaction.users.remove(user || msg.client.user || undefined);
+            }
         } catch (error) {
             if (error instanceof DiscordAPIError && IGNORED_ERRORS.includes(error.code)) {
                 return;

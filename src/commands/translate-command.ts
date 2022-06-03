@@ -2,7 +2,7 @@ import { ChatInputApplicationCommandData, CommandInteraction, PermissionString }
 
 import { LangCode } from '../enums/index.js';
 import { Language } from '../models/enum-helpers/index.js';
-import { EventData } from '../models/internal-models.js';
+import { EventData } from '../models/event-data.js';
 import { Lang } from '../services/index.js';
 import { InteractionUtils } from '../utils/index.js';
 import { Command, CommandDeferType } from './index.js';
@@ -19,8 +19,8 @@ export class TranslateCommand implements Command {
     public requireUserPerms: PermissionString[] = [];
 
     public async execute(intr: CommandInteraction, data: EventData): Promise<void> {
-        let embed = Lang.getEmbed('displayEmbeds.translate', data.lang());
-        for (let langCode of Object.values(LangCode)) {
+        const embed = Lang.getEmbed('displayEmbeds.translate', data.lang());
+        for (const langCode of Object.values(LangCode)) {
             embed.addField(Language.displayName(langCode), Language.translators(langCode));
         }
         await InteractionUtils.send(intr, embed);

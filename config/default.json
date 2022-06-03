@@ -1,4 +1,5 @@
 {
+    "cacheTTLSeconds": 43200,
     "developers": [
         "198437688255184897"
     ],

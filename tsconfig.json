@@ -13,7 +13,11 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "typeRoots": [
+            "./node_modules/@types",
+            "./src/types"
+        ]
     },
     "exclude": ["dist", "node_modules", "tests"]
 }

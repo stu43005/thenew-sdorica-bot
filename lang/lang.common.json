@@ -1,7 +1,7 @@
 {
     "bot": {
-        "name": "My Bot",
-        "author": "My Name"
+        "name": "Meowbot",
+        "author": "Shiaupiau"
     },
     "commands": {
         "dev": "dev",
@@ -21,11 +21,11 @@
         "error": "#ff4a4a"
     },
     "links": {
-        "author": "https://github.com/",
+        "author": "https://github.com/stu43005",
         "docs": "https://top.gg/",
         "donate": "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EW389DYYSS4FC",
         "invite": "https://discord.com/",
-        "source": "https://github.com/",
+        "source": "https://github.com/stu43005/thenew-sdorica-bot",
         "stream": "https://www.twitch.tv/novakevin",
         "support": "https://support.discord.com/",
         "template": "https://github.com/KevinNovak/Discord-Bot-TypeScript-Template",

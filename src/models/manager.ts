@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import { JobService, Logger } from '../services/index.js';
 
 const require = createRequire(import.meta.url);
-let Logs = require('../../lang/logs.json');
+const Logs = require('../../lang/logs.json');
 
 export class Manager {
     constructor(private shardManager: ShardingManager, private jobService: JobService) { }
@@ -12,7 +12,7 @@ export class Manager {
     public async start(): Promise<void> {
         this.registerListeners();
 
-        let shardList = this.shardManager.shardList as number[];
+        const shardList = this.shardManager.shardList as number[];
 
         try {
             Logger.info(

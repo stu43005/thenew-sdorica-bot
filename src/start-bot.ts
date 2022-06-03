@@ -3,11 +3,12 @@ import config from 'config';
 import { Routes } from 'discord-api-types/v9';
 import { Options } from 'discord.js';
 import { createRequire } from 'node:module';
-import { Button } from './buttons/index.js';
+import { buttons } from './buttons/index.js';
 import {
     Command,
     commands
 } from './commands/index.js';
+import { Database } from './database/database.js';
 import {
     ButtonHandler,
     CommandHandler,
@@ -17,19 +18,22 @@ import {
     ReactionHandler,
     TriggerHandler
 } from './events/index.js';
-import { CustomClient } from './extensions/index.js';
 import { Job } from './jobs/index.js';
 import { Bot } from './models/bot.js';
-import { Reaction } from './reactions/index.js';
+import { CustomClient } from './models/custom-client.js';
+import { reactions } from './reactions/index.js';
 import { JobService, Logger } from './services/index.js';
 import { triggers } from './triggers/index.js';
 
 const require = createRequire(import.meta.url);
-let Logs = require('../lang/logs.json');
+const Logs = require('../lang/logs.json');
 
 async function start(): Promise<void> {
+    // Database
+    await Database.connect();
+
     // Client
-    let client = new CustomClient({
+    const client = new CustomClient({
         intents: config.get('client.intents'),
         partials: config.get('client.partials'),
         makeCache: Options.cacheWithLimits({
@@ -40,32 +44,22 @@ async function start(): Promise<void> {
         }),
     });
 
-    // Buttons
-    let buttons: Button[] = [
-        // TODO: Add new buttons here
-    ];
-
-    // Reactions
-    let reactions: Reaction[] = [
-        // TODO: Add new reactions here
-    ];
-
     // Event handlers
-    let guildJoinHandler = new GuildJoinHandler();
-    let guildLeaveHandler = new GuildLeaveHandler();
-    let commandHandler = new CommandHandler(commands);
-    let buttonHandler = new ButtonHandler(buttons);
-    let triggerHandler = new TriggerHandler(triggers);
-    let messageHandler = new MessageHandler(triggerHandler);
-    let reactionHandler = new ReactionHandler(reactions);
+    const guildJoinHandler = new GuildJoinHandler();
+    const guildLeaveHandler = new GuildLeaveHandler();
+    const commandHandler = new CommandHandler(commands);
+    const buttonHandler = new ButtonHandler(buttons);
+    const triggerHandler = new TriggerHandler(triggers);
+    const messageHandler = new MessageHandler(triggerHandler);
+    const reactionHandler = new ReactionHandler(reactions);
 
     // Jobs
-    let jobs: Job[] = [
+    const jobs: Job[] = [
         // TODO: Add new jobs here
     ];
 
     // Bot
-    let bot = new Bot(
+    const bot = new Bot(
         config.get('client.token'),
         client,
         guildJoinHandler,
@@ -90,8 +84,8 @@ async function start(): Promise<void> {
 }
 
 async function registerCommands(commands: Command[]): Promise<void> {
-    let cmdDatas = commands.map(cmd => cmd.metadata);
-    let cmdNames = cmdDatas.map(cmdData => cmdData.name);
+    const cmdDatas = commands.map(cmd => cmd.metadata);
+    const cmdNames = cmdDatas.map(cmdData => cmdData.name);
 
     Logger.info(
         Logs.info.commandsRegistering.replaceAll(
@@ -101,7 +95,7 @@ async function registerCommands(commands: Command[]): Promise<void> {
     );
 
     try {
-        let rest = new REST({ version: '9' }).setToken(config.get('client.token'));
+        const rest = new REST({ version: '9' }).setToken(config.get('client.token'));
         await rest.put(Routes.applicationCommands(config.get('client.id')), { body: [] });
         await rest.put(Routes.applicationCommands(config.get('client.id')), { body: cmdDatas });
     } catch (error) {
@@ -116,7 +110,7 @@ async function clearCommands(): Promise<void> {
     Logger.info(Logs.info.commandsClearing);
 
     try {
-        let rest = new REST({ version: '9' }).setToken(config.get('client.token'));
+        const rest = new REST({ version: '9' }).setToken(config.get('client.token'));
         await rest.put(Routes.applicationCommands(config.get('client.id')), { body: [] });
     } catch (error) {
         Logger.error(Logs.error.commandsClearing, error);

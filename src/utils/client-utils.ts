@@ -4,6 +4,7 @@ import {
     Client,
     DiscordAPIError,
     Guild,
+    GuildEmoji,
     GuildMember,
     NewsChannel,
     Role,
@@ -62,12 +63,12 @@ export class ClientUtils {
 
     public static async findMember(guild: Guild, input: string): Promise<GuildMember | undefined> {
         try {
-            let discordId = RegexUtils.discordId(input);
+            const discordId = RegexUtils.discordId(input);
             if (discordId) {
                 return await guild.members.fetch(discordId);
             }
 
-            let tag = RegexUtils.tag(input);
+            const tag = RegexUtils.tag(input);
             if (tag) {
                 return (
                     await guild.members.fetch({ query: tag.username, limit: FETCH_MEMBER_LIMIT })
@@ -89,14 +90,37 @@ export class ClientUtils {
 
     public static async findRole(guild: Guild, input: string): Promise<Role | null | undefined> {
         try {
-            let discordId = RegexUtils.discordId(input);
+            const discordId = RegexUtils.discordId(input);
             if (discordId) {
                 return await guild.roles.fetch(discordId);
             }
 
-            let search = input.toLowerCase();
+            const search = input.toLowerCase();
             return (await guild.roles.fetch()).find(role =>
                 role.name.toLowerCase().includes(search)
+            );
+        } catch (error) {
+            if (
+                error instanceof DiscordAPIError &&
+                [DiscordApiErrors.UnknownRole].includes(error.code)
+            ) {
+                return;
+            } else {
+                throw error;
+            }
+        }
+    }
+
+    public static async findGuildEmoji(guild: Guild, input: string): Promise<GuildEmoji | null | undefined> {
+        try {
+            const { discordId } = RegexUtils.guildEmoji(input) ?? {};
+            if (discordId) {
+                return await guild.emojis.fetch(discordId);
+            }
+
+            const search = input.toLowerCase();
+            return (await guild.emojis.fetch()).find(emoji =>
+                emoji.name?.toLowerCase().includes(search) ?? false
             );
         } catch (error) {
             if (
@@ -115,9 +139,9 @@ export class ClientUtils {
         input: string
     ): Promise<NewsChannel | TextChannel | undefined> {
         try {
-            let discordId = RegexUtils.discordId(input);
+            const discordId = RegexUtils.discordId(input);
             if (discordId) {
-                let channel = await guild.channels.fetch(discordId);
+                const channel = await guild.channels.fetch(discordId);
                 if (channel instanceof NewsChannel || channel instanceof TextChannel) {
                     return channel;
                 } else {
@@ -125,7 +149,7 @@ export class ClientUtils {
                 }
             }
 
-            let search = input.toLowerCase().replaceAll(' ', '-');
+            const search = input.toLowerCase().replaceAll(' ', '-');
             return [...(await guild.channels.fetch()).values()]
                 .filter(channel => channel instanceof NewsChannel || channel instanceof TextChannel)
                 .map(channel => channel as NewsChannel | TextChannel)
@@ -147,9 +171,9 @@ export class ClientUtils {
         input: string
     ): Promise<StageChannel | VoiceChannel | undefined> {
         try {
-            let discordId = RegexUtils.discordId(input);
+            const discordId = RegexUtils.discordId(input);
             if (discordId) {
-                let channel = await guild.channels.fetch(discordId);
+                const channel = await guild.channels.fetch(discordId);
                 if (channel instanceof StageChannel || channel instanceof VoiceChannel) {
                     return channel;
                 } else {
@@ -157,7 +181,7 @@ export class ClientUtils {
                 }
             }
 
-            let search = input.toLowerCase();
+            const search = input.toLowerCase();
             return [...(await guild.channels.fetch()).values()]
                 .filter(
                     channel => channel instanceof StageChannel || channel instanceof VoiceChannel
@@ -181,7 +205,7 @@ export class ClientUtils {
         langCode: LangCode
     ): Promise<TextChannel | NewsChannel | undefined> {
         // Prefer the system channel
-        let systemChannel = guild.systemChannel;
+        const systemChannel = guild.systemChannel;
         if (systemChannel && PermissionUtils.canSend(systemChannel, true)) {
             return systemChannel;
         }

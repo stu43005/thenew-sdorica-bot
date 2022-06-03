@@ -2,12 +2,16 @@ import { RESTJSONErrorCodes as DiscordApiErrors } from 'discord-api-types/v9';
 import {
     CommandInteraction,
     DiscordAPIError,
+    GuildMember,
+    InteractionReplyOptions,
+    InteractionUpdateOptions,
     Message,
     MessageComponentInteraction,
     MessageEmbed,
     MessageOptions,
+    User
 } from 'discord.js';
-
+import { ClientUtils } from './client-utils.js';
 import { MessageUtils } from './index.js';
 
 const IGNORED_ERRORS = [
@@ -56,7 +60,7 @@ export class InteractionUtils {
         hidden: boolean = false
     ): Promise<Message | undefined> {
         try {
-            let msgOptions = MessageUtils.messageOptions(content);
+            const msgOptions = MessageUtils.messageOptions(content) as InteractionReplyOptions;
 
             if (intr.deferred || intr.replied) {
                 return (await intr.followUp({
@@ -84,7 +88,7 @@ export class InteractionUtils {
         content: string | MessageEmbed | MessageOptions
     ): Promise<Message | undefined> {
         try {
-            let msgOptions = MessageUtils.messageOptions(content);
+            const msgOptions = MessageUtils.messageOptions(content);
             return (await intr.editReply({
                 ...msgOptions,
             })) as Message;
@@ -102,7 +106,7 @@ export class InteractionUtils {
         content: string | MessageEmbed | MessageOptions
     ): Promise<Message | undefined> {
         try {
-            let msgOptions = MessageUtils.messageOptions(content);
+            const msgOptions = MessageUtils.messageOptions(content) as InteractionUpdateOptions;
             return (await intr.update({
                 ...msgOptions,
                 fetchReply: true,
@@ -114,5 +118,15 @@ export class InteractionUtils {
                 throw error;
             }
         }
+    }
+
+    public static async getMemberOrUser(intr: CommandInteraction | MessageComponentInteraction): Promise<GuildMember | User> {
+        if (intr.guild) {
+            const member = await ClientUtils.findMember(intr.guild, intr.user.id);
+            if (member) {
+                return member;
+            }
+        }
+        return intr.user;
     }
 }

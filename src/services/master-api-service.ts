@@ -4,7 +4,7 @@ import {
     LoginClusterResponse,
     RegisterClusterRequest,
     RegisterClusterResponse
-} from '../models/master-api/index.js';
+} from '../api/models/master-api/index.js';
 import { HttpService } from './index.js';
 
 export class MasterApiService {
@@ -13,7 +13,7 @@ export class MasterApiService {
     constructor(private httpService: HttpService) { }
 
     public async register(): Promise<void> {
-        let reqBody: RegisterClusterRequest = {
+        const reqBody: RegisterClusterRequest = {
             shardCount: config.get('clustering.shardCount'),
             callback: {
                 url: config.get('clustering.callbackUrl'),
@@ -21,7 +21,7 @@ export class MasterApiService {
             },
         };
 
-        let res = await this.httpService.post(
+        const res = await this.httpService.post(
             new URL('/clusters', config.get('clustering.masterApi.url')),
             config.get('clustering.masterApi.token'),
             reqBody
@@ -31,12 +31,12 @@ export class MasterApiService {
             throw res;
         }
 
-        let resBody = (await res.json()) as RegisterClusterResponse;
+        const resBody = (await res.json()) as RegisterClusterResponse;
         this.clusterId = resBody.id;
     }
 
     public async login(): Promise<LoginClusterResponse> {
-        let res = await this.httpService.put(
+        const res = await this.httpService.put(
             new URL(`/clusters/${this.clusterId}/login`, config.get('clustering.masterApi.url')),
             config.get('clustering.masterApi.token')
         );
@@ -49,7 +49,7 @@ export class MasterApiService {
     }
 
     public async ready(): Promise<void> {
-        let res = await this.httpService.put(
+        const res = await this.httpService.put(
             new URL(`/clusters/${this.clusterId}/ready`, config.get('clustering.masterApi.url')),
             config.get('clustering.masterApi.token')
         );

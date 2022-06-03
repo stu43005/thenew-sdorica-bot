@@ -1,7 +1,7 @@
 import { ChatInputApplicationCommandData, CommandInteraction, PermissionString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
-import { EventData } from '../models/internal-models.js';
+import { EventData } from '../models/event-data.js';
 
 export interface Command {
     metadata: ChatInputApplicationCommandData;

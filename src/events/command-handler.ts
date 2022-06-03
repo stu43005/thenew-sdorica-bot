@@ -3,13 +3,15 @@ import { CommandInteraction, NewsChannel, TextChannel, ThreadChannel } from 'dis
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { createRequire } from 'node:module';
 import { Command, CommandDeferType } from '../commands/index.js';
-import { EventData } from '../models/internal-models.js';
+import { getGuildRepository } from '../database/entities/guild.js';
+import { getUserRepository } from '../database/entities/user.js';
+import { EventData } from '../models/event-data.js';
 import { Lang, Logger } from '../services/index.js';
 import { CommandUtils, InteractionUtils } from '../utils/index.js';
 import { EventHandler } from './index.js';
 
 const require = createRequire(import.meta.url);
-let Logs = require('../../lang/logs.json');
+const Logs = require('../../lang/logs.json');
 
 export class CommandHandler implements EventHandler {
     private rateLimiter = new RateLimiter(
@@ -26,13 +28,13 @@ export class CommandHandler implements EventHandler {
         }
 
         // Check if user is rate limited
-        let limited = this.rateLimiter.take(intr.user.id);
+        const limited = this.rateLimiter.take(intr.user.id);
         if (limited) {
             return;
         }
 
         // Try to find the command the user wants
-        let command = this.commands.find(command => command.metadata.name === intr.commandName);
+        const command = this.commands.find(command => command.metadata.name === intr.commandName);
         if (!command) {
             Logger.error(
                 Logs.error.commandNotFound
@@ -60,12 +62,14 @@ export class CommandHandler implements EventHandler {
             return;
         }
 
-        // TODO: Get data from database
-        let data = new EventData();
+        const data = new EventData(
+            await getUserRepository().findById(intr.user.id),
+            intr.guild ? await getGuildRepository().findById(intr.guild.id) : undefined
+        );
 
         try {
             // Check if interaction passes command checks
-            let passesChecks = await CommandUtils.runChecks(command, intr, data);
+            const passesChecks = await CommandUtils.runChecks(command, intr, data);
             if (passesChecks) {
                 // Execute the command
                 await command.execute(intr, data);
