@@ -6,7 +6,6 @@ import djs, {
 import fileSize from 'filesize';
 import { createRequire } from 'node:module';
 import os from 'node:os';
-import typescript from 'typescript';
 import { EventData } from '../models/event-data.js';
 import { Lang } from '../services/index.js';
 import { InteractionUtils, ShardUtils } from '../utils/index.js';
@@ -53,7 +52,7 @@ export class DevCommand implements Command {
             intr,
             Lang.getEmbed('displayEmbeds.dev', data.lang(), {
                 NODE_VERSION: process.version,
-                TS_VERSION: `v${typescript.version}`,
+                // TS_VERSION: `v${typescript.version}`,
                 ES_VERSION: TsConfig.compilerOptions.target,
                 DJS_VERSION: `v${djs.version}`,
                 SHARD_COUNT: shardCount.toLocaleString(),
