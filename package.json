@@ -22,7 +22,7 @@
         "commands:register": "npm run build && node --enable-source-maps dist/start-bot.js --register",
         "commands:clear": "npm run build && node --enable-source-maps dist/start-bot.js --clear",
         "dev": "npm run build && cross-env NODE_ENV=development npm run start:bot",
-        "start": "npm run start:bot",
+        "start": "npm run start:manager",
         "start:bot": "node --enable-source-maps dist/start-bot.js",
         "start:manager": "node --enable-source-maps dist/start-manager.js",
         "start:pm2": "npm run pm2:start",
