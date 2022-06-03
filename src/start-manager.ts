@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import 'reflect-metadata';
 import { Api } from './api/api.js';
 import { GuildsController, RootController, ShardsController } from './api/controllers/index.js';
-import { Job, UpdateServerCountJob } from './jobs/index.js';
+import { Job } from './jobs/index.js';
 import { Manager } from './models/manager.js';
 import { HttpService, JobService, Logger, MasterApiService } from './services/index.js';
 import { MathUtils, ShardUtils } from './utils/index.js';
@@ -59,7 +59,7 @@ async function start(): Promise<void> {
 
     // Jobs
     const jobs: Job[] = [
-        ...(config.get('clustering.enabled') ? [] : [new UpdateServerCountJob(shardManager, httpService)]),
+        // ...(config.get('clustering.enabled') ? [] : [new UpdateServerCountJob(shardManager, httpService)]),
         // TODO: Add new jobs here
     ];
 
