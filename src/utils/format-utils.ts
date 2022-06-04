@@ -1,4 +1,4 @@
-import { codeBlock } from '@discordjs/builders';
+import { channelMention, codeBlock, roleMention, userMention } from '@discordjs/builders';
 import { Guild, GuildMember, MessageEmbed, User } from 'discord.js';
 import { Duration } from 'luxon';
 import { LangCode } from '../enums/index.js';
@@ -14,15 +14,15 @@ export class FormatUtils {
             return '@everyone';
         }
 
-        return `<@&${discordId}>`;
+        return roleMention(discordId);
     }
 
     public static channelMention(discordId: string): string {
-        return `<#${discordId}>`;
+        return channelMention(discordId);
     }
 
     public static userMention(discordId: string): string {
-        return `<@!${discordId}>`;
+        return userMention(discordId);
     }
 
     public static duration(milliseconds: number, langCode: LangCode): string {
@@ -55,7 +55,7 @@ export class FormatUtils {
             embed = new MessageEmbed(embed);
         }
         embed.setFooter({
-            text: user instanceof GuildMember ? user.displayName : user.tag,
+            text: user instanceof GuildMember ? user.user.tag : user.tag,
             iconURL: user.displayAvatarURL(),
         });
         if (user instanceof GuildMember && user.displayColor != 0) {
