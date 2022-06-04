@@ -1,8 +1,9 @@
-import { Constants, DiscordAPIError, Message, MessageEmbed, MessageReaction, TextChannel, User } from 'discord.js';
+import { AnyChannel, Constants, DiscordAPIError, Message, MessageEmbed, MessageReaction, TextChannel, User } from 'discord.js';
 import { StarboardSetting } from '../database/entities/guild.js';
 import { StarboardStore } from '../database/starboard-store.js';
 import { EventData } from '../models/event-data.js';
 import { Logger } from '../services/logger.js';
+import { FormatUtils } from '../utils/index.js';
 import { Reaction } from './reaction.js';
 
 export class StarboardReaction implements Reaction {
@@ -45,7 +46,7 @@ async function sendStarboard(setting: StarboardSetting, message: Message, count:
     if (!setting.channel) return;
     const starboardChannel = message.guild.channels.resolve(setting.channel) as TextChannel;
     if (!starboardChannel) return;
-    const template = getTemplate(message, count);
+    const template = getTemplate(starboardChannel, message, count);
 
     const mapping = await StarboardStore.fromGuild(message.guild);
     try {
@@ -81,25 +82,9 @@ async function sendStarboard(setting: StarboardSetting, message: Message, count:
     }));
 }
 
-function getTemplate(message: Message, count: number): { content: string; embeds: MessageEmbed[]; } {
-    const embed = new MessageEmbed();
-    embed.setDescription(message.content);
-    embed.setAuthor({
-        name: message.author.tag,
-        iconURL: message.author.displayAvatarURL(),
-    });
+function getTemplate(contextChannel: AnyChannel, message: Message, count: number): { content: string; embeds: MessageEmbed[]; } {
+    const embed = FormatUtils.embedTheMessage(message, contextChannel);
     embed.addField('Original', `[Show me!](${(message as unknown as Message).url})`);
-    embed.setTimestamp(message.createdAt);
-    if (message.attachments && message.attachments.size > 0) {
-        if (message.attachments.size == 1 && String(message.attachments.at(0)?.url).match(/(.jpg|.jpeg|.png|.gif|.gifv|.webp|.bmp)$/i)) {
-            embed.setImage(message.attachments.at(0)?.url ?? '');
-        }
-        else {
-            message.attachments.forEach(attachment => {
-                embed.addField('Attachment', `[${attachment.name}](${attachment.url})`, false);
-            });
-        }
-    }
     return {
         content: `${count} ⭐ in <#${message.channel.id}>`,
         embeds: [embed],

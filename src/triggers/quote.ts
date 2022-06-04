@@ -1,6 +1,7 @@
 import { Message, MessageEmbed, TextBasedChannel, User } from 'discord.js';
 import { EventData } from '../models/event-data.js';
 import { ClientUtils } from '../utils/client-utils.js';
+import { FormatUtils } from '../utils/format-utils.js';
 import { MessageUtils } from '../utils/message-utils.js';
 import { PermissionUtils } from '../utils/permission-utils.js';
 import { RegexUtils } from '../utils/regex-utils.js';
@@ -69,31 +70,7 @@ export async function quoteEmbed(sourceMsg: Message, msg: Message, footer: strin
 }
 
 export function buildQuoteEmbed(contextChannel: TextBasedChannel, message: Message, user: User, footer: string): MessageEmbed {
-    const embed = new MessageEmbed({
-        description: message.content,
-        timestamp: message.createdAt,
-    });
-    if (message.member && message.member.displayColor != 0) {
-        embed.setColor(message.member.displayColor);
-    }
-    if (message.attachments && message.attachments.size > 0) {
-        if ('nsfw' in message.channel && message.channel.nsfw && 'nsfw' in contextChannel && !contextChannel.nsfw) {
-            embed.addField('Attachments', ':underage: **Quoted message belongs in NSFW channel.**');
-        }
-        else if (message.attachments.size == 1 && String(message.attachments.at(0)?.url).match(/(.jpg|.jpeg|.png|.gif|.gifv|.webp|.bmp)$/i)) {
-            embed.setImage(message.attachments.at(0)?.url ?? '');
-        }
-        else {
-            for (const [_, attachment] of message.attachments) {
-                embed.addField('Attachment', `[${attachment.name}](${attachment.url})`, false);
-            }
-        }
-    }
-    embed.setAuthor({
-        name: message.author.tag,
-        iconURL: message.author.displayAvatarURL(),
-        url: message.url,
-    });
+    const embed = FormatUtils.embedTheMessage(message, contextChannel);
     if (message.channel.id != contextChannel.id && 'name' in message.channel) {
         embed.setFooter({ text: `${footer} by: ${user.tag} | in channel: #${message.channel.name}` });
     }

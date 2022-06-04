@@ -1,5 +1,5 @@
 import { channelMention, codeBlock, roleMention, userMention } from '@discordjs/builders';
-import { Guild, GuildMember, MessageEmbed, User } from 'discord.js';
+import { AnyChannel, Guild, GuildMember, Message, MessageEmbed, User } from 'discord.js';
 import { Duration } from 'luxon';
 import { LangCode } from '../enums/index.js';
 import { Language } from '../models/enum-helpers/index.js';
@@ -60,6 +60,36 @@ export class FormatUtils {
         });
         if (user instanceof GuildMember && user.displayColor != 0) {
             embed.setColor(user.displayColor);
+        }
+        return embed;
+    }
+
+    public static embedTheMessage(message: Message, contextChannel: AnyChannel, embed?: MessageEmbed): MessageEmbed {
+        if (!(embed instanceof MessageEmbed)) {
+            embed = new MessageEmbed(embed);
+        }
+        embed.setAuthor({
+            name: message.author.tag,
+            iconURL: message.author.displayAvatarURL(),
+            url: message.url,
+        });
+        embed.setDescription(message.content);
+        if (message.attachments && message.attachments.size > 0) {
+            if ('nsfw' in message.channel && message.channel.nsfw && 'nsfw' in contextChannel && !contextChannel.nsfw) {
+                embed.addField('Attachments', ':underage: **Quoted message belongs in NSFW channel.**');
+            }
+            else if (message.attachments.size == 1 && String(message.attachments.at(0)?.url).match(/(.jpg|.jpeg|.png|.gif|.gifv|.webp|.bmp)$/i)) {
+                embed.setImage(message.attachments.at(0)?.url ?? '');
+            }
+            else {
+                for (const [_, attachment] of message.attachments) {
+                    embed.addField('Attachment', `[${attachment.name}](${attachment.url})`, false);
+                }
+            }
+        }
+        embed.setTimestamp(message.createdAt);
+        if (message.member && message.member.displayColor != 0) {
+            embed.setColor(message.member.displayColor);
         }
         return embed;
     }
