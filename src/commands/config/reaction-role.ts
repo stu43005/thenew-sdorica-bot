@@ -1,5 +1,5 @@
 import { inlineCode } from '@discordjs/builders';
-import { ApplicationCommandOptionType, ApplicationCommandType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { ApplicationCommandOptionType, ApplicationCommandType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction, Message, MessageEmbed, NewsChannel, PermissionString, TextChannel } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
 import { Logger } from '../../services/logger.js';

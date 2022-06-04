@@ -1,6 +1,6 @@
 import { REST } from '@discordjs/rest';
 import config from 'config';
-import { RESTPutAPIApplicationCommandsJSONBody, Routes } from 'discord-api-types/v9';
+import { RESTPutAPIApplicationCommandsJSONBody, Routes } from 'discord-api-types/v10';
 import { Options } from 'discord.js';
 import { createRequire } from 'node:module';
 import { buttons } from './buttons/index.js';

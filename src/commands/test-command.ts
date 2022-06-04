@@ -1,4 +1,4 @@
-import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction, PermissionString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { EventData } from '../models/event-data.js';

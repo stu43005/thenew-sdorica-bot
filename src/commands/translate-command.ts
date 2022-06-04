@@ -1,4 +1,4 @@
-import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction, PermissionString } from 'discord.js';
 import { LangCode } from '../enums/index.js';
 import { Language } from '../models/enum-helpers/index.js';

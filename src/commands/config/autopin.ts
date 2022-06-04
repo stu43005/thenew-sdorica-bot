@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction, PermissionString } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';

@@ -1,5 +1,5 @@
-import { inlineCode } from '@discordjs/builders';
-import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { inlineCode, SlashCommandBuilder } from '@discordjs/builders';
+import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction, PermissionString } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
@@ -7,24 +7,18 @@ import { RegexUtils } from '../../utils/regex-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 
 export default class DeleteBetweenCommand implements Command {
-    public metadata: RESTPostAPIApplicationCommandsJSONBody = {
-        name: 'delete-between',
-        description: '刪除兩個訊息(不含)之間的所有訊息。',
-        options: [
-            {
-                name: 'message-id1',
-                description: '請輸入第一個訊息ID',
-                required: true,
-                type: ApplicationCommandOptionType.String.valueOf(),
-            },
-            {
-                name: 'message-id2',
-                description: '請輸入第二個訊息ID',
-                required: true,
-                type: ApplicationCommandOptionType.String.valueOf(),
-            }
-        ],
-    };
+    public metadata: RESTPostAPIApplicationCommandsJSONBody = new SlashCommandBuilder()
+        .setName('delete-between')
+        .setDescription('刪除兩個訊息(不含)之間的所有訊息。')
+        .addStringOption((builder) => builder
+            .setName('message-id1')
+            .setDescription('請輸入第一個訊息ID')
+            .setRequired(true))
+        .addStringOption((builder) => builder
+            .setName('message-id2')
+            .setDescription('請輸入第二個訊息ID')
+            .setRequired(true))
+        .toJSON();
     public deferType = CommandDeferType.PUBLIC;
     public requireDev = false;
     public requireGuild = true;

@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction, MessageEmbed, PermissionString } from 'discord.js';
 import admin from 'firebase-admin';
 import { groupBy, sumBy } from 'lodash-es';
@@ -36,11 +36,6 @@ export class GashaponCommand implements Command {
     public requireUserPerms: PermissionString[] = [];
 
     public async execute(intr: CommandInteraction): Promise<void> {
-        if (intr.guild && intr.guild.id === '437330083976445953' && intr.channelId !== '643335140902436905') {
-            await InteractionUtils.send(intr, `禁止在此頻道使用指令，請至 <#643335140902436905> 頻道使用。`);
-            return;
-        }
-
         const gashaponName = intr.options.getString('gashapon', true);
         let count = intr.options.getInteger('count') ?? 10;
         if (isNaN(count) || (count != 1 && count != 5 && count != 10)) {

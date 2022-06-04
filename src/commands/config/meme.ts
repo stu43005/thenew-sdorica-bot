@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction, GuildMember, MessageEmbed, PermissionString, User } from 'discord.js';
 import { nodeCrypto, Random } from 'random-js';
 import { EventData } from '../../models/event-data.js';

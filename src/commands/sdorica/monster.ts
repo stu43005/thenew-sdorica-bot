@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction, MessageEmbed, PermissionString } from 'discord.js';
 import fetch from 'node-fetch';
 import { setTimeout } from 'node:timers/promises';
@@ -28,11 +28,6 @@ export class MonsterCommand implements Command {
     public requireUserPerms: PermissionString[] = [];
 
     public async execute(intr: CommandInteraction): Promise<void> {
-        if (intr.guild && intr.guild.id === '437330083976445953' && intr.channelId !== '643335140902436905') {
-            await InteractionUtils.send(intr, `禁止在此頻道使用指令，請至 <#643335140902436905> 頻道使用。`);
-            return;
-        }
-
         const itemName = intr.options.getString('item-name', true);
 
         const monsterTrap = await CacheUtils.getOrFetch<MonsterTrap>('MonsterTrap', async () => {

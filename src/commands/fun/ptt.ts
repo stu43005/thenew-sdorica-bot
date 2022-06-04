@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction, MessageEmbed, PermissionString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import fetch from 'node-fetch';
