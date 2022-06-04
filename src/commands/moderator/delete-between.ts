@@ -1,13 +1,13 @@
 import { inlineCode } from '@discordjs/builders';
-import { ApplicationCommandOptionType } from 'discord-api-types/v9';
-import { ChatInputApplicationCommandData, CommandInteraction, PermissionString } from 'discord.js';
+import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { CommandInteraction, PermissionString } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { RegexUtils } from '../../utils/regex-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 
 export default class DeleteBetweenCommand implements Command {
-    public metadata: ChatInputApplicationCommandData = {
+    public metadata: RESTPostAPIApplicationCommandsJSONBody = {
         name: 'delete-between',
         description: '刪除兩個訊息(不含)之間的所有訊息。',
         options: [

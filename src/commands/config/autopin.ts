@@ -1,11 +1,11 @@
-import { ApplicationCommandOptionType } from 'discord-api-types/v9';
-import { ChatInputApplicationCommandData, CommandInteraction, PermissionString } from 'discord.js';
+import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { CommandInteraction, PermissionString } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 
 export default class AutoPinCommand implements Command {
-	public metadata: ChatInputApplicationCommandData = {
+	public metadata: RESTPostAPIApplicationCommandsJSONBody = {
 		name: 'autopin',
 		description: '設定自動釘選所需📌的數量',
 		options: [

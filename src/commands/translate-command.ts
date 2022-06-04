@@ -1,5 +1,5 @@
-import { ChatInputApplicationCommandData, CommandInteraction, PermissionString } from 'discord.js';
-
+import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { CommandInteraction, PermissionString } from 'discord.js';
 import { LangCode } from '../enums/index.js';
 import { Language } from '../models/enum-helpers/index.js';
 import { EventData } from '../models/event-data.js';
@@ -8,7 +8,7 @@ import { InteractionUtils } from '../utils/index.js';
 import { Command, CommandDeferType } from './index.js';
 
 export class TranslateCommand implements Command {
-    public metadata: ChatInputApplicationCommandData = {
+    public metadata: RESTPostAPIApplicationCommandsJSONBody = {
         name: Lang.getCom('commands.translate'),
         description: Lang.getRef('commandDescs.translate', Lang.Default),
     };

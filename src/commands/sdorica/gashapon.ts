@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType } from 'discord-api-types/v9';
-import { ChatInputApplicationCommandData, CommandInteraction, MessageEmbed, PermissionString } from 'discord.js';
+import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { CommandInteraction, MessageEmbed, PermissionString } from 'discord.js';
 import admin from 'firebase-admin';
 import { groupBy, sumBy } from 'lodash-es';
 import fetch from 'node-fetch';
@@ -11,7 +11,7 @@ import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 
 export class GashaponCommand implements Command {
-    public metadata: ChatInputApplicationCommandData = {
+    public metadata: RESTPostAPIApplicationCommandsJSONBody = {
         name: 'gashapon',
         description: '試試你的非洲程度',
         options: [

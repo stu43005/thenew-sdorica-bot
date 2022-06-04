@@ -1,6 +1,6 @@
 import { inlineCode } from '@discordjs/builders';
-import { ApplicationCommandOptionType, ApplicationCommandType } from 'discord-api-types/v9';
-import { ChatInputApplicationCommandData, CommandInteraction, Message, MessageEmbed, NewsChannel, PermissionString, TextChannel } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { CommandInteraction, Message, MessageEmbed, NewsChannel, PermissionString, TextChannel } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
 import { Logger } from '../../services/logger.js';
 import { ClientUtils } from '../../utils/client-utils.js';
@@ -10,7 +10,7 @@ import { RegexUtils } from '../../utils/regex-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 
 export default class ReactionRoleCommand implements Command {
-	public metadata: ChatInputApplicationCommandData = {
+	public metadata: RESTPostAPIApplicationCommandsJSONBody = {
 		name: 'reaction-role',
 		type: ApplicationCommandType.ChatInput.valueOf(),
 		description: '[管理員專用] 設定反應表情身分組',

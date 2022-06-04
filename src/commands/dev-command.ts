@@ -1,5 +1,5 @@
+import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
 import djs, {
-    ChatInputApplicationCommandData,
     CommandInteraction,
     PermissionString
 } from 'discord.js';
@@ -15,7 +15,7 @@ const require = createRequire(import.meta.url);
 const TsConfig = require('../../tsconfig.json');
 
 export class DevCommand implements Command {
-    public metadata: ChatInputApplicationCommandData = {
+    public metadata: RESTPostAPIApplicationCommandsJSONBody = {
         name: Lang.getCom('commands.dev'),
         description: Lang.getRef('commandDescs.dev', Lang.Default),
     };

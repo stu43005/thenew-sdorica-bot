@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
-import { ApplicationCommandOptionType } from 'discord-api-types/v9';
-import { ChatInputApplicationCommandData, CommandInteraction, MessageEmbed, PermissionString } from 'discord.js';
+import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { CommandInteraction, MessageEmbed, PermissionString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import fetch from 'node-fetch';
 import { Logger } from '../../services/logger.js';
@@ -10,7 +10,7 @@ import { Command, CommandDeferType } from '../index.js';
 export const pttUrlRegex = /((?:https?:)?\/\/)?((?:www\.ptt\.cc))\/bbs\/([\w-]+)\/((?:M\.)([\d]+)(?:\.A\.)([\w]+))(?:\.html)/g;
 
 export class PttCommand implements Command {
-    public metadata: ChatInputApplicationCommandData = {
+    public metadata: RESTPostAPIApplicationCommandsJSONBody = {
         name: 'ptt',
         description: '預覽 PTT 文章訊息',
         options: [

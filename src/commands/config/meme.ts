@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType } from 'discord-api-types/v9';
-import { ChatInputApplicationCommandData, CommandInteraction, GuildMember, MessageEmbed, PermissionString, User } from 'discord.js';
+import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v9';
+import { CommandInteraction, GuildMember, MessageEmbed, PermissionString, User } from 'discord.js';
 import { nodeCrypto, Random } from 'random-js';
 import { EventData } from '../../models/event-data.js';
 import { FormatUtils } from '../../utils/format-utils.js';
@@ -9,7 +9,7 @@ import { Command, CommandDeferType } from '../command.js';
 const random = new Random(nodeCrypto);
 
 export default class MemeCommand implements Command {
-	public metadata: ChatInputApplicationCommandData = {
+	public metadata: RESTPostAPIApplicationCommandsJSONBody = {
 		name: 'meme',
 		description: '[管理員專用] 編輯梗圖',
 		options: [

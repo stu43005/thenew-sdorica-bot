@@ -1,6 +1,6 @@
 import { REST } from '@discordjs/rest';
 import config from 'config';
-import { Routes } from 'discord-api-types/v9';
+import { RESTPutAPIApplicationCommandsJSONBody, Routes } from 'discord-api-types/v9';
 import { Options } from 'discord.js';
 import { createRequire } from 'node:module';
 import { buttons } from './buttons/index.js';
@@ -84,7 +84,7 @@ async function start(): Promise<void> {
 }
 
 async function registerCommands(commands: Command[]): Promise<void> {
-    const cmdDatas = commands.map(cmd => cmd.metadata);
+    const cmdDatas: RESTPutAPIApplicationCommandsJSONBody = commands.map(cmd => cmd.metadata);
     const cmdNames = cmdDatas.map(cmdData => cmdData.name);
 
     Logger.info(
