@@ -1,5 +1,5 @@
 import config from 'config';
-import { CommandInteraction, GuildChannel, GuildMember, Permissions } from 'discord.js';
+import { CommandInteraction, ContextMenuInteraction, GuildChannel, GuildMember, Permissions } from 'discord.js';
 import { Command } from '../commands/index.js';
 import { Permission } from '../models/enum-helpers/index.js';
 import { EventData } from '../models/event-data.js';
@@ -9,7 +9,7 @@ import { FormatUtils, InteractionUtils } from './index.js';
 export class CommandUtils {
     public static async runChecks(
         command: Command,
-        intr: CommandInteraction,
+        intr: CommandInteraction | ContextMenuInteraction,
         data: EventData
     ): Promise<boolean> {
         if (command.cooldown) {

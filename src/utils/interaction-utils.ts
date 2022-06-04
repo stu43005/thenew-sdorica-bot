@@ -1,6 +1,7 @@
 import { RESTJSONErrorCodes as DiscordApiErrors } from 'discord-api-types/v10';
 import {
     CommandInteraction,
+    ContextMenuInteraction,
     DiscordAPIError,
     GuildMember,
     InteractionReplyOptions,
@@ -9,6 +10,7 @@ import {
     MessageComponentInteraction,
     MessageEmbed,
     MessageOptions,
+    ModalSubmitInteraction,
     User
 } from 'discord.js';
 import { ClientUtils } from './client-utils.js';
@@ -26,7 +28,7 @@ const IGNORED_ERRORS = [
 
 export class InteractionUtils {
     public static async deferReply(
-        intr: CommandInteraction | MessageComponentInteraction,
+        intr: CommandInteraction | ContextMenuInteraction | MessageComponentInteraction | ModalSubmitInteraction,
         hidden: boolean = false
     ): Promise<void> {
         try {
@@ -42,7 +44,7 @@ export class InteractionUtils {
         }
     }
 
-    public static async deferUpdate(intr: MessageComponentInteraction): Promise<void> {
+    public static async deferUpdate(intr: MessageComponentInteraction | ModalSubmitInteraction): Promise<void> {
         try {
             return await intr.deferUpdate();
         } catch (error) {
@@ -55,7 +57,7 @@ export class InteractionUtils {
     }
 
     public static async send(
-        intr: CommandInteraction | MessageComponentInteraction,
+        intr: CommandInteraction | ContextMenuInteraction | MessageComponentInteraction | ModalSubmitInteraction,
         content: string | MessageEmbed | MessageOptions,
         hidden: boolean = false
     ): Promise<Message | undefined> {

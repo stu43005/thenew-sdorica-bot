@@ -18,7 +18,9 @@ import {
     ReactionHandler,
     TriggerHandler
 } from './events/index.js';
+import { ModelSubmitHandler } from './events/model-submit-handler.js';
 import { Job } from './jobs/index.js';
+import { modelSubmits } from './model-submits/index.js';
 import { Bot } from './models/bot.js';
 import { CustomClient } from './models/custom-client.js';
 import { reactions } from './reactions/index.js';
@@ -49,6 +51,7 @@ async function start(): Promise<void> {
     const guildLeaveHandler = new GuildLeaveHandler();
     const commandHandler = new CommandHandler(commands);
     const buttonHandler = new ButtonHandler(buttons);
+    const modelSubmitHandler = new ModelSubmitHandler(modelSubmits);
     const triggerHandler = new TriggerHandler(triggers);
     const messageHandler = new MessageHandler(triggerHandler);
     const reactionHandler = new ReactionHandler(reactions);
@@ -67,6 +70,7 @@ async function start(): Promise<void> {
         messageHandler,
         commandHandler,
         buttonHandler,
+        modelSubmitHandler,
         reactionHandler,
         new JobService(jobs)
     );

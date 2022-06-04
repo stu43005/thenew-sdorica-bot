@@ -1,3 +1,4 @@
+import { CommandInteraction, ContextMenuInteraction } from 'discord.js';
 import { Command } from './command.js';
 import { configCommands } from './config/index.js';
 import { DevCommand } from './dev-command.js';
@@ -7,7 +8,7 @@ import { sdoricaCommands } from './sdorica/index.js';
 
 export { Command, CommandDeferType } from './command.js';
 
-export const commands: Command[] = [
+export const commands: Command<CommandInteraction | ContextMenuInteraction>[] = [
     new DevCommand(),
     // new HelpCommand(),
     // new InfoCommand(),

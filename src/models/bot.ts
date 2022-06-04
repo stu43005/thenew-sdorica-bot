@@ -20,6 +20,7 @@ import {
     MessageHandler,
     ReactionHandler
 } from '../events/index.js';
+import { ModelSubmitHandler } from '../events/model-submit-handler.js';
 import { JobService, Logger } from '../services/index.js';
 import { ConfigUtils } from '../utils/config-utils.js';
 import { PartialUtils } from '../utils/index.js';
@@ -38,6 +39,7 @@ export class Bot {
         private messageHandler: MessageHandler,
         private commandHandler: CommandHandler,
         private buttonHandler: ButtonHandler,
+        private modelSubmitHandler: ModelSubmitHandler,
         private reactionHandler: ReactionHandler,
         private jobService: JobService
     ) { }
@@ -160,7 +162,8 @@ export class Bot {
             return;
         }
 
-        if (intr.isCommand()) {
+        Logger.debug(`Receiving interaction: ${intr.id}, type: ${intr.type}`);
+        if (intr.isCommand() || intr.isContextMenu()) {
             try {
                 await this.commandHandler.process(intr);
             } catch (error) {
@@ -171,6 +174,12 @@ export class Bot {
                 await this.buttonHandler.process(intr, intr.message as Message);
             } catch (error) {
                 Logger.error(Logs.error.button, error);
+            }
+        } else if (intr.isModalSubmit()) {
+            try {
+                await this.modelSubmitHandler.process(intr, intr.message as Message);
+            } catch (error) {
+                Logger.error(Logs.error.modelSubmit, error);
             }
         }
     }
