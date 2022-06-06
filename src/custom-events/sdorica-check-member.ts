@@ -21,7 +21,7 @@ const mee6Roles = [
 const assignRole = '622371686502891529';
 
 export class SdoricaCheckMember implements CustomEvent<'guildMemberUpdate'> {
-    public event = 'guildMemberUpdate';
+    public readonly event = 'guildMemberUpdate';
 
     public async process(oldMember: GuildMember | PartialGuildMember, newMember: GuildMember): Promise<void> {
         if (newMember.guild.id === '437330083976445953') {
