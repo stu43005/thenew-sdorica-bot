@@ -85,7 +85,7 @@ export class InteractionUtils {
     }
 
     public static async editReply(
-        intr: CommandInteraction | MessageComponentInteraction,
+        intr: BaseCommandInteraction | MessageComponentInteraction,
         content: string | MessageEmbed | MessageOptions
     ): Promise<Message | undefined> {
         try {
