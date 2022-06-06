@@ -2,7 +2,7 @@ import { Guild } from 'discord.js';
 import { createRequire } from 'node:module';
 
 import { Logger } from '../services/index.js';
-import { EventHandler } from './index.js';
+import { EventHandler } from './event-handler.js';
 
 const require = createRequire(import.meta.url);
 const Logs = require('../../lang/logs.json');

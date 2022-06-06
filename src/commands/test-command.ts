@@ -4,7 +4,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 import { EventData } from '../models/event-data.js';
 import { Lang } from '../services/index.js';
 import { InteractionUtils } from '../utils/index.js';
-import { Command, CommandDeferType } from './index.js';
+import { Command, CommandDeferType } from './command.js';
 
 export class TestCommand implements Command {
     public metadata: RESTPostAPIApplicationCommandsJSONBody = {

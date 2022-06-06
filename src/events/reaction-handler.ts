@@ -5,7 +5,7 @@ import { getGuildRepository } from '../database/entities/guild.js';
 import { getUserRepository } from '../database/entities/user.js';
 import { EventData } from '../models/event-data.js';
 import { Reaction } from '../reactions/index.js';
-import { EventHandler } from './index.js';
+import { EventHandler } from './event-handler.js';
 
 export class ReactionHandler implements EventHandler {
     private rateLimiter = new RateLimiter(

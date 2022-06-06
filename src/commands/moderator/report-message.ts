@@ -2,9 +2,9 @@ import { ContextMenuCommandBuilder } from '@discordjs/builders';
 import { ApplicationCommandType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { MessageActionRow, MessageContextMenuInteraction, Modal, ModalActionRowComponent, PermissionString, TextInputComponent } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
-import { Command, CommandDeferType } from '../command.js';
+import { CommandDeferType, MessageContextMenu } from '../command.js';
 
-export default class ReportMessageCommand implements Command<MessageContextMenuInteraction> {
+export default class ReportMessageCommand implements MessageContextMenu {
     public metadata: RESTPostAPIApplicationCommandsJSONBody = new ContextMenuCommandBuilder()
         .setName('report-message')
         .setType(ApplicationCommandType.Message)

@@ -1,8 +1,7 @@
 import { RESTJSONErrorCodes as DiscordApiErrors } from 'discord-api-types/v10';
 import {
-    CommandInteraction,
-    ContextMenuInteraction,
-    DiscordAPIError,
+    BaseCommandInteraction,
+    CommandInteraction, DiscordAPIError,
     GuildMember,
     InteractionReplyOptions,
     InteractionUpdateOptions,
@@ -28,7 +27,7 @@ const IGNORED_ERRORS = [
 
 export class InteractionUtils {
     public static async deferReply(
-        intr: CommandInteraction | ContextMenuInteraction | MessageComponentInteraction | ModalSubmitInteraction,
+        intr: BaseCommandInteraction | MessageComponentInteraction | ModalSubmitInteraction,
         hidden: boolean = false
     ): Promise<void> {
         try {
@@ -57,7 +56,7 @@ export class InteractionUtils {
     }
 
     public static async send(
-        intr: CommandInteraction | ContextMenuInteraction | MessageComponentInteraction | ModalSubmitInteraction,
+        intr: BaseCommandInteraction | MessageComponentInteraction | ModalSubmitInteraction,
         content: string | MessageEmbed | MessageOptions,
         hidden: boolean = false
     ): Promise<Message | undefined> {

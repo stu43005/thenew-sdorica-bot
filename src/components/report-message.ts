@@ -4,7 +4,7 @@ import { CommandDeferType } from '../commands/command.js';
 import { EventData } from '../models/event-data.js';
 import { FormatUtils, MessageUtils, PermissionUtils, RegexUtils } from '../utils/index.js';
 import { InteractionUtils } from '../utils/interaction-utils.js';
-import { ModelSubmit } from './model-submit.js';
+import { ModelSubmit } from './component.js';
 
 export default class ReportMessageSubmit implements ModelSubmit {
     public ids = ['report_message_submit'];

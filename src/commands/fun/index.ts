@@ -1,6 +1,6 @@
-import { Command } from '../command.js';
+import { AppCommand } from '../command.js';
 import { HitokotoCommand } from './hitokoto.js';
 
-export const funCommands: Command[] = [
+export const funCommands: AppCommand[] = [
     new HitokotoCommand(),
 ];

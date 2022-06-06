@@ -3,7 +3,7 @@ import { CommandInteraction, PermissionString } from 'discord.js';
 import { EventData } from '../models/event-data.js';
 import { Lang } from '../services/index.js';
 import { InteractionUtils } from '../utils/index.js';
-import { Command, CommandDeferType } from './index.js';
+import { Command, CommandDeferType } from './command.js';
 
 export class InfoCommand implements Command {
     public metadata: RESTPostAPIApplicationCommandsJSONBody = {

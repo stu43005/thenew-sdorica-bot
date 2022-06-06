@@ -1,9 +1,8 @@
-import { CommandInteraction, ContextMenuInteraction } from 'discord.js';
-import { Command } from '../command.js';
+import { AppCommand } from '../command.js';
 import DeleteBetweenCommand from './delete-between.js';
 import ReportMessageCommand from './report-message.js';
 
-export const moderatorCommands: Command<CommandInteraction | ContextMenuInteraction>[] = [
+export const moderatorCommands: AppCommand[] = [
     new DeleteBetweenCommand(),
     new ReportMessageCommand(),
 ];

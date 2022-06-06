@@ -204,6 +204,12 @@ export class ClientUtils {
         guild: Guild,
         langCode: LangCode
     ): Promise<TextChannel | NewsChannel | undefined> {
+        // Prefer the public updates channel
+        const publicUpdatesChannel = guild.publicUpdatesChannel;
+        if (publicUpdatesChannel && PermissionUtils.canSend(publicUpdatesChannel, true)) {
+            return publicUpdatesChannel;
+        }
+
         // Prefer the system channel
         const systemChannel = guild.systemChannel;
         if (systemChannel && PermissionUtils.canSend(systemChannel, true)) {

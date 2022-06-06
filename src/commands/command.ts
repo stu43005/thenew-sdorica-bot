@@ -1,9 +1,9 @@
 import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
-import { CommandInteraction, ContextMenuInteraction, PermissionString } from 'discord.js';
+import { BaseCommandInteraction, CommandInteraction, MessageContextMenuInteraction, PermissionString, UserContextMenuInteraction } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { EventData } from '../models/event-data.js';
 
-export interface Command<T extends CommandInteraction | ContextMenuInteraction = CommandInteraction> {
+export interface AppCommand<T extends BaseCommandInteraction = BaseCommandInteraction> {
     metadata: RESTPostAPIApplicationCommandsJSONBody;
     cooldown?: RateLimiter;
     deferType: CommandDeferType;
@@ -19,3 +19,7 @@ export enum CommandDeferType {
     HIDDEN = 'HIDDEN',
     NONE = 'NONE',
 }
+
+export type Command = AppCommand<CommandInteraction>;
+export type UserContextMenu = AppCommand<UserContextMenuInteraction>;
+export type MessageContextMenu = AppCommand<MessageContextMenuInteraction>;

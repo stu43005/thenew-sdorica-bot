@@ -3,7 +3,7 @@ import { CommandInteraction, MessageEmbed, PermissionString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import fetch from 'node-fetch';
 import { InteractionUtils } from '../../utils/index.js';
-import { Command, CommandDeferType } from '../index.js';
+import { Command, CommandDeferType } from '../command.js';
 
 export class HitokotoCommand implements Command {
     public metadata: RESTPostAPIApplicationCommandsJSONBody = {

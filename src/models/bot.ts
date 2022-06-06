@@ -12,15 +12,12 @@ import {
 } from 'discord.js';
 import { createRequire } from 'node:module';
 import { customEvents } from '../custom-events/index.js';
-import {
-    ButtonHandler,
-    CommandHandler,
-    GuildJoinHandler,
-    GuildLeaveHandler,
-    MessageHandler,
-    ReactionHandler
-} from '../events/index.js';
-import { ModelSubmitHandler } from '../events/model-submit-handler.js';
+import { CommandHandler } from '../events/command-handler.js';
+import { ComponentHandler } from '../events/component-handler.js';
+import { GuildJoinHandler } from '../events/guild-join-handler.js';
+import { GuildLeaveHandler } from '../events/guild-leave-handler.js';
+import { MessageHandler } from '../events/message-handler.js';
+import { ReactionHandler } from '../events/reaction-handler.js';
 import { JobService, Logger } from '../services/index.js';
 import { ConfigUtils } from '../utils/config-utils.js';
 import { PartialUtils } from '../utils/index.js';
@@ -38,8 +35,7 @@ export class Bot {
         private guildLeaveHandler: GuildLeaveHandler,
         private messageHandler: MessageHandler,
         private commandHandler: CommandHandler,
-        private buttonHandler: ButtonHandler,
-        private modelSubmitHandler: ModelSubmitHandler,
+        private componentHandler: ComponentHandler,
         private reactionHandler: ReactionHandler,
         private jobService: JobService
     ) { }
@@ -163,23 +159,17 @@ export class Bot {
         }
 
         Logger.debug(`Receiving interaction: ${intr.id}, type: ${intr.type}`);
-        if (intr.isCommand() || intr.isContextMenu()) {
+        if (intr.isApplicationCommand()) {
             try {
                 await this.commandHandler.process(intr);
             } catch (error) {
                 Logger.error(Logs.error.command, error);
             }
-        } else if (intr.isButton()) {
+        } else if (intr.isMessageComponent() || intr.isModalSubmit()) {
             try {
-                await this.buttonHandler.process(intr, intr.message as Message);
+                await this.componentHandler.process(intr, intr.message as Message);
             } catch (error) {
-                Logger.error(Logs.error.button, error);
-            }
-        } else if (intr.isModalSubmit()) {
-            try {
-                await this.modelSubmitHandler.process(intr, intr.message as Message);
-            } catch (error) {
-                Logger.error(Logs.error.modelSubmit, error);
+                Logger.error(Logs.error.component, error);
             }
         }
     }

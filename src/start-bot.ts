@@ -3,24 +3,18 @@ import config from 'config';
 import { RESTPutAPIApplicationCommandsJSONBody, Routes } from 'discord-api-types/v10';
 import { Options } from 'discord.js';
 import { createRequire } from 'node:module';
-import { buttons } from './buttons/index.js';
-import {
-    Command,
-    commands
-} from './commands/index.js';
+import { Command } from './commands/command.js';
+import { commands } from './commands/index.js';
+import { components } from './components/index.js';
 import { Database } from './database/database.js';
-import {
-    ButtonHandler,
-    CommandHandler,
-    GuildJoinHandler,
-    GuildLeaveHandler,
-    MessageHandler,
-    ReactionHandler,
-    TriggerHandler
-} from './events/index.js';
-import { ModelSubmitHandler } from './events/model-submit-handler.js';
+import { CommandHandler } from './events/command-handler.js';
+import { ComponentHandler } from './events/component-handler.js';
+import { GuildJoinHandler } from './events/guild-join-handler.js';
+import { GuildLeaveHandler } from './events/guild-leave-handler.js';
+import { MessageHandler } from './events/message-handler.js';
+import { ReactionHandler } from './events/reaction-handler.js';
+import { TriggerHandler } from './events/trigger-handler.js';
 import { Job } from './jobs/index.js';
-import { modelSubmits } from './model-submits/index.js';
 import { Bot } from './models/bot.js';
 import { CustomClient } from './models/custom-client.js';
 import { reactions } from './reactions/index.js';
@@ -50,8 +44,7 @@ async function start(): Promise<void> {
     const guildJoinHandler = new GuildJoinHandler();
     const guildLeaveHandler = new GuildLeaveHandler();
     const commandHandler = new CommandHandler(commands);
-    const buttonHandler = new ButtonHandler(buttons);
-    const modelSubmitHandler = new ModelSubmitHandler(modelSubmits);
+    const componentHandler = new ComponentHandler(components);
     const triggerHandler = new TriggerHandler(triggers);
     const messageHandler = new MessageHandler(triggerHandler);
     const reactionHandler = new ReactionHandler(reactions);
@@ -69,8 +62,7 @@ async function start(): Promise<void> {
         guildLeaveHandler,
         messageHandler,
         commandHandler,
-        buttonHandler,
-        modelSubmitHandler,
+        componentHandler,
         reactionHandler,
         new JobService(jobs)
     );

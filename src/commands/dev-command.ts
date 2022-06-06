@@ -9,7 +9,7 @@ import os from 'node:os';
 import { EventData } from '../models/event-data.js';
 import { Lang } from '../services/index.js';
 import { InteractionUtils, ShardUtils } from '../utils/index.js';
-import { Command, CommandDeferType } from './index.js';
+import { Command, CommandDeferType } from './command.js';
 
 const require = createRequire(import.meta.url);
 const TsConfig = require('../../tsconfig.json');
