@@ -7,6 +7,12 @@ import { InteractionUtils } from '../utils/interaction-utils.js';
 import { ModelSubmit } from './component.js';
 
 export default class ReportMessageSubmit implements ModelSubmit {
+    static #instance: ReportMessageSubmit;
+
+    public static getInstance(): ReportMessageSubmit {
+        return this.#instance ??= new ReportMessageSubmit();
+    }
+
     public ids = ['report_message_submit'];
     public deferType = CommandDeferType.HIDDEN;
     public requireGuild = true;
@@ -25,6 +31,16 @@ export default class ReportMessageSubmit implements ModelSubmit {
             return;
         }
         const reason = intr.fields.getTextInputValue('reason');
+
+        await ReportMessageSubmit.report(intr, message, reason);
+    }
+
+    public static addId(customId: string): void {
+        ReportMessageSubmit.getInstance().ids.push(customId);
+    }
+
+    public static async report(intr: ModalSubmitInteraction, message: Message, reason: string): Promise<void> {
+        if (!intr.channel || !intr.guild) return;
 
         const report = new MessageEmbed();
         report.setAuthor({

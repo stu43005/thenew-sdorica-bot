@@ -1,7 +1,11 @@
 import { ContextMenuCommandBuilder } from '@discordjs/builders';
 import { ApplicationCommandType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
-import { MessageActionRow, MessageContextMenuInteraction, Modal, ModalActionRowComponent, PermissionString, TextInputComponent } from 'discord.js';
+import { Message, MessageActionRow, MessageContextMenuInteraction, Modal, ModalActionRowComponent, PermissionString, TextInputComponent } from 'discord.js';
+import { randomUUID } from 'node:crypto';
+import ReportMessageSubmit from '../../components/report-message.js';
 import { EventData } from '../../models/event-data.js';
+import { Logger } from '../../services/logger.js';
+import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { CommandDeferType, MessageContextMenu } from '../command.js';
 
 export default class ReportMessageCommand implements MessageContextMenu {
@@ -17,26 +21,14 @@ export default class ReportMessageCommand implements MessageContextMenu {
     public requireUserPerms: PermissionString[] = [];
 
     public async execute(intr: MessageContextMenuInteraction, _data: EventData): Promise<void> {
-        // if (!intr.channel) return;
-        // const message = intr.targetMessage instanceof Message
-        //     ? intr.targetMessage
-        //     : await intr.channel.messages.fetch(intr.targetMessage.id);
-        // const embed = FormatUtils.embedTheMessage(message, intr.channel);
-        // const row = new MessageActionRow()
-        //     .addComponents(
-        //         new MessageButton()
-        //             .setCustomId('report_message_send')
-        //             .setLabel('送出')
-        //             .setStyle('PRIMARY'),
-        //     );
-        // await InteractionUtils.send(intr, {
-        //     content: '向管理員檢舉該訊息',
-        //     embeds: [embed],
-        //     components: [row],
-        // });
+        if (!intr.channel) return;
+        const message = intr.targetMessage instanceof Message
+            ? intr.targetMessage
+            : await intr.channel.messages.fetch(intr.targetMessage.id);
 
+        const customId = `report_message_submit_${randomUUID()}`;
         const modal = new Modal()
-            .setCustomId('report_message_submit')
+            .setCustomId(customId)
             .setTitle('向管理員檢舉該訊息')
             .addComponents(
                 new MessageActionRow<ModalActionRowComponent>()
@@ -58,5 +50,23 @@ export default class ReportMessageCommand implements MessageContextMenu {
                     ),
             );
         await intr.showModal(modal);
+
+        try {
+            const modelIntr = await intr.awaitModalSubmit({
+                filter: (intr) => intr.customId === customId,
+                time: 60_000,
+            });
+            const reason = modelIntr.fields.getTextInputValue('reason');
+
+            await InteractionUtils.deferReply(modelIntr, true);
+            await ReportMessageSubmit.report(modelIntr, message, reason);
+        } catch (error) {
+            if (error instanceof Error && error.name.includes('[INTERACTION_COLLECTOR_ERROR]')) {
+                Logger.debug(`Intercation collector error: ${error.message}`);
+                ReportMessageSubmit.addId(customId);
+            } else {
+                throw error;
+            }
+        }
     }
 }

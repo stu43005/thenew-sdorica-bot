@@ -158,15 +158,16 @@ export class Bot {
             return;
         }
 
-        Logger.debug(`Receiving interaction: ${intr.id}, type: ${intr.type}`);
         if (intr.isApplicationCommand()) {
             try {
+                Logger.debug(`Receiving interaction: ${intr.id}, type: ${intr.type}, commandName: ${intr.commandName}`);
                 await this.commandHandler.process(intr);
             } catch (error) {
                 Logger.error(Logs.error.command, error);
             }
         } else if (intr.isMessageComponent() || intr.isModalSubmit()) {
             try {
+                Logger.debug(`Receiving interaction: ${intr.id}, type: ${intr.type}, customId: ${intr.customId}`);
                 await this.componentHandler.process(intr, intr.message as Message);
             } catch (error) {
                 Logger.error(Logs.error.component, error);
