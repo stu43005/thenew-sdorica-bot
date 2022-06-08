@@ -37,6 +37,8 @@ export class QuoteTrigger implements Trigger {
 
             const listIds = word.slice(prefix.length).split('/');
             if (listIds.length == 3) {
+                if (listIds[0] !== msg.guild.id) continue;
+
                 const channel = await ClientUtils.findTextChannel(msg.guild, listIds[1]);
                 if (!channel) continue;
 
