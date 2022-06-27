@@ -53,7 +53,7 @@ export class EmoteCommand implements Command {
 
         const focusedValue = intr.options.getFocused();
         const choices = [...new Set(data.guild.memes.map(meme => meme.keyword))];
-        const filtered = choices.filter(choice => choice.includes(focusedValue.toString()));
+        const filtered = choices.filter(choice => choice.includes(focusedValue.toString())).slice(0, 25);
         await intr.respond(filtered.map(choice => ({ name: choice, value: choice })));
     }
 }
