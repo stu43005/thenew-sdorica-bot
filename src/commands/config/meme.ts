@@ -1,12 +1,10 @@
 import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction, GuildMember, MessageEmbed, PermissionString, User } from 'discord.js';
-import { nodeCrypto, Random } from 'random-js';
+import * as crypto from 'node:crypto';
 import { EventData } from '../../models/event-data.js';
 import { FormatUtils } from '../../utils/format-utils.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
-
-const random = new Random(nodeCrypto);
 
 export default class MemeCommand implements Command {
 	public metadata: RESTPostAPIApplicationCommandsJSONBody = {
@@ -99,7 +97,7 @@ export default class MemeCommand implements Command {
 				if (matchtype) {
 					const memes: MemeItem[] = data.guild.memes ?? [];
 					const newitem: MemeItem = {
-						uuid: random.uuid4(),
+						uuid: crypto.randomUUID(),
 						keyword,
 						url,
 						matchtype,

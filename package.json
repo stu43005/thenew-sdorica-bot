@@ -59,7 +59,6 @@
         "pino-abstract-transport": "^0.5.0",
         "pino-pretty": "7.5.2",
         "pm2": "^5.2.0",
-        "random-js": "^2.1.0",
         "random-weighted-choice": "^0.1.4",
         "reflect-metadata": "^0.1.13",
         "remove-markdown": "0.3.0"
