@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed, PermissionString } from 'discord.js';
 import admin from 'firebase-admin';
 import { groupBy, sumBy } from 'lodash-es';
@@ -11,24 +11,18 @@ import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 
 export class GashaponCommand implements Command {
-    public metadata: RESTPostAPIApplicationCommandsJSONBody = {
-        name: 'gashapon',
-        description: '試試你的非洲程度',
-        options: [
-            {
-                name: 'gashapon',
-                description: '賦魂名稱 (list, me)',
-                required: true,
-                type: ApplicationCommandOptionType.String.valueOf(),
-            },
-            {
-                name: 'count',
-                description: '想要抽的抽數',
-                required: false,
-                type: ApplicationCommandOptionType.Integer.valueOf(),
-            },
-        ]
-    };
+    public metadata = new SlashCommandBuilder()
+        .setName('gashapon')
+        .setDescription('試試你的非洲程度')
+        .addStringOption((builder) => builder
+            .setName('gashapon')
+            .setDescription('賦魂名稱 (list, me)')
+            .setRequired(true))
+        .addIntegerOption((builder) => builder
+            .setName('count')
+            .setDescription('想要抽的抽數')
+            .setRequired(false))
+        .toJSON();
     public deferType = CommandDeferType.PUBLIC;
     public requireDev = false;
     public requireGuild = false;

@@ -1,22 +1,22 @@
-import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
-import { CommandInteraction, PermissionString } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { CommandInteraction, Permissions, PermissionString } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 
 export default class AutoPinCommand implements Command {
-	public metadata: RESTPostAPIApplicationCommandsJSONBody = {
-		name: 'autopin',
-		description: '設定自動釘選所需📌的數量',
-		options: [
-			{
-				name: 'count',
-				description: '自動釘選所需的數量',
-				required: false,
-				type: ApplicationCommandOptionType.Integer.valueOf(),
-			}
-		],
-	};
+	public metadata = new SlashCommandBuilder()
+		.setName('autopin')
+		.setDescription('設定自動釘選所需📌的數量')
+		.addIntegerOption((builder) => builder
+			.setName('count')
+			.setDescription('自動釘選所需的數量')
+			.setRequired(false))
+		.setDMPermission(false)
+		.setDefaultMemberPermissions(new Permissions()
+			.add('MANAGE_GUILD')
+			.valueOf())
+		.toJSON();
 	public deferType = CommandDeferType.HIDDEN;
 	public requireDev = false;
 	public requireGuild = true;

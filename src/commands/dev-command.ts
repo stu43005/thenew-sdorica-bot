@@ -1,6 +1,7 @@
-import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import djs, {
     CommandInteraction,
+    Permissions,
     PermissionString
 } from 'discord.js';
 import fileSize from 'filesize';
@@ -15,10 +16,13 @@ const require = createRequire(import.meta.url);
 const TsConfig = require('../../tsconfig.json');
 
 export class DevCommand implements Command {
-    public metadata: RESTPostAPIApplicationCommandsJSONBody = {
-        name: Lang.getCom('commands.dev'),
-        description: Lang.getRef('commandDescs.dev', Lang.Default),
-    };
+    public metadata = new SlashCommandBuilder()
+        .setName(Lang.getCom('commands.dev'))
+        .setDescription(Lang.getRef('commandDescs.dev', Lang.Default))
+        .setDefaultMemberPermissions(new Permissions()
+            .add('ADMINISTRATOR')
+            .valueOf())
+        .toJSON();
     public deferType = CommandDeferType.HIDDEN;
     public requireDev = true;
     public requireGuild = false;

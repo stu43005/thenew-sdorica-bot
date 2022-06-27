@@ -1,15 +1,18 @@
-import { channelMention } from '@discordjs/builders';
-import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
-import { CommandInteraction, PermissionString } from 'discord.js';
+import { channelMention, SlashCommandBuilder } from '@discordjs/builders';
+import { CommandInteraction, Permissions, PermissionString } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 
 export default class AutoCrosspostingCommand implements Command {
-	public metadata: RESTPostAPIApplicationCommandsJSONBody = {
-		name: 'auto-crossposting',
-		description: '設定自動發佈貼文(必須是公告頻道)',
-	};
+	public metadata = new SlashCommandBuilder()
+		.setName('auto-crossposting')
+		.setDescription('設定自動發佈貼文(必須是公告頻道)')
+		.setDMPermission(false)
+		.setDefaultMemberPermissions(new Permissions()
+			.add('MANAGE_GUILD')
+			.valueOf())
+		.toJSON();
 	public deferType = CommandDeferType.HIDDEN;
 	public requireDev = false;
 	public requireGuild = true;

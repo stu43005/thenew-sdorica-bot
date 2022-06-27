@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed, PermissionString } from 'discord.js';
 import fetch from 'node-fetch';
 import { setTimeout } from 'node:timers/promises';
@@ -9,18 +9,14 @@ import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 
 export class MonsterCommand implements Command {
-    public metadata: RESTPostAPIApplicationCommandsJSONBody = {
-        name: 'monster',
-        description: '野獸抽抽樂',
-        options: [
-            {
-                name: 'item-name',
-                description: '呼喚道具名稱 (list)',
-                required: true,
-                type: ApplicationCommandOptionType.String.valueOf(),
-            },
-        ]
-    };
+    public metadata = new SlashCommandBuilder()
+        .setName('monster')
+        .setDescription('野獸抽抽樂')
+        .addStringOption((builder) => builder
+            .setName('item-name')
+            .setDescription('呼喚道具名稱 (list)')
+            .setRequired(true))
+        .toJSON();
     public deferType = CommandDeferType.PUBLIC;
     public requireDev = false;
     public requireGuild = false;

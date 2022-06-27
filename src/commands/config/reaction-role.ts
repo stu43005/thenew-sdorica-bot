@@ -1,6 +1,5 @@
-import { inlineCode } from '@discordjs/builders';
-import { ApplicationCommandOptionType, ApplicationCommandType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
-import { CommandInteraction, Message, MessageEmbed, NewsChannel, PermissionString, TextChannel } from 'discord.js';
+import { inlineCode, SlashCommandBuilder } from '@discordjs/builders';
+import { CommandInteraction, Message, MessageEmbed, NewsChannel, Permissions, PermissionString, TextChannel } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
 import { Logger } from '../../services/logger.js';
 import { ClientUtils } from '../../utils/client-utils.js';
@@ -10,139 +9,100 @@ import { RegexUtils } from '../../utils/regex-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 
 export default class ReactionRoleCommand implements Command {
-	public metadata: RESTPostAPIApplicationCommandsJSONBody = {
-		name: 'reaction-role',
-		type: ApplicationCommandType.ChatInput.valueOf(),
-		description: '[管理員專用] 設定反應表情身分組',
-		options: [
-			{
-				name: 'list',
-				description: '顯示反應表情清單',
-				type: ApplicationCommandOptionType.Subcommand.valueOf(),
-				options: [
+	public metadata = new SlashCommandBuilder()
+		.setName('reaction-role')
+		.setDescription('設定反應表情身分組')
+		.setDMPermission(false)
+		.setDefaultMemberPermissions(new Permissions()
+			.add('MANAGE_GUILD')
+			.valueOf())
+		.addSubcommand((builder) => builder
+			.setName('list')
+			.setDescription('顯示反應表情清單')
+			.addStringOption((option) => option
+				.setName('message-id')
+				.setDescription('僅顯示該訊息ID的設定')))
+		.addSubcommand((builder) => builder
+			.setName('add')
+			.setDescription('新增反應表情')
+			.addChannelOption((option) => option
+				.setName('channel')
+				.setDescription('訊息所在的頻道')
+				.setRequired(true))
+			.addStringOption((option) => option
+				.setName('message-id')
+				.setDescription('訊息ID')
+				.setRequired(true))
+			.addStringOption((option) => option
+				.setName('emoji')
+				.setDescription('表情')
+				.setRequired(true))
+			.addRoleOption((option) => option
+				.setName('role')
+				.setDescription('用戶組')
+				.setRequired(true)))
+		.addSubcommand((builder) => builder
+			.setName('setmode')
+			.setDescription('改變反應表情模式')
+			.addStringOption((option) => option
+				.setName('message-id')
+				.setDescription('訊息ID')
+				.setRequired(true))
+			.addStringOption((option) => option
+				.setName('mode')
+				.setDescription('模式')
+				.setRequired(true)
+				.addChoices(
 					{
-						name: 'message-id',
-						description: '僅顯示該訊息ID的設定',
-						type: ApplicationCommandOptionType.String.valueOf(),
-					},
-				]
-			},
-			{
-				name: 'add',
-				description: '新增反應表情',
-				type: ApplicationCommandOptionType.Subcommand.valueOf(),
-				options: [
-					{
-						name: 'channel',
-						description: '訊息所在的頻道',
-						required: true,
-						type: ApplicationCommandOptionType.Channel.valueOf(),
-					},
-					{
-						name: 'message-id',
-						description: '訊息ID',
-						required: true,
-						type: ApplicationCommandOptionType.String.valueOf(),
-					},
-					{
-						name: 'emoji',
-						description: '表情',
-						required: true,
-						type: ApplicationCommandOptionType.String.valueOf(),
-					},
-					{
-						name: 'role',
-						description: '用戶組',
-						required: true,
-						type: ApplicationCommandOptionType.Role.valueOf(),
-					},
-				]
-			},
-			{
-				name: 'setmode',
-				description: '改變反應表情模式',
-				type: ApplicationCommandOptionType.Subcommand.valueOf(),
-				options: [
-					{
-						name: 'message-id',
-						description: '訊息ID',
-						required: true,
-						type: ApplicationCommandOptionType.String.valueOf(),
+						name: 'normal: 反應表情獲得用戶組，再點一次則刪除。',
+						value: 'normal',
 					},
 					{
-						name: 'mode',
-						description: '模式',
-						required: true,
-						type: ApplicationCommandOptionType.String.valueOf(),
-						choices: [
-							{
-								name: 'normal: 反應表情獲得用戶組，再點一次則刪除。',
-								value: 'normal',
-							},
-							{
-								name: 'unique: 一次只能取得訊息中的一個用戶組，自動消除舊的反應。',
-								value: 'unique',
-							},
-							{
-								name: 'verify: 只能取得用戶組，不能刪除用戶組，做出反應後會自動刪除該反應。',
-								value: 'verify',
-							},
-							{
-								name: 'drop: 用戶組只能刪除，不能取得。(點擊表情符號將會移除用戶組)',
-								value: 'drop',
-							},
-							{
-								name: 'reversed: 反應表情時刪除用戶組，刪除反應添加用戶組。',
-								value: 'reversed',
-							},
-							{
-								name: 'limit: 限制每位使用者可以從此訊息中獲得的用戶組數。',
-								value: 'limit',
-							},
-							{
-								name: 'binding: verify和unique的組合。只能選擇一個角色，而不能在兩個角色之間交換。',
-								value: 'binding',
-							},
-						]
+						name: 'unique: 一次只能取得訊息中的一個用戶組，自動消除舊的反應。',
+						value: 'unique',
 					},
 					{
-						name: 'limit',
-						description: 'limit模式需提供限制數量',
-						type: ApplicationCommandOptionType.Number.valueOf(),
-					},
-				]
-			},
-			{
-				name: 'remove',
-				description: '移除反應表情',
-				type: ApplicationCommandOptionType.Subcommand.valueOf(),
-				options: [
-					{
-						name: 'channel',
-						description: '訊息所在的頻道',
-						required: true,
-						type: ApplicationCommandOptionType.Channel.valueOf(),
+						name: 'verify: 只能取得用戶組，不能刪除用戶組，做出反應後會自動刪除該反應。',
+						value: 'verify',
 					},
 					{
-						name: 'message-id',
-						description: '訊息ID',
-						required: true,
-						type: ApplicationCommandOptionType.String.valueOf(),
+						name: 'drop: 用戶組只能刪除，不能取得。(點擊表情符號將會移除用戶組)',
+						value: 'drop',
 					},
 					{
-						name: 'emoji',
-						description: '僅刪除符合表情的設定',
-						type: ApplicationCommandOptionType.String.valueOf(),
+						name: 'reversed: 反應表情時刪除用戶組，刪除反應添加用戶組。',
+						value: 'reversed',
 					},
 					{
-						name: 'role',
-						description: '僅刪除符合該用戶組的設定',
-						type: ApplicationCommandOptionType.Role.valueOf(),
+						name: 'limit: 限制每位使用者可以從此訊息中獲得的用戶組數。',
+						value: 'limit',
 					},
-				]
-			},
-		],
-	};
+					{
+						name: 'binding: verify和unique的組合。只能選擇一個角色，而不能在兩個角色之間交換。',
+						value: 'binding',
+					},
+				))
+			.addIntegerOption((option) => option
+				.setName('limit')
+				.setDescription('limit模式需提供限制數量')))
+		.addSubcommand((builder) => builder
+			.setName('remove')
+			.setDescription('移除反應表情')
+			.addChannelOption((option) => option
+				.setName('channel')
+				.setDescription('訊息所在的頻道')
+				.setRequired(true))
+			.addStringOption((option) => option
+				.setName('message-id')
+				.setDescription('訊息ID')
+				.setRequired(true))
+			.addStringOption((option) => option
+				.setName('emoji')
+				.setDescription('僅刪除符合表情的設定'))
+			.addRoleOption((option) => option
+				.setName('role')
+				.setDescription('僅刪除符合該用戶組的設定')))
+		.toJSON();
 	public deferType = CommandDeferType.PUBLIC;
 	public requireDev = false;
 	public requireGuild = true;

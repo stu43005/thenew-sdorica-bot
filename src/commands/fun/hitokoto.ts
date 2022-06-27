@@ -1,4 +1,4 @@
-import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed, PermissionString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import fetch from 'node-fetch';
@@ -6,10 +6,10 @@ import { InteractionUtils } from '../../utils/index.js';
 import { Command, CommandDeferType } from '../command.js';
 
 export class HitokotoCommand implements Command {
-    public metadata: RESTPostAPIApplicationCommandsJSONBody = {
-        name: 'hitokoto',
-        description: '獲取一則一言。',
-    };
+    public metadata = new SlashCommandBuilder()
+        .setName('hitokoto')
+        .setDescription('獲取一則一言。')
+        .toJSON();
     public cooldown = new RateLimiter(1, 60 * 1000);
     public deferType = CommandDeferType.PUBLIC;
     public requireDev = false;
