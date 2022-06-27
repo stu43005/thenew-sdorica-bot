@@ -20,7 +20,8 @@ export class CommandUtils {
                     Lang.getEmbed('validationEmbeds.cooldownHit', data.lang(), {
                         AMOUNT: command.cooldown.amount.toLocaleString(),
                         INTERVAL: FormatUtils.duration(command.cooldown.interval, data.lang()),
-                    })
+                    }),
+                    true
                 );
                 return false;
             }
@@ -29,7 +30,8 @@ export class CommandUtils {
         if (command.requireDev && !config.get<string[]>('developers').includes(intr.user.id)) {
             await InteractionUtils.send(
                 intr,
-                Lang.getEmbed('validationEmbeds.devOnlyCommand', data.lang())
+                Lang.getEmbed('validationEmbeds.devOnlyCommand', data.lang()),
+                true
             );
             return false;
         }
@@ -37,7 +39,8 @@ export class CommandUtils {
         if (command.requireGuild && !intr.guild) {
             await InteractionUtils.send(
                 intr,
-                Lang.getEmbed('validationEmbeds.serverOnlyCommand', data.lang())
+                Lang.getEmbed('validationEmbeds.serverOnlyCommand', data.lang()),
+                true
             );
             return false;
         }
@@ -53,7 +56,8 @@ export class CommandUtils {
                     PERMISSIONS: command.requireClientPerms
                         .map(perm => `**${Permission.Data[perm].displayName(data.lang())}**`)
                         .join(', '),
-                })
+                }),
+                true
             );
             return false;
         }
@@ -62,7 +66,8 @@ export class CommandUtils {
         if (intr.member && !this.hasPermission(intr.member as GuildMember, command)) {
             await InteractionUtils.send(
                 intr,
-                Lang.getEmbed('validationEmbeds.missingUserPerms', data.lang())
+                Lang.getEmbed('validationEmbeds.missingUserPerms', data.lang()),
+                true
             );
             return false;
         }
