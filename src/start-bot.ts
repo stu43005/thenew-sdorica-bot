@@ -70,13 +70,11 @@ async function start(): Promise<void> {
     // Register
     if (process.argv[2] === '--register') {
         await registerCommands(commands);
-        process.exit();
     } else if (process.argv[2] === '--clear') {
         await clearCommands();
-        process.exit();
+    } else {
+        await bot.start();
     }
-
-    await bot.start();
 }
 
 async function registerCommands(commands: Command[]): Promise<void> {
@@ -92,7 +90,6 @@ async function registerCommands(commands: Command[]): Promise<void> {
 
     try {
         const rest = new REST({ version: '9' }).setToken(config.get('client.token'));
-        await rest.put(Routes.applicationCommands(config.get('client.id')), { body: [] });
         await rest.put(Routes.applicationCommands(config.get('client.id')), { body: cmdDatas });
     } catch (error) {
         Logger.error(Logs.error.commandsRegistering, error);
