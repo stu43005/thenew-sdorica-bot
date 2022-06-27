@@ -1,5 +1,5 @@
 import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
-import { BaseCommandInteraction, CommandInteraction, MessageContextMenuInteraction, PermissionString, UserContextMenuInteraction } from 'discord.js';
+import { AutocompleteInteraction, BaseCommandInteraction, CommandInteraction, MessageContextMenuInteraction, PermissionString, UserContextMenuInteraction } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { EventData } from '../models/event-data.js';
 
@@ -12,6 +12,7 @@ export interface AppCommand<T extends BaseCommandInteraction = BaseCommandIntera
     requireClientPerms: PermissionString[];
     requireUserPerms: PermissionString[];
     execute(intr: T, data: EventData): Promise<void>;
+    autocomplete?: (intr: AutocompleteInteraction, data: EventData) => Promise<void>;
 }
 
 export enum CommandDeferType {

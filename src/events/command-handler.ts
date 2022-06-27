@@ -1,5 +1,5 @@
 import config from 'config';
-import { BaseCommandInteraction, NewsChannel, TextChannel, ThreadChannel } from 'discord.js';
+import { AutocompleteInteraction, BaseCommandInteraction, NewsChannel, TextChannel, ThreadChannel } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { createRequire } from 'node:module';
 import { AppCommand, CommandDeferType } from '../commands/command.js';
@@ -77,6 +77,53 @@ export class CommandHandler implements EventHandler {
         } catch (error) {
             await this.sendError(intr, data);
 
+            // Log command error
+            Logger.error(
+                intr.channel instanceof TextChannel ||
+                    intr.channel instanceof NewsChannel ||
+                    intr.channel instanceof ThreadChannel
+                    ? Logs.error.commandGuild
+                        .replaceAll('{INTERACTION_ID}', intr.id)
+                        .replaceAll('{COMMAND_NAME}', command.metadata.name)
+                        .replaceAll('{USER_TAG}', intr.user.tag)
+                        .replaceAll('{USER_ID}', intr.user.id)
+                        .replaceAll('{CHANNEL_NAME}', intr.channel.name)
+                        .replaceAll('{CHANNEL_ID}', intr.channel.id)
+                        .replaceAll('{GUILD_NAME}', intr.guild?.name)
+                        .replaceAll('{GUILD_ID}', intr.guild?.id)
+                    : Logs.error.commandOther
+                        .replaceAll('{INTERACTION_ID}', intr.id)
+                        .replaceAll('{COMMAND_NAME}', command.metadata.name)
+                        .replaceAll('{USER_TAG}', intr.user.tag)
+                        .replaceAll('{USER_ID}', intr.user.id),
+                error
+            );
+        }
+    }
+
+    public async autocomplete(intr: AutocompleteInteraction): Promise<void> {
+        // Don't respond to self, or other bots
+        if (intr.user.id === intr.client.user?.id || intr.user.bot) {
+            return;
+        }
+
+        // Try to find the command the user wants
+        const command = this.commands.find(command => command.metadata.name === intr.commandName);
+        if (!command) {
+            return;
+        }
+
+        const data = new EventData(
+            await getUserRepository().findById(intr.user.id),
+            intr.guild ? await getGuildRepository().findById(intr.guild.id) : undefined
+        );
+
+        try {
+            // Execute the command
+            if (command.autocomplete) {
+                await command.autocomplete(intr, data);
+            }
+        } catch (error) {
             // Log command error
             Logger.error(
                 intr.channel instanceof TextChannel ||

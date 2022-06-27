@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
-import { CommandInteraction, GuildMember, MessageEmbed, PermissionString, User } from 'discord.js';
+import { codeBlock, SlashCommandBuilder } from '@discordjs/builders';
+import { CommandInteraction, GuildMember, MessageEmbed, Permissions, PermissionString, User } from 'discord.js';
 import * as crypto from 'node:crypto';
 import { EventData } from '../../models/event-data.js';
 import { FormatUtils } from '../../utils/format-utils.js';
@@ -7,77 +7,64 @@ import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 
 export default class MemeCommand implements Command {
-	public metadata: RESTPostAPIApplicationCommandsJSONBody = {
-		name: 'meme',
-		description: '[管理員專用] 編輯梗圖',
-		options: [
-			{
-				name: 'add',
-				description: '新增一則梗圖',
-				type: ApplicationCommandOptionType.Subcommand.valueOf(),
-				options: [
+	public metadata = new SlashCommandBuilder()
+		.setName('meme')
+		.setDescription('編輯梗圖')
+		.setDMPermission(false)
+		.setDefaultMemberPermissions(new Permissions()
+			.add('MANAGE_GUILD')
+			.valueOf())
+		.addSubcommand((builder) => builder
+			.setName('list')
+			.setDescription('列出梗圖清單'))
+		.addSubcommand((builder) => builder
+			.setName('add')
+			.setDescription('新增一則梗圖')
+			.addStringOption((option) => option
+				.setName('type')
+				.setDescription('關鍵字匹配類型')
+				.setRequired(true)
+				.addChoices(
 					{
-						name: 'type',
-						description: '關鍵字匹配類型',
-						required: true,
-						type: ApplicationCommandOptionType.String.valueOf(),
-						choices: [
-							{
-								name: 'normal',
-								value: 'normal',
-							},
-							{
-								name: 'strict',
-								value: 'strict',
-							},
-							{
-								name: 'exact',
-								value: 'exact',
-							},
-							{
-								name: 'startswith',
-								value: 'startswith',
-							},
-							{
-								name: 'endswith',
-								value: 'endswith',
-							},
-						]
+						name: 'normal',
+						value: 'normal',
 					},
 					{
-						name: 'keyword',
-						description: '關鍵字',
-						required: true,
-						type: ApplicationCommandOptionType.String.valueOf(),
+						name: 'strict',
+						value: 'strict',
 					},
 					{
-						name: 'url',
-						description: '圖片網址',
-						required: true,
-						type: ApplicationCommandOptionType.String.valueOf(),
-					},
-				]
-			},
-			{
-				name: 'remove',
-				description: '刪除一則梗圖',
-				type: ApplicationCommandOptionType.Subcommand.valueOf(),
-				options: [
-					{
-						name: 'keyword',
-						description: '關鍵字',
-						required: true,
-						type: ApplicationCommandOptionType.String.valueOf(),
+						name: 'exact',
+						value: 'exact',
 					},
 					{
-						name: 'url',
-						description: '圖片網址',
-						type: ApplicationCommandOptionType.String.valueOf(),
+						name: 'startswith',
+						value: 'startswith',
 					},
-				]
-			},
-		],
-	};
+					{
+						name: 'endswith',
+						value: 'endswith',
+					},
+				))
+			.addStringOption((option) => option
+				.setName('keyword')
+				.setDescription('關鍵字')
+				.setRequired(true))
+			.addStringOption((option) => option
+				.setName('url')
+				.setDescription('圖片網址')
+				.setRequired(true)))
+		.addSubcommand((builder) => builder
+			.setName('remove')
+			.setDescription('刪除一則梗圖')
+			.addStringOption((option) => option
+				.setName('keyword')
+				.setDescription('關鍵字')
+				.setRequired(true))
+			.addStringOption((option) => option
+				.setName('url')
+				.setDescription('圖片網址')))
+		.toJSON();
 	public deferType = CommandDeferType.PUBLIC;
 	public requireDev = false;
 	public requireGuild = true;
@@ -88,6 +75,15 @@ export default class MemeCommand implements Command {
 		if (!intr.guild || !data.guild) return;
 
 		switch (intr.options.getSubcommand()) {
+			case 'list': {
+				const memes: MemeItem[] = data.guild.memes ?? [];
+				if (memes.length) {
+					await InteractionUtils.send(intr, codeBlock([...new Set(memes.map(meme => meme.keyword))].join('\n')));
+				} else {
+					await InteractionUtils.send(intr, `尚無任何梗圖。`);
+				}
+				break;
+			}
 			case 'add': {
 				const type = intr.options.getString('type', true);
 				const keyword = intr.options.getString('keyword', true);
@@ -185,6 +181,28 @@ export function getMemeEmbed(user: User | GuildMember, item: MemeItem): MessageE
 	embed.setTitle(item.keyword);
 	embed.setImage(item.url);
 	return FormatUtils.embedOriginUserData(user, embed);
+}
+
+export function metchMeme(memes: MemeItem[], content: string, strict: boolean = false): MemeItem | undefined {
+	const matches: MemeItem[] = [];
+	for (let i = 0; i < memes.length; i++) {
+		const item = memes[i];
+		if (strict) {
+			if (item.keyword === content) {
+				matches.push(item);
+			}
+		} else {
+			const reg = getMatchRegexp(item);
+			if (reg && content.match(reg)) {
+				matches.push(item);
+			}
+		}
+	}
+
+	if (matches.length) {
+		const index = crypto.randomInt(matches.length);
+		return matches[index];
+	}
 }
 
 export interface MemeItem {

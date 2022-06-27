@@ -158,10 +158,14 @@ export class Bot {
             return;
         }
 
-        if (intr.isApplicationCommand()) {
+        if (intr.isApplicationCommand() || intr.isAutocomplete()) {
             try {
                 Logger.debug(`Receiving interaction: ${intr.id}, type: ${intr.type}, commandName: ${intr.commandName}`);
-                await this.commandHandler.process(intr);
+                if (intr.isAutocomplete()) {
+                    await this.commandHandler.autocomplete(intr);
+                } else {
+                    await this.commandHandler.process(intr);
+                }
             } catch (error) {
                 Logger.error(Logs.error.command, error);
             }
