@@ -1,4 +1,4 @@
-import { AnyChannel, DMChannel, GuildChannel, Permissions } from 'discord.js';
+import { AnyChannel, DMChannel, GuildChannel, GuildMember, PermissionResolvable, Permissions } from 'discord.js';
 
 export class PermissionUtils {
     public static canSend(channel: AnyChannel, embedLinks: boolean = false): boolean {
@@ -115,5 +115,12 @@ export class PermissionUtils {
         } else {
             return false;
         }
+    }
+
+    public static memberHasPermission(channel: AnyChannel, member: GuildMember | null | undefined, permission: PermissionResolvable): boolean {
+        return member &&
+            'permissionsFor' in channel &&
+            channel.permissionsFor(member).has(permission) ||
+            false;
     }
 }

@@ -1,4 +1,4 @@
-import { AnyChannel, GuildMember, Message, MessageReaction, PermissionResolvable, User } from 'discord.js';
+import { Message, MessageReaction, User } from 'discord.js';
 import { EventData } from '../models/event-data.js';
 import { ClientUtils } from '../utils/client-utils.js';
 import { MessageUtils } from '../utils/message-utils.js';
@@ -23,8 +23,9 @@ export class AutoPinReaction implements Reaction {
         if (!msg.guild) return;
         if (typeof data.guild?.autopinCount === 'undefined' || data.guild.autopinCount === 0) return;
 
+        const member = await ClientUtils.findMember(msg.guild, reactor.id);
         if (
-            this.hasPermission(msg.channel, msg.member, 'MANAGE_MESSAGES') ||
+            PermissionUtils.memberHasPermission(msg.channel, member, 'MANAGE_MESSAGES') ||
             msgReaction.count >= data.guild.autopinCount
         ) {
             if (msg.pinnable && !msg.pinned) {
@@ -35,7 +36,7 @@ export class AutoPinReaction implements Reaction {
                     }
                     for (const [_, user] of x.users.cache) {
                         const member = await ClientUtils.findMember(msg.guild, user.id);
-                        if (this.hasPermission(msg.channel, member, 'MANAGE_MESSAGES')) {
+                        if (PermissionUtils.memberHasPermission(msg.channel, member, 'MANAGE_MESSAGES')) {
                             return;
                         }
                     }
@@ -43,12 +44,5 @@ export class AutoPinReaction implements Reaction {
                 await MessageUtils.pin(msg);
             }
         }
-    }
-
-    private hasPermission(channel: AnyChannel, member: GuildMember | null | undefined, permission: PermissionResolvable): boolean {
-        return member &&
-            'permissionsFor' in channel &&
-            channel.permissionsFor(member).has(permission) ||
-            false;
     }
 }

@@ -1,5 +1,6 @@
-import { AnyChannel, GuildMember, Message, MessageReaction, PermissionResolvable, User } from 'discord.js';
+import { Message, MessageReaction, User } from 'discord.js';
 import { EventData } from '../models/event-data.js';
+import { ClientUtils } from '../utils/client-utils.js';
 import { MessageUtils } from '../utils/message-utils.js';
 import { PermissionUtils } from '../utils/permission-utils.js';
 import { Reaction } from './reaction.js';
@@ -18,20 +19,14 @@ export class AutoUnpinReaction implements Reaction {
         return PermissionUtils.canPin(msg.channel, true);
     }
 
-    public async execute(msgReaction: MessageReaction, msg: Message, _reactor: User, _data: EventData): Promise<void> {
+    public async execute(msgReaction: MessageReaction, msg: Message, reactor: User, _data: EventData): Promise<void> {
         if (!msg.guild) return;
 
-        if (this.hasPermission(msg.channel, msg.member, 'MANAGE_MESSAGES')) {
+        const member = await ClientUtils.findMember(msg.guild, reactor.id);
+        if (PermissionUtils.memberHasPermission(msg.channel, member, 'MANAGE_MESSAGES')) {
             if (msg.pinnable && msg.pinned) {
                 await MessageUtils.unpin(msg);
             }
         }
-    }
-
-    private hasPermission(channel: AnyChannel, member: GuildMember | null | undefined, permission: PermissionResolvable): boolean {
-        return member &&
-            'permissionsFor' in channel &&
-            channel.permissionsFor(member).has(permission) ||
-            false;
     }
 }
