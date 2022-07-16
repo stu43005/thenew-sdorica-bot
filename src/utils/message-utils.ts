@@ -44,10 +44,15 @@ export class MessageUtils {
 
     public static async reply(
         msg: Message,
-        content: string | MessageEmbed | MessageOptions
+        content: string | MessageEmbed | MessageOptions,
+        mentionRepliedUser: boolean = true,
     ): Promise<Message | undefined> {
         try {
             const msgOptions = this.messageOptions(content);
+            if (!mentionRepliedUser) {
+                msgOptions.allowedMentions ??= {};
+                msgOptions.allowedMentions.repliedUser = false;
+            }
             return await msg.reply(msgOptions);
         } catch (error) {
             if (error instanceof DiscordAPIError && IGNORED_ERRORS.includes(error.code)) {

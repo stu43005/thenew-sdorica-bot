@@ -24,7 +24,7 @@ export class PttTrigger implements Trigger {
     public async execute(msg: Message, _data: EventData): Promise<void> {
         const embed = await pttAutoEmbed(msg.content);
         if (embed) {
-            await MessageUtils.reply(msg, embed);
+            await MessageUtils.reply(msg, embed, false);
         }
     }
 
