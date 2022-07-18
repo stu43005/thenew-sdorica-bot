@@ -1,4 +1,3 @@
-import { RESTJSONErrorCodes as DiscordApiErrors } from 'discord-api-types/v10';
 import {
     DiscordAPIError,
     Message,
@@ -6,16 +5,17 @@ import {
     PartialMessage,
     PartialMessageReaction,
     PartialUser,
+    RESTJSONErrorCodes,
     User,
 } from 'discord.js';
 
-const IGNORED_ERRORS = [
-    DiscordApiErrors.UnknownMessage,
-    DiscordApiErrors.UnknownChannel,
-    DiscordApiErrors.UnknownGuild,
-    DiscordApiErrors.UnknownUser,
-    DiscordApiErrors.UnknownInteraction,
-    DiscordApiErrors.MissingAccess,
+const IGNORED_ERRORS: (string | number)[] = [
+    RESTJSONErrorCodes.UnknownMessage,
+    RESTJSONErrorCodes.UnknownChannel,
+    RESTJSONErrorCodes.UnknownGuild,
+    RESTJSONErrorCodes.UnknownUser,
+    RESTJSONErrorCodes.UnknownInteraction,
+    RESTJSONErrorCodes.MissingAccess,
 ];
 
 export class PartialUtils {

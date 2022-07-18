@@ -1,8 +1,14 @@
 import { REST } from '@discordjs/rest';
 import config from 'config';
-import { RESTPutAPIApplicationCommandsJSONBody, Routes } from 'discord-api-types/v10';
-import { Options } from 'discord.js';
+import {
+    GatewayIntentBits,
+    Options,
+    Partials,
+    RESTPutAPIApplicationCommandsJSONBody,
+    Routes,
+} from 'discord.js';
 import { createRequire } from 'node:module';
+import process from 'node:process';
 import { Command } from './commands/command.js';
 import { commands } from './commands/index.js';
 import { components } from './components/index.js';
@@ -14,11 +20,12 @@ import { GuildLeaveHandler } from './events/guild-leave-handler.js';
 import { MessageHandler } from './events/message-handler.js';
 import { ReactionHandler } from './events/reaction-handler.js';
 import { TriggerHandler } from './events/trigger-handler.js';
-import { Job } from './jobs/index.js';
+import { jobs } from './jobs/index.js';
 import { Bot } from './models/bot.js';
 import { CustomClient } from './models/custom-client.js';
 import { reactions } from './reactions/index.js';
-import { JobService, Logger } from './services/index.js';
+import { JobService } from './services/job-service.js';
+import { Logger } from './services/logger.js';
 import { triggers } from './triggers/index.js';
 
 const require = createRequire(import.meta.url);
@@ -30,11 +37,17 @@ async function start(): Promise<void> {
 
     // Client
     const client = new CustomClient({
-        intents: config.get('client.intents'),
-        partials: config.get('client.partials'),
+        intents: [
+            GatewayIntentBits.Guilds,
+            GatewayIntentBits.GuildMessages,
+            GatewayIntentBits.GuildMessageReactions,
+            GatewayIntentBits.DirectMessages,
+            GatewayIntentBits.DirectMessageReactions,
+        ],
+        partials: [Partials.Message, Partials.Channel, Partials.Reaction],
         makeCache: Options.cacheWithLimits({
             // Keep default caching behavior
-            ...Options.defaultMakeCacheSettings,
+            ...Options.DefaultMakeCacheSettings,
             // Override specific options from config
             ...config.get('client.caches'),
         }),
@@ -48,11 +61,6 @@ async function start(): Promise<void> {
     const triggerHandler = new TriggerHandler(triggers);
     const messageHandler = new MessageHandler(triggerHandler);
     const reactionHandler = new ReactionHandler(reactions);
-
-    // Jobs
-    const jobs: Job[] = [
-        // TODO: Add new jobs here
-    ];
 
     // Bot
     const bot = new Bot(

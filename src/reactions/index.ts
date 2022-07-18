@@ -5,8 +5,6 @@ import { ReactionRoleRemove } from './reaction-role-remove.js';
 import { Reaction } from './reaction.js';
 import { StarboardReaction } from './starboard.js';
 
-export { Reaction } from './reaction.js';
-
 export const reactions: Reaction[] = [
     new AutoPinReaction(),
     new AutoUnpinReaction(),

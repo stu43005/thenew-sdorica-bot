@@ -1,15 +1,16 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
 import djs, {
-    CommandInteraction,
-    Permissions,
-    PermissionString
+    ChatInputCommandInteraction,
+    PermissionsBitField,
+    PermissionsString,
+    SlashCommandBuilder,
 } from 'discord.js';
 import fileSize from 'filesize';
 import { createRequire } from 'node:module';
 import os from 'node:os';
 import { EventData } from '../models/event-data.js';
-import { Lang } from '../services/index.js';
-import { InteractionUtils, ShardUtils } from '../utils/index.js';
+import { Lang } from '../services/lang.js';
+import { InteractionUtils } from '../utils/interaction-utils.js';
+import { ShardUtils } from '../utils/shard-utils.js';
 import { Command, CommandDeferType } from './command.js';
 
 const require = createRequire(import.meta.url);
@@ -19,17 +20,15 @@ export class DevCommand implements Command {
     public metadata = new SlashCommandBuilder()
         .setName(Lang.getCom('commands.dev'))
         .setDescription(Lang.getRef('commandDescs.dev', Lang.Default))
-        .setDefaultMemberPermissions(new Permissions()
-            .add('ADMINISTRATOR')
-            .valueOf())
+        .setDefaultMemberPermissions(new PermissionsBitField().add('Administrator').valueOf())
         .toJSON();
     public deferType = CommandDeferType.HIDDEN;
     public requireDev = true;
     public requireGuild = false;
-    public requireClientPerms: PermissionString[] = [];
-    public requireUserPerms: PermissionString[] = [];
+    public requireClientPerms: PermissionsString[] = [];
+    public requireUserPerms: PermissionsString[] = [];
 
-    public async execute(intr: CommandInteraction, data: EventData): Promise<void> {
+    public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
         const shardCount = intr.client.shard?.count ?? 1;
         let serverCount: number;
         if (intr.client.shard) {

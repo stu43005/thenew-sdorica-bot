@@ -1,9 +1,18 @@
-import { AnyChannel, Constants, DiscordAPIError, Message, MessageEmbed, MessageReaction, TextChannel, User } from 'discord.js';
+import {
+    Channel,
+    DiscordAPIError,
+    EmbedBuilder,
+    Message,
+    MessageReaction,
+    RESTJSONErrorCodes,
+    TextChannel,
+    User,
+} from 'discord.js';
 import { StarboardSetting } from '../database/entities/guild.js';
 import { StarboardStore } from '../database/starboard-store.js';
 import { EventData } from '../models/event-data.js';
 import { Logger } from '../services/logger.js';
-import { FormatUtils } from '../utils/index.js';
+import { FormatUtils } from '../utils/format-utils.js';
 import { Reaction } from './reaction.js';
 
 export class StarboardReaction implements Reaction {
@@ -18,7 +27,12 @@ export class StarboardReaction implements Reaction {
         return true;
     }
 
-    public async execute(msgReaction: MessageReaction, msg: Message, reactor: User, data: EventData): Promise<void> {
+    public async execute(
+        msgReaction: MessageReaction,
+        msg: Message,
+        reactor: User,
+        data: EventData
+    ): Promise<void> {
         if (!msg.guild) return;
         const starboard = data.guild?.starboard;
         if (!starboard?.channel || !starboard.limit) return;
@@ -41,7 +55,11 @@ async function getStarCount(messageReaction: MessageReaction, msg: Message): Pro
     return count;
 }
 
-async function sendStarboard(setting: StarboardSetting, message: Message, count: number): Promise<void> {
+async function sendStarboard(
+    setting: StarboardSetting,
+    message: Message,
+    count: number
+): Promise<void> {
     if (!message.guild) return;
     if (!setting.channel) return;
     const starboardChannel = message.guild.channels.resolve(setting.channel) as TextChannel;
@@ -51,40 +69,51 @@ async function sendStarboard(setting: StarboardSetting, message: Message, count:
     const mapping = await StarboardStore.fromGuild(message.guild);
     try {
         await mapping.getTemporarilyTimer(message);
-    } catch (error) {
-    }
+    } catch (error) {}
 
-    mapping.setTemporarilyTimer(message, (async () => {
-        const starData = await mapping.getItem(message);
-        if (starData) {
-            try {
-                const starboardMessage = await starboardChannel.messages.fetch(starData.starboardMessageId);
-                const messageReaction = message.reactions.resolve('⭐');
-                if (messageReaction) {
-                    const count = await getStarCount(messageReaction, message);
-                    if (starData.count < count) {
-                        await mapping.addStarboardMessage(message, count, starboardMessage);
-                        await starboardMessage.edit(template);
+    mapping.setTemporarilyTimer(
+        message,
+        (async () => {
+            const starData = await mapping.getItem(message);
+            if (starData) {
+                try {
+                    const starboardMessage = await starboardChannel.messages.fetch(
+                        starData.starboardMessageId
+                    );
+                    const messageReaction = message.reactions.resolve('⭐');
+                    if (messageReaction) {
+                        const count = await getStarCount(messageReaction, message);
+                        if (starData.count < count) {
+                            await mapping.addStarboardMessage(message, count, starboardMessage);
+                            await starboardMessage.edit(template);
+                        }
+                    }
+                } catch (error) {
+                    const allowErrors: (string | number)[] = [RESTJSONErrorCodes.UnknownMessage];
+                    if (!(error instanceof DiscordAPIError && allowErrors.includes(error.code))) {
+                        throw error;
                     }
                 }
-            } catch (error) {
-                const allowErrors: number[] = [Constants.APIErrors.UNKNOWN_MESSAGE];
-                if (!(error instanceof DiscordAPIError && allowErrors.includes(error.code))) {
-                    throw error;
-                }
+                return;
             }
-            return;
-        }
-        const sendedMessage = await starboardChannel.send(template);
-        await mapping.addStarboardMessage(message, count, sendedMessage);
-    })().catch(reason => {
-        Logger.error('[starboard] [sendStarboard]', reason);
-    }));
+            const sendedMessage = await starboardChannel.send(template);
+            await mapping.addStarboardMessage(message, count, sendedMessage);
+        })().catch(reason => {
+            Logger.error('[starboard] [sendStarboard]', reason);
+        })
+    );
 }
 
-function getTemplate(contextChannel: AnyChannel, message: Message, count: number): { content: string; embeds: MessageEmbed[]; } {
+function getTemplate(
+    contextChannel: Channel,
+    message: Message,
+    count: number
+): { content: string; embeds: EmbedBuilder[] } {
     const embed = FormatUtils.embedTheMessage(message, contextChannel);
-    embed.addField('Original', `[Show me!](${(message as unknown as Message).url})`);
+    embed.addFields({
+        name: 'Original',
+        value: `[Show me!](${(message as unknown as Message).url})`,
+    });
     return {
         content: `${count} ⭐ in <#${message.channel.id}>`,
         embeds: [embed],

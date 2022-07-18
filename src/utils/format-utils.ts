@@ -1,8 +1,18 @@
-import { channelMention, codeBlock, roleMention, userMention } from '@discordjs/builders';
-import { AnyChannel, Guild, GuildMember, Message, MessageEmbed, User } from 'discord.js';
+import {
+    Channel,
+    channelMention,
+    codeBlock,
+    EmbedBuilder,
+    Guild,
+    GuildMember,
+    Message,
+    roleMention,
+    User,
+    userMention,
+} from 'discord.js';
 import { Duration } from 'luxon';
-import { LangCode } from '../enums/index.js';
-import { Language } from '../models/enum-helpers/index.js';
+import { LangCode } from '../enums/lang-code.js';
+import { Language } from '../models/enum-helpers/language.js';
 
 export class FormatUtils {
     public static roleMention(guild: Guild, discordId: string): string {
@@ -50,9 +60,12 @@ export class FormatUtils {
         return codeBlock('json', JSON.stringify(obj, null, 2));
     }
 
-    public static embedOriginUserData(user: User | GuildMember, embed?: MessageEmbed): MessageEmbed {
-        if (!(embed instanceof MessageEmbed)) {
-            embed = new MessageEmbed(embed);
+    public static embedOriginUserData(
+        user: User | GuildMember,
+        embed?: EmbedBuilder
+    ): EmbedBuilder {
+        if (!(embed instanceof EmbedBuilder)) {
+            embed = new EmbedBuilder(embed);
         }
         embed.setFooter({
             text: user instanceof GuildMember ? user.user.tag : user.tag,
@@ -64,9 +77,13 @@ export class FormatUtils {
         return embed;
     }
 
-    public static embedTheMessage(message: Message, contextChannel: AnyChannel, embed?: MessageEmbed): MessageEmbed {
-        if (!(embed instanceof MessageEmbed)) {
-            embed = new MessageEmbed(embed);
+    public static embedTheMessage(
+        message: Message,
+        contextChannel: Channel,
+        embed?: EmbedBuilder
+    ): EmbedBuilder {
+        if (!(embed instanceof EmbedBuilder)) {
+            embed = new EmbedBuilder(embed);
         }
         embed.setAuthor({
             name: message.author.tag,
@@ -75,16 +92,34 @@ export class FormatUtils {
         });
         embed.setDescription(message.content);
         if (message.attachments && message.attachments.size > 0) {
-            if ('nsfw' in message.channel && message.channel.nsfw && 'nsfw' in contextChannel && !contextChannel.nsfw) {
-                embed.addField('Attachments', ':underage: **Quoted message belongs in NSFW channel.**');
-            }
-            else if (message.attachments.size == 1 && String(message.attachments.at(0)?.url).match(/(.jpg|.jpeg|.png|.gif|.gifv|.webp|.bmp)$/i)) {
+            if (
+                'nsfw' in message.channel &&
+                message.channel.nsfw &&
+                'nsfw' in contextChannel &&
+                !contextChannel.nsfw
+            ) {
+                embed.addFields([
+                    {
+                        name: 'Attachments',
+                        value: ':underage: **Quoted message belongs in NSFW channel.**',
+                    },
+                ]);
+            } else if (
+                message.attachments.size == 1 &&
+                String(message.attachments.at(0)?.url).match(
+                    /(.jpg|.jpeg|.png|.gif|.gifv|.webp|.bmp)$/i
+                )
+            ) {
                 embed.setImage(message.attachments.at(0)?.url ?? '');
-            }
-            else {
-                for (const [_, attachment] of message.attachments) {
-                    embed.addField('Attachment', `[${attachment.name}](${attachment.url})`, false);
-                }
+            } else {
+                embed.addFields([
+                    {
+                        name: 'Attachments',
+                        value: message.attachments
+                            .map(attachment => `[${attachment.name}](${attachment.url})`)
+                            .join('\n'),
+                    },
+                ]);
             }
         }
         embed.setTimestamp(message.createdAt);

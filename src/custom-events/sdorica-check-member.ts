@@ -1,4 +1,4 @@
-import { GuildMember, PartialGuildMember } from 'discord.js';
+import { Events, GuildMember, PartialGuildMember } from 'discord.js';
 import { CustomEvent } from './custom-event.js';
 
 const mee6Roles = [
@@ -20,12 +20,17 @@ const mee6Roles = [
 ];
 const assignRole = '622371686502891529';
 
-export class SdoricaCheckMember implements CustomEvent<'guildMemberUpdate'> {
-    public readonly event = 'guildMemberUpdate';
+export class SdoricaCheckMember implements CustomEvent<Events.GuildMemberUpdate> {
+    public readonly event = Events.GuildMemberUpdate;
 
-    public async process(oldMember: GuildMember | PartialGuildMember, newMember: GuildMember): Promise<void> {
+    public async process(
+        oldMember: GuildMember | PartialGuildMember,
+        newMember: GuildMember
+    ): Promise<void> {
         if (newMember.guild.id === '437330083976445953') {
-            const matchedRoles = Array.from(newMember.roles.cache.keys()).filter(r => mee6Roles.includes(r));
+            const matchedRoles = Array.from(newMember.roles.cache.keys()).filter(r =>
+                mee6Roles.includes(r)
+            );
             if (matchedRoles.length > 0 && !newMember.roles.cache.has(assignRole)) {
                 await newMember.roles.add(assignRole);
             }

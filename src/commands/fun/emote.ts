@@ -1,8 +1,13 @@
-import { inlineCode, SlashCommandBuilder } from '@discordjs/builders';
-import { AutocompleteInteraction, CommandInteraction, PermissionString } from 'discord.js';
+import {
+    AutocompleteInteraction,
+    ChatInputCommandInteraction,
+    inlineCode,
+    PermissionsString,
+    SlashCommandBuilder,
+} from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { EventData } from '../../models/event-data.js';
-import { InteractionUtils } from '../../utils/index.js';
+import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 import { getMemeEmbed, MemeItem, metchMeme } from '../config/meme.js';
 
@@ -10,20 +15,22 @@ export class EmoteCommand implements Command {
     public metadata = new SlashCommandBuilder()
         .setName('emote')
         .setDescription('顯示自訂圖片')
-        .addStringOption((builder) => builder
-            .setName('keyword')
-            .setDescription('關鍵字')
-            .setRequired(true)
-            .setAutocomplete(true))
+        .addStringOption(builder =>
+            builder
+                .setName('keyword')
+                .setDescription('關鍵字')
+                .setRequired(true)
+                .setAutocomplete(true)
+        )
         .toJSON();
     public channelCooldown = new RateLimiter(2, 60 * 1000);
     public deferType = CommandDeferType.NONE;
     public requireDev = false;
     public requireGuild = true;
-    public requireClientPerms: PermissionString[] = [];
-    public requireUserPerms: PermissionString[] = [];
+    public requireClientPerms: PermissionsString[] = [];
+    public requireUserPerms: PermissionsString[] = [];
 
-    public async execute(intr: CommandInteraction, data: EventData): Promise<void> {
+    public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
         if (!data.guild?.memes?.length) return;
 
         const memes: MemeItem[] = data.guild?.memes;
@@ -53,7 +60,9 @@ export class EmoteCommand implements Command {
 
         const focusedValue = intr.options.getFocused();
         const choices = [...new Set(data.guild.memes.map(meme => meme.keyword))];
-        const filtered = choices.filter(choice => choice.includes(focusedValue.toString())).slice(0, 25);
+        const filtered = choices
+            .filter(choice => choice.includes(focusedValue.toString()))
+            .slice(0, 25);
         await intr.respond(filtered.map(choice => ({ name: choice, value: choice })));
     }
 }

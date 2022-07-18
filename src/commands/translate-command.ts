@@ -1,10 +1,13 @@
-import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
-import { CommandInteraction, PermissionString } from 'discord.js';
-import { LangCode } from '../enums/index.js';
-import { Language } from '../models/enum-helpers/index.js';
+import {
+    ChatInputCommandInteraction,
+    PermissionsString,
+    RESTPostAPIApplicationCommandsJSONBody,
+} from 'discord.js';
+import { LangCode } from '../enums/lang-code.js';
+import { Language } from '../models/enum-helpers/language.js';
 import { EventData } from '../models/event-data.js';
-import { Lang } from '../services/index.js';
-import { InteractionUtils } from '../utils/index.js';
+import { Lang } from '../services/lang.js';
+import { InteractionUtils } from '../utils/interaction-utils.js';
 import { Command, CommandDeferType } from './command.js';
 
 export class TranslateCommand implements Command {
@@ -15,13 +18,16 @@ export class TranslateCommand implements Command {
     public deferType = CommandDeferType.PUBLIC;
     public requireDev = false;
     public requireGuild = false;
-    public requireClientPerms: PermissionString[] = [];
-    public requireUserPerms: PermissionString[] = [];
+    public requireClientPerms: PermissionsString[] = [];
+    public requireUserPerms: PermissionsString[] = [];
 
-    public async execute(intr: CommandInteraction, data: EventData): Promise<void> {
+    public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
         const embed = Lang.getEmbed('displayEmbeds.translate', data.lang());
         for (const langCode of Object.values(LangCode)) {
-            embed.addField(Language.displayName(langCode), Language.translators(langCode));
+            embed.addFields({
+                name: Language.displayName(langCode),
+                value: Language.translators(langCode),
+            });
         }
         await InteractionUtils.send(intr, embed);
     }

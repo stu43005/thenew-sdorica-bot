@@ -4,7 +4,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 import { getGuildRepository } from '../database/entities/guild.js';
 import { getUserRepository } from '../database/entities/user.js';
 import { EventData } from '../models/event-data.js';
-import { Reaction } from '../reactions/index.js';
+import { Reaction } from '../reactions/reaction.js';
 import { EventHandler } from './event-handler.js';
 
 export class ReactionHandler implements EventHandler {
@@ -13,9 +13,14 @@ export class ReactionHandler implements EventHandler {
         config.get<number>('rateLimiting.reactions.interval') * 1000
     );
 
-    constructor(private reactions: Reaction[]) { }
+    constructor(private reactions: Reaction[]) {}
 
-    public async process(msgReaction: MessageReaction, msg: Message, reactor: User, remove: boolean): Promise<void> {
+    public async process(
+        msgReaction: MessageReaction,
+        msg: Message,
+        reactor: User,
+        remove: boolean
+    ): Promise<void> {
         // Don't respond to self, or other bots
         if (reactor.id === msgReaction.client.user?.id || reactor.bot) {
             return;

@@ -1,8 +1,12 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, MessageEmbed, PermissionString } from 'discord.js';
+import {
+    ChatInputCommandInteraction,
+    EmbedBuilder,
+    PermissionsString,
+    SlashCommandBuilder,
+} from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import fetch from 'node-fetch';
-import { InteractionUtils } from '../../utils/index.js';
+import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 
 export class HitokotoCommand implements Command {
@@ -14,13 +18,13 @@ export class HitokotoCommand implements Command {
     public deferType = CommandDeferType.PUBLIC;
     public requireDev = false;
     public requireGuild = false;
-    public requireClientPerms: PermissionString[] = [];
-    public requireUserPerms: PermissionString[] = [];
+    public requireClientPerms: PermissionsString[] = [];
+    public requireUserPerms: PermissionsString[] = [];
 
-    public async execute(intr: CommandInteraction): Promise<void> {
+    public async execute(intr: ChatInputCommandInteraction): Promise<void> {
         const res = await fetch('https://v1.hitokoto.cn/');
-        const hitokoto = await res.json() as Hitokoto;
-        const embed = new MessageEmbed();
+        const hitokoto = (await res.json()) as Hitokoto;
+        const embed = new EmbedBuilder();
         embed.setTitle('一言');
         embed.setURL(`https://hitokoto.cn?id=${hitokoto.id}`);
         embed.setDescription(hitokoto.hitokoto);

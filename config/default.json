@@ -1,23 +1,9 @@
 {
     "cacheTTLSeconds": 43200,
-    "developers": [
-        "198437688255184897"
-    ],
+    "developers": ["198437688255184897"],
     "client": {
         "id": "",
         "token": "",
-        "intents": [
-            "GUILDS",
-            "GUILD_MESSAGES",
-            "GUILD_MESSAGE_REACTIONS",
-            "DIRECT_MESSAGES",
-            "DIRECT_MESSAGE_REACTIONS"
-        ],
-        "partials": [
-            "MESSAGE",
-            "CHANNEL",
-            "REACTION"
-        ],
         "caches": {
             "BaseGuildEmojiManager": 0,
             "GuildBanManager": 0,
@@ -96,10 +82,7 @@
         },
         "dummyMode": {
             "enabled": false,
-            "whitelist": [
-                "212772875793334272",
-                "478288246858711040"
-            ]
+            "whitelist": ["212772875793334272", "478288246858711040"]
         }
     },
     "bot-sites": [

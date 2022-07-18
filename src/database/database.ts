@@ -6,7 +6,7 @@ export class Database {
     public static async connect(): Promise<admin.firestore.Firestore> {
         admin.initializeApp({
             credential: admin.credential.cert(config.get('firebaseAdmin.cert')),
-            databaseURL: config.get('firebaseAdmin.databaseURL')
+            databaseURL: config.get('firebaseAdmin.databaseURL'),
         });
         const firestore = admin.firestore();
         fireorm.initialize(firestore);

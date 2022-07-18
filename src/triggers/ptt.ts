@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import { Message, MessageEmbed } from 'discord.js';
+import { EmbedBuilder, Message } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import fetch from 'node-fetch';
 import { EventData } from '../models/event-data.js';
@@ -27,12 +27,12 @@ export class PttTrigger implements Trigger {
             await MessageUtils.reply(msg, embed, false);
         }
     }
-
 }
 
-export const pttUrlRegex = /((?:https?:)?\/\/)?((?:www\.ptt\.cc))\/bbs\/([\w-]+)\/((?:M\.)([\d]+)(?:\.A\.)([\w]+))(?:\.html)/g;
+export const pttUrlRegex =
+    /((?:https?:)?\/\/)?((?:www\.ptt\.cc))\/bbs\/([\w-]+)\/((?:M\.)([\d]+)(?:\.A\.)([\w]+))(?:\.html)/g;
 
-export async function pttAutoEmbed(content: string): Promise<MessageEmbed | null> {
+export async function pttAutoEmbed(content: string): Promise<EmbedBuilder | null> {
     let result: RegExpExecArray | null;
     while ((result = pttUrlRegex.exec(content)) !== null) {
         const url = result[0];
@@ -42,7 +42,7 @@ export async function pttAutoEmbed(content: string): Promise<MessageEmbed | null
         Logger.debug(`[ptt] metaline = \`${JSON.stringify(metaline)}\``);
 
         if (metaline['標題'] && metaline['nsfw']) {
-            const embed = new MessageEmbed();
+            const embed = new EmbedBuilder();
             embed.setColor(789094);
             embed.setAuthor({
                 name: `看板：${metaline['看板']}    作者：${metaline['作者']}`,
@@ -70,7 +70,7 @@ export async function pttAutoEmbed(content: string): Promise<MessageEmbed | null
     內文: "だむ\n10/17発売のCOMIC失楽天 2019年12月号にて\n28PのHな漫画が載ります～！\nhttps://pbs.twimg.com/media/EG2PA0BUUAcXyCp.jpg\nhttps://pbs.twimg.com/media/EG2PAz3U4AAQU__.jpg\n"
 }
 */
-export async function getPttMetaline(url: string): Promise<{ [key: string]: string; }> {
+export async function getPttMetaline(url: string): Promise<{ [key: string]: string }> {
     const html = await req(url, false);
     const $ = cheerio.load(html);
     const r18html = await req(url, true);

@@ -7,15 +7,11 @@ export interface Reaction {
     requireSentByClient: boolean;
     requireEmbedAuthorTag: boolean;
     requireRemove: boolean;
-    triggered(
-        msgReaction: MessageReaction,
-        msg: Message,
-        reactor: User,
-    ): boolean;
+    triggered(msgReaction: MessageReaction, msg: Message, reactor: User): boolean;
     execute(
         msgReaction: MessageReaction,
         msg: Message,
         reactor: User,
-        data: EventData,
+        data: EventData
     ): Promise<void>;
 }

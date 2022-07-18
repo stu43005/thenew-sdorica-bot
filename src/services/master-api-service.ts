@@ -3,14 +3,14 @@ import { URL } from 'node:url';
 import {
     LoginClusterResponse,
     RegisterClusterRequest,
-    RegisterClusterResponse
-} from '../api/models/master-api/index.js';
-import { HttpService } from './index.js';
+    RegisterClusterResponse,
+} from '../api/models/master-api/clusters.js';
+import { HttpService } from './http-service.js';
 
 export class MasterApiService {
     private clusterId: string | undefined;
 
-    constructor(private httpService: HttpService) { }
+    constructor(private httpService: HttpService) {}
 
     public async register(): Promise<void> {
         const reqBody: RegisterClusterRequest = {

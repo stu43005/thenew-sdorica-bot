@@ -1,7 +1,14 @@
-import { AnyChannel, DMChannel, GuildChannel, GuildMember, PermissionResolvable, Permissions } from 'discord.js';
+import {
+    Channel,
+    DMChannel,
+    GuildChannel,
+    GuildMember,
+    PermissionResolvable,
+    PermissionsBitField,
+} from 'discord.js';
 
 export class PermissionUtils {
-    public static canSend(channel: AnyChannel, embedLinks: boolean = false): boolean {
+    public static canSend(channel: Channel, embedLinks: boolean = false): boolean {
         if (channel instanceof DMChannel) {
             return true;
         } else if (channel instanceof GuildChannel && channel.client.user) {
@@ -15,16 +22,16 @@ export class PermissionUtils {
             // SEND_MESSAGES - Needed to send messages
             // EMBED_LINKS - Needed to send embedded links
             return channelPerms.has([
-                Permissions.FLAGS.VIEW_CHANNEL,
-                Permissions.FLAGS.SEND_MESSAGES,
-                ...(embedLinks ? [Permissions.FLAGS.EMBED_LINKS] : []),
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.SendMessages,
+                ...(embedLinks ? [PermissionsBitField.Flags.EmbedLinks] : []),
             ]);
         } else {
             return false;
         }
     }
 
-    public static canMention(channel: AnyChannel): boolean {
+    public static canMention(channel: Channel): boolean {
         if (channel instanceof DMChannel) {
             return true;
         } else if (channel instanceof GuildChannel && channel.client.user) {
@@ -37,15 +44,15 @@ export class PermissionUtils {
             // VIEW_CHANNEL - Needed to view the channel
             // MENTION_EVERYONE - Needed to mention @everyone, @here, and all roles
             return channelPerms.has([
-                Permissions.FLAGS.VIEW_CHANNEL,
-                Permissions.FLAGS.MENTION_EVERYONE,
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.MentionEveryone,
             ]);
         } else {
             return false;
         }
     }
 
-    public static canReact(channel: AnyChannel, removeOthers: boolean = false): boolean {
+    public static canReact(channel: Channel, removeOthers: boolean = false): boolean {
         if (channel instanceof DMChannel) {
             return true;
         } else if (channel instanceof GuildChannel && channel.client.user) {
@@ -61,17 +68,17 @@ export class PermissionUtils {
             //    https://discordjs.guide/popular-topics/permissions-extended.html#implicit-permissions
             // MANAGE_MESSAGES - Needed to remove others reactions
             return channelPerms.has([
-                Permissions.FLAGS.VIEW_CHANNEL,
-                Permissions.FLAGS.ADD_REACTIONS,
-                Permissions.FLAGS.READ_MESSAGE_HISTORY,
-                ...(removeOthers ? [Permissions.FLAGS.MANAGE_MESSAGES] : []),
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.AddReactions,
+                PermissionsBitField.Flags.ReadMessageHistory,
+                ...(removeOthers ? [PermissionsBitField.Flags.ManageMessages] : []),
             ]);
         } else {
             return false;
         }
     }
 
-    public static canPin(channel: AnyChannel, unpinOld: boolean = false): boolean {
+    public static canPin(channel: Channel, unpinOld: boolean = false): boolean {
         if (channel instanceof DMChannel) {
             return true;
         } else if (channel instanceof GuildChannel && channel.client.user) {
@@ -85,16 +92,16 @@ export class PermissionUtils {
             // MANAGE_MESSAGES - Needed to pin messages
             // READ_MESSAGE_HISTORY - Needed to find old pins to unpin
             return channelPerms.has([
-                Permissions.FLAGS.VIEW_CHANNEL,
-                Permissions.FLAGS.MANAGE_MESSAGES,
-                ...(unpinOld ? [Permissions.FLAGS.READ_MESSAGE_HISTORY] : []),
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.ManageMessages,
+                ...(unpinOld ? [PermissionsBitField.Flags.ReadMessageHistory] : []),
             ]);
         } else {
             return false;
         }
     }
 
-    public static canCreateThreads(channel: AnyChannel, manageThreads: boolean = false): boolean {
+    public static canCreateThreads(channel: Channel, manageThreads: boolean = false): boolean {
         if (channel instanceof DMChannel) {
             return false;
         } else if (channel instanceof GuildChannel && channel.client.user) {
@@ -108,19 +115,25 @@ export class PermissionUtils {
             // CREATE_PUBLIC_THREADS - Needed to create public threads
             // MANAGE_THREADS - Needed to rename, delete, archive, unarchive, slow mode threads
             return channelPerms.has([
-                Permissions.FLAGS.VIEW_CHANNEL,
-                Permissions.FLAGS.CREATE_PUBLIC_THREADS,
-                ...(manageThreads ? [Permissions.FLAGS.MANAGE_THREADS] : []),
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.CreatePublicThreads,
+                ...(manageThreads ? [PermissionsBitField.Flags.ManageThreads] : []),
             ]);
         } else {
             return false;
         }
     }
 
-    public static memberHasPermission(channel: AnyChannel, member: GuildMember | null | undefined, permission: PermissionResolvable): boolean {
-        return member &&
-            'permissionsFor' in channel &&
-            channel.permissionsFor(member).has(permission) ||
-            false;
+    public static memberHasPermission(
+        channel: Channel,
+        member: GuildMember | null | undefined,
+        permission: PermissionResolvable
+    ): boolean {
+        return (
+            (member &&
+                'permissionsFor' in channel &&
+                channel.permissionsFor(member).has(permission)) ||
+            false
+        );
     }
 }

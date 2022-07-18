@@ -14,8 +14,7 @@ export class UserData {
 }
 
 @CustomRepository(UserData)
-export class CustomUserDataRepository extends CustomBaseRepository<UserData> {
-}
+export class CustomUserDataRepository extends CustomBaseRepository<UserData> {}
 
 export function getUserRepository(): CustomUserDataRepository {
     return getRepository(UserData) as CustomUserDataRepository;

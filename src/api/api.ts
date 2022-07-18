@@ -3,9 +3,10 @@ import express, { Express } from 'express';
 import * as http from 'node:http';
 import { createRequire } from 'node:module';
 import util from 'node:util';
-import { Logger } from '../services/index.js';
-import { Controller } from './controllers/index.js';
-import { checkAuth, handleError } from './middleware/index.js';
+import { Logger } from '../services/logger.js';
+import { Controller } from './controllers/controller.js';
+import { checkAuth } from './middleware/check-auth.js';
+import { handleError } from './middleware/handle-error.js';
 
 const require = createRequire(import.meta.url);
 const Logs = require('../../lang/logs.json');
@@ -21,7 +22,9 @@ export class Api {
     }
 
     public async start(): Promise<void> {
-        const listen = util.promisify(this.app.listen.bind(this.app)) as (port: number) => Promise<http.Server>;
+        const listen = util.promisify(this.app.listen.bind(this.app)) as (
+            port: number
+        ) => Promise<http.Server>;
         const port = process.env.PORT || config.get<number>('api.port');
         await listen(+port);
         Logger.info(Logs.info.apiStarted.replaceAll('{PORT}', port));

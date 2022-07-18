@@ -3,11 +3,17 @@ import { ShardingManager } from 'discord.js';
 import { createRequire } from 'node:module';
 import 'reflect-metadata';
 import { Api } from './api/api.js';
-import { GuildsController, RootController, ShardsController } from './api/controllers/index.js';
-import { Job } from './jobs/index.js';
+import { GuildsController } from './api/controllers/guilds-controller.js';
+import { RootController } from './api/controllers/root-controller.js';
+import { ShardsController } from './api/controllers/shards-controller.js';
+import { managerJobs } from './jobs/index.js';
 import { Manager } from './models/manager.js';
-import { HttpService, JobService, Logger, MasterApiService } from './services/index.js';
-import { MathUtils, ShardUtils } from './utils/index.js';
+import { HttpService } from './services/http-service.js';
+import { JobService } from './services/job-service.js';
+import { Logger } from './services/logger.js';
+import { MasterApiService } from './services/master-api-service.js';
+import { MathUtils } from './utils/math-utils.js';
+import { ShardUtils } from './utils/shard-utils.js';
 
 const require = createRequire(import.meta.url);
 const Logs = require('../lang/logs.json');
@@ -51,19 +57,15 @@ async function start(): Promise<void> {
 
     const shardManager = new ShardingManager('dist/start-bot.js', {
         token: config.get('client.token'),
-        mode: config.get('debug.override.shardMode.enabled') ? config.get('debug.override.shardMode.value') : 'worker',
+        mode: config.get('debug.override.shardMode.enabled')
+            ? config.get('debug.override.shardMode.value')
+            : 'worker',
         respawn: true,
         totalShards,
         shardList,
     });
 
-    // Jobs
-    const jobs: Job[] = [
-        // ...(config.get('clustering.enabled') ? [] : [new UpdateServerCountJob(shardManager, httpService)]),
-        // TODO: Add new jobs here
-    ];
-
-    const manager = new Manager(shardManager, new JobService(jobs));
+    const manager = new Manager(shardManager, new JobService(managerJobs));
 
     // API
     const guildsController = new GuildsController(shardManager);

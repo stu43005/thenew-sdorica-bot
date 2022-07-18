@@ -1,9 +1,12 @@
-import { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
-import { CommandInteraction, PermissionString } from 'discord.js';
+import {
+    ChatInputCommandInteraction,
+    PermissionsString,
+    RESTPostAPIApplicationCommandsJSONBody,
+} from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { EventData } from '../models/event-data.js';
-import { Lang } from '../services/index.js';
-import { InteractionUtils } from '../utils/index.js';
+import { Lang } from '../services/lang.js';
+import { InteractionUtils } from '../utils/interaction-utils.js';
 import { Command, CommandDeferType } from './command.js';
 
 export class TestCommand implements Command {
@@ -15,10 +18,10 @@ export class TestCommand implements Command {
     public deferType = CommandDeferType.PUBLIC;
     public requireDev = false;
     public requireGuild = false;
-    public requireClientPerms: PermissionString[] = [];
-    public requireUserPerms: PermissionString[] = [];
+    public requireClientPerms: PermissionsString[] = [];
+    public requireUserPerms: PermissionsString[] = [];
 
-    public async execute(intr: CommandInteraction, data: EventData): Promise<void> {
+    public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
         await InteractionUtils.send(intr, Lang.getEmbed('displayEmbeds.test', data.lang()));
     }
 }

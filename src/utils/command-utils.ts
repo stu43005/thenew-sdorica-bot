@@ -1,15 +1,16 @@
 import config from 'config';
-import { BaseCommandInteraction, GuildChannel, GuildMember, Permissions } from 'discord.js';
+import { CommandInteraction, GuildChannel, GuildMember, PermissionsBitField } from 'discord.js';
 import { Command } from '../commands/command.js';
-import { Permission } from '../models/enum-helpers/index.js';
+import { Permission } from '../models/enum-helpers/permission.js';
 import { EventData } from '../models/event-data.js';
-import { Lang } from '../services/index.js';
-import { FormatUtils, InteractionUtils } from './index.js';
+import { Lang } from '../services/lang.js';
+import { FormatUtils } from './format-utils.js';
+import { InteractionUtils } from './interaction-utils.js';
 
 export class CommandUtils {
     public static async runChecks(
         command: Command,
-        intr: BaseCommandInteraction,
+        intr: CommandInteraction,
         data: EventData
     ): Promise<boolean> {
         if (command.cooldown) {
@@ -84,7 +85,7 @@ export class CommandUtils {
         // Developers, server owners, and members with "Manage Server" have permission for all commands
         if (
             member.guild.ownerId === member.id ||
-            member.permissions.has(Permissions.FLAGS.MANAGE_GUILD) ||
+            member.permissions.has(PermissionsBitField.Flags.ManageGuild) ||
             config.get<string[]>('developers').includes(member.id)
         ) {
             return true;

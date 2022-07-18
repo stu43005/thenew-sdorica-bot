@@ -1,22 +1,23 @@
-import { RESTJSONErrorCodes as DiscordApiErrors } from 'discord-api-types/v10';
 import {
-    AnyChannel,
+    Channel,
     Client,
     DiscordAPIError,
     Guild,
     GuildEmoji,
     GuildMember,
     NewsChannel,
+    RESTJSONErrorCodes,
     Role,
     StageChannel,
     TextChannel,
     User,
     VoiceChannel,
 } from 'discord.js';
+import { LangCode } from '../enums/lang-code.js';
 
-import { LangCode } from '../enums/index.js';
-import { Lang } from '../services/index.js';
-import { PermissionUtils, RegexUtils } from './index.js';
+import { Lang } from '../services/lang.js';
+import { PermissionUtils } from './permission-utils.js';
+import { RegexUtils } from './regex-utils.js';
 
 const FETCH_MEMBER_LIMIT = 20;
 
@@ -30,10 +31,8 @@ export class ClientUtils {
         try {
             return await client.users.fetch(discordId);
         } catch (error) {
-            if (
-                error instanceof DiscordAPIError &&
-                [DiscordApiErrors.UnknownUser].includes(error.code)
-            ) {
+            const allowErrors: (string | number)[] = [RESTJSONErrorCodes.UnknownUser];
+            if (error instanceof DiscordAPIError && allowErrors.includes(error.code)) {
                 return;
             } else {
                 throw error;
@@ -41,7 +40,10 @@ export class ClientUtils {
         }
     }
 
-    public static async getChannel(client: Client, input: string): Promise<AnyChannel | null | undefined> {
+    public static async getChannel(
+        client: Client,
+        input: string
+    ): Promise<Channel | null | undefined> {
         const discordId = RegexUtils.discordId(input);
         if (!discordId) {
             return;
@@ -50,10 +52,8 @@ export class ClientUtils {
         try {
             return await client.channels.fetch(discordId);
         } catch (error) {
-            if (
-                error instanceof DiscordAPIError &&
-                [DiscordApiErrors.UnknownChannel].includes(error.code)
-            ) {
+            const allowErrors: (string | number)[] = [RESTJSONErrorCodes.UnknownChannel];
+            if (error instanceof DiscordAPIError && allowErrors.includes(error.code)) {
                 return;
             } else {
                 throw error;
@@ -77,10 +77,11 @@ export class ClientUtils {
 
             return (await guild.members.fetch({ query: input, limit: 1 })).first();
         } catch (error) {
-            if (
-                error instanceof DiscordAPIError &&
-                [DiscordApiErrors.UnknownMember, DiscordApiErrors.UnknownUser].includes(error.code)
-            ) {
+            const allowErrors: (string | number)[] = [
+                RESTJSONErrorCodes.UnknownMember,
+                RESTJSONErrorCodes.UnknownUser,
+            ];
+            if (error instanceof DiscordAPIError && allowErrors.includes(error.code)) {
                 return;
             } else {
                 throw error;
@@ -100,10 +101,8 @@ export class ClientUtils {
                 role.name.toLowerCase().includes(search)
             );
         } catch (error) {
-            if (
-                error instanceof DiscordAPIError &&
-                [DiscordApiErrors.UnknownRole].includes(error.code)
-            ) {
+            const allowErrors: (string | number)[] = [RESTJSONErrorCodes.UnknownRole];
+            if (error instanceof DiscordAPIError && allowErrors.includes(error.code)) {
                 return;
             } else {
                 throw error;
@@ -111,7 +110,10 @@ export class ClientUtils {
         }
     }
 
-    public static async findGuildEmoji(guild: Guild, input: string): Promise<GuildEmoji | null | undefined> {
+    public static async findGuildEmoji(
+        guild: Guild,
+        input: string
+    ): Promise<GuildEmoji | null | undefined> {
         try {
             const { discordId } = RegexUtils.guildEmoji(input) ?? {};
             if (discordId) {
@@ -119,14 +121,12 @@ export class ClientUtils {
             }
 
             const search = input.toLowerCase();
-            return (await guild.emojis.fetch()).find(emoji =>
-                emoji.name?.toLowerCase().includes(search) ?? false
+            return (await guild.emojis.fetch()).find(
+                emoji => emoji.name?.toLowerCase().includes(search) ?? false
             );
         } catch (error) {
-            if (
-                error instanceof DiscordAPIError &&
-                [DiscordApiErrors.UnknownRole].includes(error.code)
-            ) {
+            const allowErrors: (string | number)[] = [RESTJSONErrorCodes.UnknownRole];
+            if (error instanceof DiscordAPIError && allowErrors.includes(error.code)) {
                 return;
             } else {
                 throw error;
@@ -155,10 +155,8 @@ export class ClientUtils {
                 .map(channel => channel as NewsChannel | TextChannel)
                 .find(channel => channel.name.toLowerCase().includes(search));
         } catch (error) {
-            if (
-                error instanceof DiscordAPIError &&
-                [DiscordApiErrors.UnknownChannel].includes(error.code)
-            ) {
+            const allowErrors: (string | number)[] = [RESTJSONErrorCodes.UnknownChannel];
+            if (error instanceof DiscordAPIError && allowErrors.includes(error.code)) {
                 return;
             } else {
                 throw error;
@@ -189,10 +187,8 @@ export class ClientUtils {
                 .map(channel => channel as StageChannel | VoiceChannel)
                 .find(channel => channel.name.toLowerCase().includes(search));
         } catch (error) {
-            if (
-                error instanceof DiscordAPIError &&
-                [DiscordApiErrors.UnknownChannel].includes(error.code)
-            ) {
+            const allowErrors: (string | number)[] = [RESTJSONErrorCodes.UnknownChannel];
+            if (error instanceof DiscordAPIError && allowErrors.includes(error.code)) {
                 return;
             } else {
                 throw error;

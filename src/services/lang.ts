@@ -1,9 +1,8 @@
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import { Linguini, TypeMapper, TypeMappers, Utils } from 'linguini';
 import path, { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-import { LangCode } from '../enums/index.js';
+import { LangCode } from '../enums/lang-code.js';
 
 export class Lang {
     public static Default = LangCode.EN_US;
@@ -17,7 +16,7 @@ export class Lang {
         location: string,
         langCode: LangCode,
         variables?: { [name: string]: string }
-    ): MessageEmbed {
+    ): EmbedBuilder {
         return (
             this.linguini.get(location, langCode, this.messageEmbedTm, variables) ??
             this.linguini.get(location, this.Default, this.messageEmbedTm, variables)
@@ -46,8 +45,8 @@ export class Lang {
         return this.linguini.getCom(location, variables);
     }
 
-    private static messageEmbedTm: TypeMapper<MessageEmbed> = (jsonValue: any) => {
-        return new MessageEmbed({
+    private static messageEmbedTm: TypeMapper<EmbedBuilder> = (jsonValue: any) => {
+        return new EmbedBuilder({
             author: jsonValue.author,
             title: Utils.join(jsonValue.title, '\n'),
             url: jsonValue.url,

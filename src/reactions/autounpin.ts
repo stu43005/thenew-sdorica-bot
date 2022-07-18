@@ -19,11 +19,16 @@ export class AutoUnpinReaction implements Reaction {
         return PermissionUtils.canPin(msg.channel, true);
     }
 
-    public async execute(msgReaction: MessageReaction, msg: Message, reactor: User, _data: EventData): Promise<void> {
+    public async execute(
+        msgReaction: MessageReaction,
+        msg: Message,
+        reactor: User,
+        _data: EventData
+    ): Promise<void> {
         if (!msg.guild) return;
 
         const member = await ClientUtils.findMember(msg.guild, reactor.id);
-        if (PermissionUtils.memberHasPermission(msg.channel, member, 'MANAGE_MESSAGES')) {
+        if (PermissionUtils.memberHasPermission(msg.channel, member, 'ManageMessages')) {
             if (msg.pinnable && msg.pinned) {
                 await MessageUtils.unpin(msg);
             }

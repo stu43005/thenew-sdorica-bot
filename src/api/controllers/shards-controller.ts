@@ -3,15 +3,15 @@ import { ShardingManager } from 'discord.js';
 import { Request, Response, Router } from 'express';
 import router from 'express-promise-router';
 import { createRequire } from 'node:module';
-import { Logger } from '../../services/index.js';
-import { mapClass } from '../middleware/index.js';
+import { Logger } from '../../services/logger.js';
+import { mapClass } from '../middleware/map-class.js';
 import {
     GetShardsResponse,
     SetShardPresencesRequest,
     ShardInfo,
-    ShardStats
-} from '../models/cluster-api/index.js';
-import { Controller } from './index.js';
+    ShardStats,
+} from '../models/cluster-api/shards.js';
+import { Controller } from './controller.js';
 
 const require = createRequire(import.meta.url);
 const Logs = require('../../../lang/logs.json');
@@ -21,7 +21,7 @@ export class ShardsController implements Controller {
     public router: Router = router();
     public authToken: string = config.get('api.secret');
 
-    constructor(private shardManager: ShardingManager) { }
+    constructor(private shardManager: ShardingManager) {}
 
     public register(): void {
         this.router.get('/', (req, res) => this.getShards(req, res));

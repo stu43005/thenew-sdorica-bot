@@ -1,13 +1,21 @@
 import config from 'config';
-import { AutocompleteInteraction, BaseCommandInteraction, NewsChannel, TextChannel, ThreadChannel } from 'discord.js';
+import {
+    AutocompleteInteraction,
+    CommandInteraction,
+    NewsChannel,
+    TextChannel,
+    ThreadChannel,
+} from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { createRequire } from 'node:module';
 import { AppCommand, CommandDeferType } from '../commands/command.js';
 import { getGuildRepository } from '../database/entities/guild.js';
 import { getUserRepository } from '../database/entities/user.js';
 import { EventData } from '../models/event-data.js';
-import { Lang, Logger } from '../services/index.js';
-import { CommandUtils, InteractionUtils } from '../utils/index.js';
+import { Lang } from '../services/lang.js';
+import { Logger } from '../services/logger.js';
+import { CommandUtils } from '../utils/command-utils.js';
+import { InteractionUtils } from '../utils/interaction-utils.js';
 import { EventHandler } from './event-handler.js';
 
 const require = createRequire(import.meta.url);
@@ -19,9 +27,9 @@ export class CommandHandler implements EventHandler {
         config.get<number>('rateLimiting.commands.interval') * 1000
     );
 
-    constructor(public commands: AppCommand[]) { }
+    constructor(public commands: AppCommand[]) {}
 
-    public async process(intr: BaseCommandInteraction): Promise<void> {
+    public async process(intr: CommandInteraction): Promise<void> {
         // Don't respond to self, or other bots
         if (intr.user.id === intr.client.user?.id || intr.user.bot) {
             return;
@@ -83,19 +91,19 @@ export class CommandHandler implements EventHandler {
                     intr.channel instanceof NewsChannel ||
                     intr.channel instanceof ThreadChannel
                     ? Logs.error.commandGuild
-                        .replaceAll('{INTERACTION_ID}', intr.id)
-                        .replaceAll('{COMMAND_NAME}', command.metadata.name)
-                        .replaceAll('{USER_TAG}', intr.user.tag)
-                        .replaceAll('{USER_ID}', intr.user.id)
-                        .replaceAll('{CHANNEL_NAME}', intr.channel.name)
-                        .replaceAll('{CHANNEL_ID}', intr.channel.id)
-                        .replaceAll('{GUILD_NAME}', intr.guild?.name)
-                        .replaceAll('{GUILD_ID}', intr.guild?.id)
+                          .replaceAll('{INTERACTION_ID}', intr.id)
+                          .replaceAll('{COMMAND_NAME}', command.metadata.name)
+                          .replaceAll('{USER_TAG}', intr.user.tag)
+                          .replaceAll('{USER_ID}', intr.user.id)
+                          .replaceAll('{CHANNEL_NAME}', intr.channel.name)
+                          .replaceAll('{CHANNEL_ID}', intr.channel.id)
+                          .replaceAll('{GUILD_NAME}', intr.guild?.name)
+                          .replaceAll('{GUILD_ID}', intr.guild?.id)
                     : Logs.error.commandOther
-                        .replaceAll('{INTERACTION_ID}', intr.id)
-                        .replaceAll('{COMMAND_NAME}', command.metadata.name)
-                        .replaceAll('{USER_TAG}', intr.user.tag)
-                        .replaceAll('{USER_ID}', intr.user.id),
+                          .replaceAll('{INTERACTION_ID}', intr.id)
+                          .replaceAll('{COMMAND_NAME}', command.metadata.name)
+                          .replaceAll('{USER_TAG}', intr.user.tag)
+                          .replaceAll('{USER_ID}', intr.user.id),
                 error
             );
         }
@@ -130,25 +138,25 @@ export class CommandHandler implements EventHandler {
                     intr.channel instanceof NewsChannel ||
                     intr.channel instanceof ThreadChannel
                     ? Logs.error.commandGuild
-                        .replaceAll('{INTERACTION_ID}', intr.id)
-                        .replaceAll('{COMMAND_NAME}', command.metadata.name)
-                        .replaceAll('{USER_TAG}', intr.user.tag)
-                        .replaceAll('{USER_ID}', intr.user.id)
-                        .replaceAll('{CHANNEL_NAME}', intr.channel.name)
-                        .replaceAll('{CHANNEL_ID}', intr.channel.id)
-                        .replaceAll('{GUILD_NAME}', intr.guild?.name)
-                        .replaceAll('{GUILD_ID}', intr.guild?.id)
+                          .replaceAll('{INTERACTION_ID}', intr.id)
+                          .replaceAll('{COMMAND_NAME}', command.metadata.name)
+                          .replaceAll('{USER_TAG}', intr.user.tag)
+                          .replaceAll('{USER_ID}', intr.user.id)
+                          .replaceAll('{CHANNEL_NAME}', intr.channel.name)
+                          .replaceAll('{CHANNEL_ID}', intr.channel.id)
+                          .replaceAll('{GUILD_NAME}', intr.guild?.name)
+                          .replaceAll('{GUILD_ID}', intr.guild?.id)
                     : Logs.error.commandOther
-                        .replaceAll('{INTERACTION_ID}', intr.id)
-                        .replaceAll('{COMMAND_NAME}', command.metadata.name)
-                        .replaceAll('{USER_TAG}', intr.user.tag)
-                        .replaceAll('{USER_ID}', intr.user.id),
+                          .replaceAll('{INTERACTION_ID}', intr.id)
+                          .replaceAll('{COMMAND_NAME}', command.metadata.name)
+                          .replaceAll('{USER_TAG}', intr.user.tag)
+                          .replaceAll('{USER_ID}', intr.user.id),
                 error
             );
         }
     }
 
-    private async sendError(intr: BaseCommandInteraction, data: EventData): Promise<void> {
+    private async sendError(intr: CommandInteraction, data: EventData): Promise<void> {
         try {
             await InteractionUtils.send(
                 intr,

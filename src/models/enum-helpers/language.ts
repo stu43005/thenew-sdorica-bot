@@ -1,5 +1,5 @@
-import { LangCode } from '../../enums/index.js';
-import { Lang } from '../../services/index.js';
+import { LangCode } from '../../enums/lang-code.js';
+import { Lang } from '../../services/lang.js';
 
 export class Language {
     public static keyword(langCode: LangCode): string {

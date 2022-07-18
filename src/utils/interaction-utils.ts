@@ -1,35 +1,36 @@
-import { RESTJSONErrorCodes as DiscordApiErrors } from 'discord-api-types/v10';
 import {
-    BaseCommandInteraction,
-    CommandInteraction, DiscordAPIError,
+    CommandInteraction,
+    DiscordAPIError,
+    EmbedBuilder,
     GuildMember,
     InteractionReplyOptions,
+    InteractionResponse,
     InteractionUpdateOptions,
     Message,
     MessageComponentInteraction,
-    MessageEmbed,
     MessageOptions,
     ModalSubmitInteraction,
-    User
+    RESTJSONErrorCodes,
+    User,
 } from 'discord.js';
 import { ClientUtils } from './client-utils.js';
-import { MessageUtils } from './index.js';
+import { MessageUtils } from './message-utils.js';
 
-const IGNORED_ERRORS = [
-    DiscordApiErrors.UnknownMessage,
-    DiscordApiErrors.UnknownChannel,
-    DiscordApiErrors.UnknownGuild,
-    DiscordApiErrors.UnknownUser,
-    DiscordApiErrors.UnknownInteraction,
-    DiscordApiErrors.CannotSendMessagesToThisUser, // User blocked bot or DM disabled
-    DiscordApiErrors.ReactionWasBlocked, // User blocked bot or DM disabled
+const IGNORED_ERRORS: (string | number)[] = [
+    RESTJSONErrorCodes.UnknownMessage,
+    RESTJSONErrorCodes.UnknownChannel,
+    RESTJSONErrorCodes.UnknownGuild,
+    RESTJSONErrorCodes.UnknownUser,
+    RESTJSONErrorCodes.UnknownInteraction,
+    RESTJSONErrorCodes.CannotSendMessagesToThisUser, // User blocked bot or DM disabled
+    RESTJSONErrorCodes.ReactionWasBlocked, // User blocked bot or DM disabled
 ];
 
 export class InteractionUtils {
     public static async deferReply(
-        intr: BaseCommandInteraction | MessageComponentInteraction | ModalSubmitInteraction,
+        intr: CommandInteraction | MessageComponentInteraction | ModalSubmitInteraction,
         hidden: boolean = false
-    ): Promise<void> {
+    ): Promise<InteractionResponse | undefined> {
         try {
             return await intr.deferReply({
                 ephemeral: hidden,
@@ -43,7 +44,9 @@ export class InteractionUtils {
         }
     }
 
-    public static async deferUpdate(intr: MessageComponentInteraction | ModalSubmitInteraction): Promise<void> {
+    public static async deferUpdate(
+        intr: MessageComponentInteraction
+    ): Promise<InteractionResponse | undefined> {
         try {
             return await intr.deferUpdate();
         } catch (error) {
@@ -56,24 +59,24 @@ export class InteractionUtils {
     }
 
     public static async send(
-        intr: BaseCommandInteraction | MessageComponentInteraction | ModalSubmitInteraction,
-        content: string | MessageEmbed | MessageOptions,
+        intr: CommandInteraction | MessageComponentInteraction | ModalSubmitInteraction,
+        content: string | EmbedBuilder | MessageOptions,
         hidden: boolean = false
     ): Promise<Message | undefined> {
         try {
             const msgOptions = MessageUtils.messageOptions(content) as InteractionReplyOptions;
 
             if (intr.deferred || intr.replied) {
-                return (await intr.followUp({
+                return await intr.followUp({
                     ...msgOptions,
                     ephemeral: hidden,
-                })) as Message;
+                });
             } else {
-                return (await intr.reply({
+                return await intr.reply({
                     ...msgOptions,
                     ephemeral: hidden,
                     fetchReply: true,
-                })) as Message;
+                });
             }
         } catch (error) {
             if (error instanceof DiscordAPIError && IGNORED_ERRORS.includes(error.code)) {
@@ -85,14 +88,14 @@ export class InteractionUtils {
     }
 
     public static async editReply(
-        intr: BaseCommandInteraction | MessageComponentInteraction,
-        content: string | MessageEmbed | MessageOptions
+        intr: CommandInteraction | MessageComponentInteraction,
+        content: string | EmbedBuilder | MessageOptions
     ): Promise<Message | undefined> {
         try {
             const msgOptions = MessageUtils.messageOptions(content);
-            return (await intr.editReply({
+            return await intr.editReply({
                 ...msgOptions,
-            })) as Message;
+            });
         } catch (error) {
             if (error instanceof DiscordAPIError && IGNORED_ERRORS.includes(error.code)) {
                 return;
@@ -104,14 +107,14 @@ export class InteractionUtils {
 
     public static async update(
         intr: MessageComponentInteraction,
-        content: string | MessageEmbed | MessageOptions
+        content: string | EmbedBuilder | MessageOptions
     ): Promise<Message | undefined> {
         try {
             const msgOptions = MessageUtils.messageOptions(content) as InteractionUpdateOptions;
-            return (await intr.update({
+            return await intr.update({
                 ...msgOptions,
                 fetchReply: true,
-            })) as Message;
+            });
         } catch (error) {
             if (error instanceof DiscordAPIError && IGNORED_ERRORS.includes(error.code)) {
                 return;
@@ -121,7 +124,9 @@ export class InteractionUtils {
         }
     }
 
-    public static async getMemberOrUser(intr: CommandInteraction | MessageComponentInteraction): Promise<GuildMember | User> {
+    public static async getMemberOrUser(
+        intr: CommandInteraction | MessageComponentInteraction
+    ): Promise<GuildMember | User> {
         if (intr.guild) {
             const member = await ClientUtils.findMember(intr.guild, intr.user.id);
             if (member) {

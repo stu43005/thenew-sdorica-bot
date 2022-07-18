@@ -1,12 +1,20 @@
-import { ButtonInteraction, Message, MessageComponentInteraction, ModalSubmitInteraction, SelectMenuInteraction } from 'discord.js';
+import {
+    ButtonInteraction,
+    Message,
+    MessageComponentInteraction,
+    ModalSubmitInteraction,
+    SelectMenuInteraction,
+} from 'discord.js';
 import { CommandDeferType } from '../commands/command.js';
 import { EventData } from '../models/event-data.js';
 
 export type ComponentIntercation = MessageComponentInteraction | ModalSubmitInteraction;
 export type ComponentDeferType<T extends ComponentIntercation> =
-    T extends MessageComponentInteraction ? ButtonDeferType :
-    T extends ModalSubmitInteraction ? CommandDeferType :
-    ButtonDeferType | CommandDeferType;
+    T extends MessageComponentInteraction
+        ? MessageComponentDeferType
+        : T extends ModalSubmitInteraction
+        ? CommandDeferType
+        : MessageComponentDeferType | CommandDeferType;
 
 export interface Component<T extends ComponentIntercation = ComponentIntercation> {
     ids: string[];
@@ -16,7 +24,7 @@ export interface Component<T extends ComponentIntercation = ComponentIntercation
     execute(intr: T, msg: Message, data: EventData): Promise<void>;
 }
 
-export enum ButtonDeferType {
+export enum MessageComponentDeferType {
     REPLY = 'REPLY',
     UPDATE = 'UPDATE',
     NONE = 'NONE',
@@ -27,14 +35,16 @@ export type SelectMenu = Component<SelectMenuInteraction>;
 export type ModelSubmit = Component<ModalSubmitInteraction>;
 
 /*
-BaseCommandInteraction
+BaseInteraction
 * CommandInteraction
-* ContextMenuInteraction
-  * UserContextMenuInteraction
-  * MessageContextMenuInteraction
-MessageComponentInteraction
-* ButtonInteraction
-* SelectMenuInteraction
-ModalSubmitInteraction
-AutocompleteInteraction
+  * ChatInputCommandInteraction
+  * ContextMenuCommandInteraction
+    * UserContextMenuCommandInteraction
+    * MessageContextMenuCommandInteraction
+* MessageComponentInteraction
+  * ButtonInteraction
+  * SelectMenuInteraction
+* ModalSubmitInteraction
+  * ModalMessageModalSubmitInteraction
+* AutocompleteInteraction
 */

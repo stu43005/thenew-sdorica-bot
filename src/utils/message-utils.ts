@@ -1,34 +1,35 @@
-import { RESTJSONErrorCodes as DiscordApiErrors } from 'discord-api-types/v10';
 import {
+    ChannelType,
     DiscordAPIError,
+    EmbedBuilder,
     EmojiResolvable,
     GuildMember,
     Message,
     MessageEditOptions,
-    MessageEmbed,
     MessageOptions,
     MessageReaction,
     MessageReactionResolvable,
+    RESTJSONErrorCodes,
     StartThreadOptions,
     TextBasedChannel,
     ThreadChannel,
-    User
+    User,
 } from 'discord.js';
 
-const IGNORED_ERRORS = [
-    DiscordApiErrors.UnknownMessage,
-    DiscordApiErrors.UnknownChannel,
-    DiscordApiErrors.UnknownGuild,
-    DiscordApiErrors.UnknownUser,
-    DiscordApiErrors.UnknownInteraction,
-    DiscordApiErrors.CannotSendMessagesToThisUser, // User blocked bot or DM disabled
-    DiscordApiErrors.ReactionWasBlocked, // User blocked bot or DM disabled
+const IGNORED_ERRORS: (string | number)[] = [
+    RESTJSONErrorCodes.UnknownMessage,
+    RESTJSONErrorCodes.UnknownChannel,
+    RESTJSONErrorCodes.UnknownGuild,
+    RESTJSONErrorCodes.UnknownUser,
+    RESTJSONErrorCodes.UnknownInteraction,
+    RESTJSONErrorCodes.CannotSendMessagesToThisUser, // User blocked bot or DM disabled
+    RESTJSONErrorCodes.ReactionWasBlocked, // User blocked bot or DM disabled
 ];
 
 export class MessageUtils {
     public static async send(
         target: User | TextBasedChannel,
-        content: string | MessageEmbed | MessageOptions
+        content: string | EmbedBuilder | MessageOptions
     ): Promise<Message | undefined> {
         try {
             const msgOptions = this.messageOptions(content);
@@ -44,8 +45,8 @@ export class MessageUtils {
 
     public static async reply(
         msg: Message,
-        content: string | MessageEmbed | MessageOptions,
-        mentionRepliedUser: boolean = true,
+        content: string | EmbedBuilder | MessageOptions,
+        mentionRepliedUser: boolean = true
     ): Promise<Message | undefined> {
         try {
             const msgOptions = this.messageOptions(content);
@@ -65,7 +66,7 @@ export class MessageUtils {
 
     public static async edit(
         msg: Message,
-        content: string | MessageEmbed | MessageOptions
+        content: string | EmbedBuilder | MessageOptions
     ): Promise<Message | undefined> {
         try {
             const msgOptions = this.messageOptions(content) as MessageEditOptions;
@@ -79,7 +80,10 @@ export class MessageUtils {
         }
     }
 
-    public static async react(msg: Message, emoji: EmojiResolvable): Promise<MessageReaction | undefined> {
+    public static async react(
+        msg: Message,
+        emoji: EmojiResolvable
+    ): Promise<MessageReaction | undefined> {
         try {
             return await msg.react(emoji);
         } catch (error) {
@@ -91,10 +95,14 @@ export class MessageUtils {
         }
     }
 
-    public static async unreact(msg: Message, emoji: MessageReactionResolvable, user?: User | GuildMember | string): Promise<MessageReaction | undefined> {
+    public static async unreact(
+        msg: Message,
+        emoji: MessageReactionResolvable,
+        user?: User | GuildMember | string
+    ): Promise<MessageReaction | undefined> {
         try {
             const reaction = msg.reactions.resolve(emoji);
-            if (reaction && msg.channel.type !== 'DM') {
+            if (reaction && msg.channel.type !== ChannelType.DM) {
                 if (user === 'all') {
                     return await reaction.remove();
                 }
@@ -160,11 +168,11 @@ export class MessageUtils {
         }
     }
 
-    public static messageOptions(content: string | MessageEmbed | MessageOptions): MessageOptions {
+    public static messageOptions(content: string | EmbedBuilder | MessageOptions): MessageOptions {
         let options: MessageOptions = {};
         if (typeof content === 'string') {
             options.content = content;
-        } else if (content instanceof MessageEmbed) {
+        } else if (content instanceof EmbedBuilder) {
             options.embeds = [content];
         } else {
             options = content;

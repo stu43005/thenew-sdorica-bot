@@ -34,8 +34,7 @@ export interface StarboardSetting {
 }
 
 @CustomRepository(GuildData)
-export class CustomGuildDataRepository extends CustomBaseRepository<GuildData> {
-}
+export class CustomGuildDataRepository extends CustomBaseRepository<GuildData> {}
 
 export function getGuildRepository(): CustomGuildDataRepository {
     return getRepository(GuildData) as CustomGuildDataRepository;

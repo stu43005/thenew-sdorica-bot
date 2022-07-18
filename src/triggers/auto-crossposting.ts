@@ -1,4 +1,4 @@
-import { Message } from 'discord.js';
+import { ChannelType, Message } from 'discord.js';
 import { EventData } from '../models/event-data.js';
 import { Trigger } from './trigger.js';
 
@@ -6,7 +6,7 @@ export class AutoCrosspostingTrigger implements Trigger {
     public requireGuild = true;
 
     public triggered(msg: Message): boolean {
-        return msg.channel.type === 'GUILD_NEWS';
+        return msg.channel.type === ChannelType.GuildNews;
     }
 
     public async execute(msg: Message, data: EventData): Promise<void> {

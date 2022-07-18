@@ -1,16 +1,18 @@
-import { inlineCode } from '@discordjs/builders';
-import { Message, MessageEmbed, ModalSubmitInteraction } from 'discord.js';
+import { EmbedBuilder, inlineCode, Message, ModalSubmitInteraction } from 'discord.js';
 import { CommandDeferType } from '../commands/command.js';
 import { EventData } from '../models/event-data.js';
-import { FormatUtils, MessageUtils, PermissionUtils, RegexUtils } from '../utils/index.js';
+import { FormatUtils } from '../utils/format-utils.js';
 import { InteractionUtils } from '../utils/interaction-utils.js';
+import { MessageUtils } from '../utils/message-utils.js';
+import { PermissionUtils } from '../utils/permission-utils.js';
+import { RegexUtils } from '../utils/regex-utils.js';
 import { ModelSubmit } from './component.js';
 
 export default class ReportMessageSubmit implements ModelSubmit {
     static #instance: ReportMessageSubmit;
 
     public static getInstance(): ReportMessageSubmit {
-        return this.#instance ??= new ReportMessageSubmit();
+        return (this.#instance ??= new ReportMessageSubmit());
     }
 
     public ids = ['report_message_submit'];
@@ -18,7 +20,11 @@ export default class ReportMessageSubmit implements ModelSubmit {
     public requireGuild = true;
     public requireEmbedAuthorTag = false;
 
-    public async execute(intr: ModalSubmitInteraction, _msg: Message, _data: EventData): Promise<void> {
+    public async execute(
+        intr: ModalSubmitInteraction,
+        _msg: Message,
+        _data: EventData
+    ): Promise<void> {
         if (!intr.channel || !intr.guild) return;
         const messageId = RegexUtils.discordId(intr.fields.getTextInputValue('messageId'));
         if (!messageId) {
@@ -27,7 +33,10 @@ export default class ReportMessageSubmit implements ModelSubmit {
         }
         const message = await intr.channel.messages.fetch(messageId);
         if (!message) {
-            await InteractionUtils.send(intr, `Error: 找不到目標訊息ID: ${inlineCode(messageId)}。`);
+            await InteractionUtils.send(
+                intr,
+                `Error: 找不到目標訊息ID: ${inlineCode(messageId)}。`
+            );
             return;
         }
         const reason = intr.fields.getTextInputValue('reason');
@@ -39,12 +48,18 @@ export default class ReportMessageSubmit implements ModelSubmit {
         ReportMessageSubmit.getInstance().ids.push(customId);
     }
 
-    public static async report(intr: ModalSubmitInteraction, message: Message, reason: string): Promise<void> {
+    public static async report(
+        intr: ModalSubmitInteraction,
+        message: Message,
+        reason: string
+    ): Promise<void> {
         if (!intr.channel || !intr.guild) return;
 
-        const report = new MessageEmbed();
+        const report = new EmbedBuilder();
         report.setAuthor({
-            name: `Report by: ${intr.user.tag} | in channel: #${'name' in intr.channel ? intr.channel.name : intr.channel.id}`,
+            name: `Report by: ${intr.user.tag} | in channel: #${
+                'name' in intr.channel ? intr.channel.name : intr.channel.id
+            }`,
             iconURL: intr.user.displayAvatarURL(),
         });
         report.setTitle('檢舉原因');
@@ -52,7 +67,10 @@ export default class ReportMessageSubmit implements ModelSubmit {
         report.setTimestamp(intr.createdAt);
         const embed = FormatUtils.embedTheMessage(message, intr.channel);
 
-        if (intr.guild.publicUpdatesChannel && PermissionUtils.canSend(intr.guild.publicUpdatesChannel)) {
+        if (
+            intr.guild.publicUpdatesChannel &&
+            PermissionUtils.canSend(intr.guild.publicUpdatesChannel)
+        ) {
             await MessageUtils.send(intr.guild.publicUpdatesChannel, {
                 content: `收到回報的訊息：`,
                 embeds: [report, embed],
@@ -66,9 +84,13 @@ export default class ReportMessageSubmit implements ModelSubmit {
             });
         }
 
-        await InteractionUtils.send(intr, {
-            content: `已報告此訊息給管理員：`,
-            embeds: [report, embed],
-        }, true);
+        await InteractionUtils.send(
+            intr,
+            {
+                content: `已報告此訊息給管理員：`,
+                embeds: [report, embed],
+            },
+            true
+        );
     }
 }

@@ -1,5 +1,9 @@
 import { Message, MessageReaction, User } from 'discord.js';
-import { ReactionRole, ReactionRoleEmoji, ReactionRoleType } from '../commands/config/reaction-role.js';
+import {
+    ReactionRole,
+    ReactionRoleEmoji,
+    ReactionRoleType,
+} from '../commands/config/reaction-role.js';
 import { EventData } from '../models/event-data.js';
 import { ClientUtils } from '../utils/client-utils.js';
 import { MessageUtils } from '../utils/message-utils.js';
@@ -18,7 +22,12 @@ export class ReactionRoleAdd implements Reaction {
         return true;
     }
 
-    public async execute(msgReaction: MessageReaction, msg: Message, reactor: User, data: EventData): Promise<void> {
+    public async execute(
+        msgReaction: MessageReaction,
+        msg: Message,
+        reactor: User,
+        data: EventData
+    ): Promise<void> {
         const guild = msg.guild;
         if (!guild) return;
 
@@ -51,11 +60,19 @@ export class ReactionRoleAdd implements Reaction {
             removes = adds;
             adds = temp;
         }
-        if (rr.type === ReactionRoleType.VERIFY || rr.type === ReactionRoleType.DROP || rr.type === ReactionRoleType.BINDING) {
+        if (
+            rr.type === ReactionRoleType.VERIFY ||
+            rr.type === ReactionRoleType.DROP ||
+            rr.type === ReactionRoleType.BINDING
+        ) {
             unreacts.push(rrEmoji);
         }
         if (rr.type === ReactionRoleType.UNIQUE) {
-            removes = removes.concat(rr.emojis.filter(emo => emo !== rrEmoji && memberHasRoles.find(r => r.id == emo.roleId)));
+            removes = removes.concat(
+                rr.emojis.filter(
+                    emo => emo !== rrEmoji && memberHasRoles.find(r => r.id == emo.roleId)
+                )
+            );
             unreacts = unreacts.concat(removes);
         }
         if (rr.type === ReactionRoleType.LIMIT || rr.type === ReactionRoleType.BINDING) {

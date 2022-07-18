@@ -14,7 +14,9 @@ export class RegexUtils {
         return input.match(/\b\d{17,20}\b/)?.[0];
     }
 
-    public static tag(input: string): { username: string; tag: string; discriminator: string } | undefined {
+    public static tag(
+        input: string
+    ): { username: string; tag: string; discriminator: string } | undefined {
         const match = input.match(/\b(.+)#([\d]{4})\b/);
         if (!match) {
             return;
@@ -27,7 +29,9 @@ export class RegexUtils {
         };
     }
 
-    public static guildEmoji(input: string): { animated?: boolean; name?: string; discordId: string } | undefined {
+    public static guildEmoji(
+        input: string
+    ): { animated?: boolean; name?: string; discordId: string } | undefined {
         const match = input.match(/^(?:<(a?):([a-zA-Z0-9_]+):)?(\d{17,20})>?$/);
         if (!match) {
             return;

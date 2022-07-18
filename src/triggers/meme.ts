@@ -30,5 +30,4 @@ export class MemeTrigger implements Trigger {
             // StatCollection.fromGuild(msg.guild).addMeme(msg, matches[index].keyword);
         }
     }
-
 }

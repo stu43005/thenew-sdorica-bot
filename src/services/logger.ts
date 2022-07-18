@@ -1,6 +1,5 @@
-import { codeBlock, inlineCode } from '@discordjs/builders';
 import config from 'config';
-import { DiscordAPIError, MessageEmbed, WebhookClient } from 'discord.js';
+import { codeBlock, DiscordAPIError, EmbedBuilder, inlineCode, WebhookClient } from 'discord.js';
 import { Response } from 'node-fetch';
 import { Transform } from 'node:stream';
 import pino, { DestinationStream, Level, LoggerOptions, StreamEntry } from 'pino';
@@ -18,38 +17,42 @@ const loggerOption: LoggerOptions = {
 };
 const streams: (DestinationStream | StreamEntry)[] = [
     ...(config.get('logging.pretty')
-        ? [{
-            stream: pino.transport({
-                target: 'pino-pretty',
-                options: {
-                    colorize: true,
-                    ignore: 'pid,hostname',
-                    translateTime: 'yyyy-mm-dd HH:MM:ss.l',
-                },
-            }),
-            level: 'debug',
-        } as const]
+        ? [
+              {
+                  stream: pino.transport({
+                      target: 'pino-pretty',
+                      options: {
+                          colorize: true,
+                          ignore: 'pid,hostname',
+                          translateTime: 'yyyy-mm-dd HH:MM:ss.l',
+                      },
+                  }),
+                  level: 'debug',
+              } as const,
+          ]
         : []),
     ...(config.get('logging.discordWebhook.enabled')
-        ? [{
-            stream: await discordWebhookTransport({
-                id: config.get('logging.discordWebhook.id'),
-                token: config.get('logging.discordWebhook.token'),
-            }),
-            level: 'info',
-        } as const]
+        ? [
+              {
+                  stream: await discordWebhookTransport({
+                      id: config.get('logging.discordWebhook.id'),
+                      token: config.get('logging.discordWebhook.token'),
+                  }),
+                  level: 'info',
+              } as const,
+          ]
         : []),
 ];
-let logger = streams.length
-    ? pino(loggerOption, pino.multistream(streams))
-    : pino(loggerOption);
+let logger = streams.length ? pino(loggerOption, pino.multistream(streams)) : pino(loggerOption);
 
 export interface DiscordWebhookTransportOptions {
     id: string;
     token: string;
 }
 
-export async function discordWebhookTransport(opts: DiscordWebhookTransportOptions): Promise<Transform & OnUnknown> {
+export async function discordWebhookTransport(
+    opts: DiscordWebhookTransportOptions
+): Promise<Transform & OnUnknown> {
     const webhookClient = new WebhookClient(opts);
 
     function webhookError(reason: any): void {
@@ -57,17 +60,23 @@ export async function discordWebhookTransport(opts: DiscordWebhookTransportOptio
     }
     function getLevel(level: Level): [number, string] {
         switch (level) {
-            case 'trace': return [0, '🐛'];
-            case 'debug': return [0, '🐛'];
-            case 'info': return [0xd5d5d5, 'ℹ️'];
-            case 'warn': return [0xfedda1, '⚠️'];
-            case 'error': return [0xfe8082, '❌'];
-            case 'fatal': return [0xfe8082, '❌'];
+            case 'trace':
+                return [0, '🐛'];
+            case 'debug':
+                return [0, '🐛'];
+            case 'info':
+                return [0xd5d5d5, 'ℹ️'];
+            case 'warn':
+                return [0xfedda1, '⚠️'];
+            case 'error':
+                return [0xfe8082, '❌'];
+            case 'fatal':
+                return [0xfe8082, '❌'];
         }
     }
     const ignore = 'level,time,msg,pid,hostname,err'.split(',');
-    function printExtraKey(embed: MessageEmbed, obj: any): string {
-        const extraKeys = Object.keys(obj).filter((key) => !ignore.includes(key));
+    function printExtraKey(embed: EmbedBuilder, obj: any): string {
+        const extraKeys = Object.keys(obj).filter(key => !ignore.includes(key));
         if (extraKeys.length) {
             const extra = extraKeys.reduce<any>((acc, cur) => {
                 acc[cur] = obj[cur];
@@ -88,11 +97,14 @@ export async function discordWebhookTransport(opts: DiscordWebhookTransportOptio
             const [color, emoji] = getLevel(obj.level);
             if (!color) continue;
 
-            const embed = new MessageEmbed();
+            const embed = new EmbedBuilder();
             embed.setColor(color);
             embed.setDescription(`${emoji}：${obj.msg}${printExtraKey(embed, obj)}`);
             if ('err' in obj) {
-                embed.addField('err', codeBlock(obj.err.stack ?? obj.err.toString()));
+                embed.addFields({
+                    name: 'err',
+                    value: codeBlock(obj.err.stack ?? obj.err.toString()),
+                });
             }
 
             await webhookClient.send({ embeds: [embed] }).catch(webhookError);
@@ -151,9 +163,9 @@ export class Logger {
                 .child({
                     message: obj.message,
                     code: obj.code,
-                    statusCode: obj.httpStatus,
+                    status: obj.status,
                     method: obj.method,
-                    path: obj.path,
+                    url: obj.url,
                     stack: obj.stack,
                 })
                 .error(message);

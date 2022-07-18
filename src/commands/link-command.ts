@@ -1,12 +1,13 @@
-import { ApplicationCommandOptionType, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import {
-    CommandInteraction,
-    MessageEmbed,
-    PermissionString
+    ApplicationCommandOptionType,
+    ChatInputCommandInteraction,
+    EmbedBuilder,
+    PermissionsString,
+    RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord.js';
 import { EventData } from '../models/event-data.js';
-import { Lang } from '../services/index.js';
-import { InteractionUtils } from '../utils/index.js';
+import { Lang } from '../services/lang.js';
+import { InteractionUtils } from '../utils/interaction-utils.js';
 import { Command, CommandDeferType } from './command.js';
 
 export class LinkCommand implements Command {
@@ -47,13 +48,13 @@ export class LinkCommand implements Command {
     public deferType = CommandDeferType.PUBLIC;
     public requireDev = false;
     public requireGuild = false;
-    public requireClientPerms: PermissionString[] = [];
-    public requireUserPerms: PermissionString[] = [];
+    public requireClientPerms: PermissionsString[] = [];
+    public requireUserPerms: PermissionsString[] = [];
 
-    public async execute(intr: CommandInteraction, data: EventData): Promise<void> {
+    public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
         const link = intr.options.getString(Lang.getCom('arguments.link'));
 
-        let embed: MessageEmbed;
+        let embed: EmbedBuilder;
         switch (link) {
             case 'docs': {
                 embed = Lang.getEmbed('displayEmbeds.linkDocs', data.lang());

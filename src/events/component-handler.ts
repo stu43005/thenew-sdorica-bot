@@ -1,12 +1,16 @@
 import config from 'config';
-import { Message } from 'discord.js';
+import { Message, MessageComponentInteraction } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { CommandDeferType } from '../commands/command.js';
-import { ButtonDeferType, Component, ComponentIntercation } from '../components/component.js';
+import {
+    Component,
+    ComponentIntercation,
+    MessageComponentDeferType,
+} from '../components/component.js';
 import { getGuildRepository } from '../database/entities/guild.js';
 import { getUserRepository } from '../database/entities/user.js';
 import { EventData } from '../models/event-data.js';
-import { InteractionUtils } from '../utils/index.js';
+import { InteractionUtils } from '../utils/interaction-utils.js';
 import { EventHandler } from './event-handler.js';
 
 export class ComponentHandler implements EventHandler {
@@ -15,7 +19,7 @@ export class ComponentHandler implements EventHandler {
         config.get<number>('rateLimiting.components.interval') * 1000
     );
 
-    constructor(private components: Component[]) { }
+    constructor(private components: Component[]) {}
 
     public async process(intr: ComponentIntercation, msg: Message): Promise<void> {
         // Don't respond to self, or other bots
@@ -47,12 +51,14 @@ export class ComponentHandler implements EventHandler {
         // Defer interaction
         // NOTE: Anything after this point we should be responding to the interaction
         switch (component.deferType) {
-            case ButtonDeferType.REPLY: {
+            case MessageComponentDeferType.REPLY: {
                 await InteractionUtils.deferReply(intr);
                 break;
             }
-            case ButtonDeferType.UPDATE: {
-                await InteractionUtils.deferUpdate(intr);
+            case MessageComponentDeferType.UPDATE: {
+                if (intr instanceof MessageComponentInteraction) {
+                    await InteractionUtils.deferUpdate(intr);
+                }
                 break;
             }
             case CommandDeferType.PUBLIC: {
@@ -66,7 +72,7 @@ export class ComponentHandler implements EventHandler {
         }
 
         // Return if defer was unsuccessful
-        if (component.deferType !== ButtonDeferType.NONE && !intr.deferred) {
+        if (component.deferType !== MessageComponentDeferType.NONE && !intr.deferred) {
             return;
         }
 

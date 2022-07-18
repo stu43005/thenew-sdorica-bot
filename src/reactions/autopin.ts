@@ -19,24 +19,36 @@ export class AutoPinReaction implements Reaction {
         return PermissionUtils.canPin(msg.channel);
     }
 
-    public async execute(msgReaction: MessageReaction, msg: Message, reactor: User, data: EventData): Promise<void> {
+    public async execute(
+        msgReaction: MessageReaction,
+        msg: Message,
+        reactor: User,
+        data: EventData
+    ): Promise<void> {
         if (!msg.guild) return;
-        if (typeof data.guild?.autopinCount === 'undefined' || data.guild.autopinCount === 0) return;
+        if (typeof data.guild?.autopinCount === 'undefined' || data.guild.autopinCount === 0)
+            return;
 
         const member = await ClientUtils.findMember(msg.guild, reactor.id);
         if (
-            PermissionUtils.memberHasPermission(msg.channel, member, 'MANAGE_MESSAGES') ||
+            PermissionUtils.memberHasPermission(msg.channel, member, 'ManageMessages') ||
             msgReaction.count >= data.guild.autopinCount
         ) {
             if (msg.pinnable && !msg.pinned) {
-                let x = msg.reactions.valueOf().find((react) => react.emoji.name === '❌');
+                let x = msg.reactions.valueOf().find(react => react.emoji.name === '❌');
                 if (x) {
                     if (x.partial) {
                         x = await x.fetch();
                     }
                     for (const [_, user] of x.users.cache) {
                         const member = await ClientUtils.findMember(msg.guild, user.id);
-                        if (PermissionUtils.memberHasPermission(msg.channel, member, 'MANAGE_MESSAGES')) {
+                        if (
+                            PermissionUtils.memberHasPermission(
+                                msg.channel,
+                                member,
+                                'ManageMessages'
+                            )
+                        ) {
                             return;
                         }
                     }

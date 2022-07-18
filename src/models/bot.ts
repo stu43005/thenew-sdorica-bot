@@ -1,14 +1,16 @@
+import { RateLimitData, RESTEvents } from '@discordjs/rest';
 import config from 'config';
 import {
-    Client, Constants,
+    Client,
+    Events,
     Guild,
     Interaction,
+    InteractionType,
     Message,
     MessageReaction,
     PartialMessageReaction,
     PartialUser,
-    RateLimitData,
-    User
+    User,
 } from 'discord.js';
 import { createRequire } from 'node:module';
 import { customEvents } from '../custom-events/index.js';
@@ -18,9 +20,10 @@ import { GuildJoinHandler } from '../events/guild-join-handler.js';
 import { GuildLeaveHandler } from '../events/guild-leave-handler.js';
 import { MessageHandler } from '../events/message-handler.js';
 import { ReactionHandler } from '../events/reaction-handler.js';
-import { JobService, Logger } from '../services/index.js';
+import { JobService } from '../services/job-service.js';
+import { Logger } from '../services/logger.js';
 import { ConfigUtils } from '../utils/config-utils.js';
-import { PartialUtils } from '../utils/index.js';
+import { PartialUtils } from '../utils/partial-utils.js';
 
 const require = createRequire(import.meta.url);
 const Logs = require('../../lang/logs.json');
@@ -38,7 +41,7 @@ export class Bot {
         private componentHandler: ComponentHandler,
         private reactionHandler: ReactionHandler,
         private jobService: JobService
-    ) { }
+    ) {}
 
     public async start(): Promise<void> {
         this.registerListeners();
@@ -46,36 +49,30 @@ export class Bot {
     }
 
     private registerListeners(): void {
-        this.client.on(Constants.Events.CLIENT_READY, () => this.onReady());
-        this.client.on(
-            Constants.Events.SHARD_READY,
-            (shardId: number, unavailableGuilds?: Set<string>) =>
-                this.onShardReady(shardId, unavailableGuilds)
+        this.client.on(Events.ClientReady, () => this.onReady());
+        this.client.on(Events.ShardReady, (shardId: number, unavailableGuilds?: Set<string>) =>
+            this.onShardReady(shardId, unavailableGuilds)
         );
-        this.client.on(Constants.Events.GUILD_CREATE, (guild: Guild) => this.onGuildJoin(guild));
-        this.client.on(Constants.Events.GUILD_DELETE, (guild: Guild) => this.onGuildLeave(guild));
-        this.client.on(Constants.Events.MESSAGE_CREATE, (msg: Message) => this.onMessage(msg));
-        this.client.on(Constants.Events.INTERACTION_CREATE, (intr: Interaction) =>
-            this.onInteraction(intr)
-        );
+        this.client.on(Events.GuildCreate, (guild: Guild) => this.onGuildJoin(guild));
+        this.client.on(Events.GuildDelete, (guild: Guild) => this.onGuildLeave(guild));
+        this.client.on(Events.MessageCreate, (msg: Message) => this.onMessage(msg));
+        this.client.on(Events.InteractionCreate, (intr: Interaction) => this.onInteraction(intr));
         this.client.on(
-            Constants.Events.MESSAGE_REACTION_ADD,
+            Events.MessageReactionAdd,
             (messageReaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) =>
                 this.onReaction(messageReaction, user, false)
         );
         this.client.on(
-            Constants.Events.MESSAGE_REACTION_REMOVE,
+            Events.MessageReactionRemove,
             (messageReaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) =>
                 this.onReaction(messageReaction, user, true)
         );
-        this.client.on(Constants.Events.RATE_LIMIT, (rateLimitData: RateLimitData) =>
+        this.client.rest.on(RESTEvents.RateLimited, (rateLimitData: RateLimitData) =>
             this.onRateLimit(rateLimitData)
         );
 
         for (const custom of customEvents) {
-            this.client.on(custom.event, (...args) =>
-                custom.process(...args)
-            );
+            this.client.on(custom.event, (...args) => custom.process(...args));
         }
     }
 
@@ -133,7 +130,8 @@ export class Bot {
     private async onMessage(msg: Message): Promise<void> {
         if (
             !this.ready ||
-            (config.get('debug.dummyMode.enabled') && !config.get<string[]>('debug.dummyMode.whitelist').includes(msg.author.id))
+            (config.get('debug.dummyMode.enabled') &&
+                !config.get<string[]>('debug.dummyMode.whitelist').includes(msg.author.id))
         ) {
             return;
         }
@@ -153,15 +151,21 @@ export class Bot {
     private async onInteraction(intr: Interaction): Promise<void> {
         if (
             !this.ready ||
-            (config.get('debug.dummyMode.enabled') && !config.get<string[]>('debug.dummyMode.whitelist').includes(intr.user.id))
+            (config.get('debug.dummyMode.enabled') &&
+                !config.get<string[]>('debug.dummyMode.whitelist').includes(intr.user.id))
         ) {
             return;
         }
 
-        if (intr.isApplicationCommand() || intr.isAutocomplete()) {
+        if (
+            intr.type === InteractionType.ApplicationCommand ||
+            intr.type === InteractionType.ApplicationCommandAutocomplete
+        ) {
             try {
-                Logger.debug(`Receiving interaction: ${intr.id}, type: ${intr.type}, commandName: ${intr.commandName}`);
-                if (intr.isAutocomplete()) {
+                Logger.debug(
+                    `Receiving interaction: ${intr.id}, type: ${intr.type}, commandType: ${intr.commandType}, commandName: ${intr.commandName}`
+                );
+                if (intr.type === InteractionType.ApplicationCommandAutocomplete) {
                     await this.commandHandler.autocomplete(intr);
                 } else {
                     await this.commandHandler.process(intr);
@@ -169,9 +173,14 @@ export class Bot {
             } catch (error) {
                 Logger.error(Logs.error.command, error);
             }
-        } else if (intr.isMessageComponent() || intr.isModalSubmit()) {
+        } else if (
+            intr.type === InteractionType.MessageComponent ||
+            intr.type === InteractionType.ModalSubmit
+        ) {
             try {
-                Logger.debug(`Receiving interaction: ${intr.id}, type: ${intr.type}, customId: ${intr.customId}`);
+                Logger.debug(
+                    `Receiving interaction: ${intr.id}, type: ${intr.type}, customId: ${intr.customId}`
+                );
                 await this.componentHandler.process(intr, intr.message as Message);
             } catch (error) {
                 Logger.error(Logs.error.component, error);
@@ -182,11 +191,12 @@ export class Bot {
     private async onReaction(
         msgReaction: MessageReaction | PartialMessageReaction,
         reactor: User | PartialUser,
-        remove: boolean,
+        remove: boolean
     ): Promise<void> {
         if (
             !this.ready ||
-            (config.get('debug.dummyMode.enabled') && !config.get<string[]>('debug.dummyMode.whitelist').includes(reactor.id))
+            (config.get('debug.dummyMode.enabled') &&
+                !config.get<string[]>('debug.dummyMode.whitelist').includes(reactor.id))
         ) {
             return;
         }
@@ -206,7 +216,7 @@ export class Bot {
                 fullMsgReaction,
                 fullMsgReaction.message,
                 fullReactor,
-                remove,
+                remove
             );
         } catch (error) {
             Logger.error(Logs.error.reaction, error);
@@ -214,7 +224,10 @@ export class Bot {
     }
 
     private async onRateLimit(rateLimitData: RateLimitData): Promise<void> {
-        if (rateLimitData.timeout >= config.get<number>('logging.rateLimit.minTimeout') * 1000) {
+        if (
+            rateLimitData.timeToReset >=
+            config.get<number>('logging.rateLimit.minTimeout') * 1000
+        ) {
             Logger.error(Logs.error.apiRateLimit, rateLimitData);
         }
     }

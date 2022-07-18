@@ -1,5 +1,9 @@
 import { Message, MessageReaction, User } from 'discord.js';
-import { ReactionRole, ReactionRoleEmoji, ReactionRoleType } from '../commands/config/reaction-role.js';
+import {
+    ReactionRole,
+    ReactionRoleEmoji,
+    ReactionRoleType,
+} from '../commands/config/reaction-role.js';
 import { EventData } from '../models/event-data.js';
 import { ClientUtils } from '../utils/client-utils.js';
 import { Reaction } from './reaction.js';
@@ -17,7 +21,12 @@ export class ReactionRoleRemove implements Reaction {
         return true;
     }
 
-    public async execute(msgReaction: MessageReaction, msg: Message, reactor: User, data: EventData): Promise<void> {
+    public async execute(
+        msgReaction: MessageReaction,
+        msg: Message,
+        reactor: User,
+        data: EventData
+    ): Promise<void> {
         const guild = msg.guild;
         if (!guild) return;
 
@@ -30,7 +39,11 @@ export class ReactionRoleRemove implements Reaction {
         const rr = reactionRoles.find(rr => rr.messageId == msg.id);
         if (!rr) return;
 
-        if (rr.type === ReactionRoleType.VERIFY || rr.type === ReactionRoleType.DROP || rr.type === ReactionRoleType.BINDING) {
+        if (
+            rr.type === ReactionRoleType.VERIFY ||
+            rr.type === ReactionRoleType.DROP ||
+            rr.type === ReactionRoleType.BINDING
+        ) {
             return;
         }
 

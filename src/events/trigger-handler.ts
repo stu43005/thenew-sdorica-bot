@@ -4,7 +4,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 import { getGuildRepository } from '../database/entities/guild.js';
 import { getUserRepository } from '../database/entities/user.js';
 import { EventData } from '../models/event-data.js';
-import { Trigger } from '../triggers/index.js';
+import { Trigger } from '../triggers/trigger.js';
 
 export class TriggerHandler {
     private rateLimiter = new RateLimiter(
@@ -12,7 +12,7 @@ export class TriggerHandler {
         config.get<number>('rateLimiting.triggers.interval') * 1000
     );
 
-    constructor(private triggers: Trigger[]) { }
+    constructor(private triggers: Trigger[]) {}
 
     public async process(msg: Message): Promise<void> {
         // Check if user is rate limited

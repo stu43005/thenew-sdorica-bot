@@ -2,9 +2,10 @@ import config from 'config';
 import { ActivityType, ShardingManager } from 'discord.js';
 import { createRequire } from 'node:module';
 import { BotSite } from '../models/config-models.js';
-import { HttpService, Lang, Logger } from '../services/index.js';
-import { ShardUtils } from '../utils/index.js';
-import { Job } from './index.js';
+import { HttpService } from '../services/http-service.js';
+import { Logger } from '../services/logger.js';
+import { ShardUtils } from '../utils/shard-utils.js';
+import { Job } from './job.js';
 
 const require = createRequire(import.meta.url);
 const Logs = require('../../lang/logs.json');
@@ -23,9 +24,8 @@ export class UpdateServerCountJob implements Job {
     public async run(): Promise<void> {
         const serverCount = await ShardUtils.serverCount(this.shardManager);
 
-        const type: ActivityType = 'STREAMING';
+        const type = ActivityType.Watching as const;
         const name = `to ${serverCount.toLocaleString()} servers`;
-        const url = Lang.getCom('links.stream');
 
         await this.shardManager.broadcastEval(
             (client, context) => {
@@ -34,12 +34,11 @@ export class UpdateServerCountJob implements Job {
                         {
                             type: context.type,
                             name: context.name,
-                            url: context.url,
                         },
                     ],
                 });
             },
-            { context: { type, name, url } }
+            { context: { type, name } }
         );
 
         Logger.info(

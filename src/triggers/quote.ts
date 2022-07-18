@@ -1,4 +1,4 @@
-import { Message, MessageEmbed, TextBasedChannel, User } from 'discord.js';
+import { EmbedBuilder, Message, TextBasedChannel, User } from 'discord.js';
 import { EventData } from '../models/event-data.js';
 import { ClientUtils } from '../utils/client-utils.js';
 import { FormatUtils } from '../utils/format-utils.js';
@@ -56,27 +56,40 @@ export class QuoteTrigger implements Trigger {
     }
 }
 
-export async function quoteEmbed(sourceMsg: Message, msg: Message, footer: string = 'Quoted'): Promise<void> {
+export async function quoteEmbed(
+    sourceMsg: Message,
+    msg: Message,
+    footer: string = 'Quoted'
+): Promise<void> {
     if (msg.content || !msg.author.bot) {
-        await MessageUtils.send(sourceMsg.channel, buildQuoteEmbed(sourceMsg.channel, msg, sourceMsg.author, footer));
+        await MessageUtils.send(
+            sourceMsg.channel,
+            buildQuoteEmbed(sourceMsg.channel, msg, sourceMsg.author, footer)
+        );
     }
     if (msg.embeds && msg.embeds.length > 0 && msg.author.bot) {
         for (let i = 0; i < msg.embeds.length; i++) {
             const embed = msg.embeds[i];
             await MessageUtils.send(sourceMsg.channel, {
                 content: `Raw embed#${i + 1} from \`${msg.author.tag}\` in <#${msg.channel.id}>`,
-                embeds: [embed]
+                embeds: [embed],
             });
         }
     }
 }
 
-export function buildQuoteEmbed(contextChannel: TextBasedChannel, message: Message, user: User, footer: string): MessageEmbed {
+export function buildQuoteEmbed(
+    contextChannel: TextBasedChannel,
+    message: Message,
+    user: User,
+    footer: string
+): EmbedBuilder {
     const embed = FormatUtils.embedTheMessage(message, contextChannel);
     if (message.channel.id != contextChannel.id && 'name' in message.channel) {
-        embed.setFooter({ text: `${footer} by: ${user.tag} | in channel: #${message.channel.name}` });
-    }
-    else {
+        embed.setFooter({
+            text: `${footer} by: ${user.tag} | in channel: #${message.channel.name}`,
+        });
+    } else {
         embed.setFooter({ text: `${footer} by: ${user.tag}` });
     }
     return embed;
