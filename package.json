@@ -20,6 +20,7 @@
         "format:fix": "prettier --write .",
         "prebuild": "shx rm -rf dist",
         "build": "tsc --project tsconfig.json",
+        "prepublishOnly": "npm run format:fix && npm run lint:fix && npm run build",
         "commands:register": "npm run build && node --enable-source-maps dist/start-bot.js --register",
         "commands:register:prod": "cross-env NODE_ENV=production npm run commands:register",
         "commands:clear": "npm run build && node --enable-source-maps dist/start-bot.js --clear",
