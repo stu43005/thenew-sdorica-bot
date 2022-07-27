@@ -1,9 +1,5 @@
-import {
-    ChatInputCommandInteraction,
-    codeBlock,
-    PermissionsString,
-    SlashCommandBuilder,
-} from 'discord.js';
+import { ChatInputCommandInteraction, PermissionsString, SlashCommandBuilder } from 'discord.js';
+import { FormatUtils } from '../../utils/format-utils.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 
@@ -23,6 +19,6 @@ export class CodeCommand implements Command {
 
     public async execute(intr: ChatInputCommandInteraction): Promise<void> {
         const argument = intr.options.getString('argument', true);
-        await InteractionUtils.send(intr, codeBlock(argument), true);
+        await InteractionUtils.send(intr, FormatUtils.codeBlock(argument), true);
     }
 }

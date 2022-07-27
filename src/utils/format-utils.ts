@@ -5,6 +5,7 @@ import {
     EmbedBuilder,
     Guild,
     GuildMember,
+    inlineCode,
     Message,
     roleMention,
     User,
@@ -35,6 +36,22 @@ export class FormatUtils {
         return userMention(discordId);
     }
 
+    public static inlineCode(content: string): string {
+        return inlineCode(content.replaceAll('`', '\\`'));
+    }
+
+    public static codeBlock(content: string): string;
+    public static codeBlock(language: string, content: string): string;
+    public static codeBlock(language: string, content?: string): string {
+        return typeof content === 'undefined'
+            ? codeBlock(language.replaceAll('`', '\\`'))
+            : codeBlock(language, content.replaceAll('`', '\\`'));
+    }
+
+    public static jsonBlock(obj: any): string {
+        return this.codeBlock('json', JSON.stringify(obj, null, 2));
+    }
+
     public static duration(milliseconds: number, langCode: LangCode): string {
         return Duration.fromObject(
             Object.fromEntries(
@@ -54,10 +71,6 @@ export class FormatUtils {
                 ).filter(([_, value]) => !!value) // Remove units that are 0
             )
         ).toHuman({ maximumFractionDigits: 0 });
-    }
-
-    public static jsonBlock(obj: any): string {
-        return codeBlock('json', JSON.stringify(obj, null, 2));
     }
 
     public static embedOriginUserData(

@@ -1,5 +1,5 @@
 import config from 'config';
-import { codeBlock, DiscordAPIError, EmbedBuilder, inlineCode, WebhookClient } from 'discord.js';
+import { DiscordAPIError, EmbedBuilder, WebhookClient } from 'discord.js';
 import { Response } from 'node-fetch';
 import { Transform } from 'node:stream';
 import pino, { DestinationStream, Level, LoggerOptions, StreamEntry } from 'pino';
@@ -87,7 +87,7 @@ export async function discordWebhookTransport(
             if (inlineString.length > 100) {
                 return `\n${FormatUtils.jsonBlock(extra)}`;
             }
-            return `\n${inlineCode(inlineString)}`;
+            return `\n${FormatUtils.inlineCode(inlineString)}`;
         }
         return '';
     }
@@ -103,7 +103,7 @@ export async function discordWebhookTransport(
             if ('err' in obj) {
                 embed.addFields({
                     name: 'err',
-                    value: codeBlock(obj.err.stack ?? obj.err.toString()),
+                    value: FormatUtils.codeBlock(obj.err.stack ?? obj.err.toString()),
                 });
             }
 

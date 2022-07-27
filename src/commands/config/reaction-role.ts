@@ -1,7 +1,6 @@
 import {
     ChatInputCommandInteraction,
     EmbedBuilder,
-    inlineCode,
     Message,
     NewsChannel,
     PermissionsBitField,
@@ -12,6 +11,7 @@ import {
 import { EventData } from '../../models/event-data.js';
 import { Logger } from '../../services/logger.js';
 import { ClientUtils } from '../../utils/client-utils.js';
+import { FormatUtils } from '../../utils/format-utils.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { MessageUtils } from '../../utils/message-utils.js';
 import { RegexUtils } from '../../utils/regex-utils.js';
@@ -140,7 +140,7 @@ export default class ReactionRoleCommand implements Command {
                 if (!message) {
                     await InteractionUtils.send(
                         intr,
-                        `Error: 找不到目標訊息ID: ${inlineCode(messageId)}。`
+                        `Error: 找不到目標訊息ID: ${FormatUtils.inlineCode(messageId)}。`
                     );
                     return;
                 }
@@ -155,7 +155,7 @@ export default class ReactionRoleCommand implements Command {
                 if (!emojiId) {
                     await InteractionUtils.send(
                         intr,
-                        `Error: 無法解析表情符號: ${inlineCode(emoji)}。`
+                        `Error: 無法解析表情符號: ${FormatUtils.inlineCode(emoji)}。`
                     );
                     return;
                 }
@@ -198,7 +198,7 @@ export default class ReactionRoleCommand implements Command {
                 if (!message) {
                     await InteractionUtils.send(
                         intr,
-                        `Error: 找不到目標訊息ID: ${inlineCode(messageId)}。`
+                        `Error: 找不到目標訊息ID: ${FormatUtils.inlineCode(messageId)}。`
                     );
                     return;
                 }
@@ -215,7 +215,7 @@ export default class ReactionRoleCommand implements Command {
                     if (!emojiId) {
                         await InteractionUtils.send(
                             intr,
-                            `Error: 無法解析表情符號: ${inlineCode(emoji)}。`
+                            `Error: 無法解析表情符號: ${FormatUtils.inlineCode(emoji)}。`
                         );
                         return;
                     }

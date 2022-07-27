@@ -1,10 +1,10 @@
 import {
     ChatInputCommandInteraction,
-    codeBlock,
     PermissionsString,
     SlashCommandBuilder,
     SnowflakeUtil,
 } from 'discord.js';
+import { FormatUtils } from '../../utils/format-utils.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 
@@ -27,7 +27,7 @@ export class SnowflakeCommand implements Command {
             const snowflake = SnowflakeUtil.deconstruct(intr.options.getString('snowflake', true));
             await InteractionUtils.send(
                 intr,
-                codeBlock(
+                FormatUtils.codeBlock(
                     'fix',
                     `snowflake: ${snowflake.id}
 timestamp: ${snowflake.timestamp}

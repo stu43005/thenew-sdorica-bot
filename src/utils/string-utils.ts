@@ -1,3 +1,4 @@
+import discordEscape from 'discord-escape';
 import removeMarkdown from 'remove-markdown';
 
 export class StringUtils {
@@ -12,6 +13,10 @@ export class StringUtils {
         }
 
         return output;
+    }
+
+    public static discordEscape(input: string): string {
+        return discordEscape(input);
     }
 
     public static stripMarkdown(input: string): string {

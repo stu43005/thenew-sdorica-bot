@@ -1,4 +1,4 @@
-import { EmbedBuilder, inlineCode, Message, ModalSubmitInteraction } from 'discord.js';
+import { EmbedBuilder, Message, ModalSubmitInteraction } from 'discord.js';
 import { CommandDeferType } from '../commands/command.js';
 import { EventData } from '../models/event-data.js';
 import { FormatUtils } from '../utils/format-utils.js';
@@ -35,7 +35,7 @@ export default class ReportMessageSubmit implements ModelSubmit {
         if (!message) {
             await InteractionUtils.send(
                 intr,
-                `Error: 找不到目標訊息ID: ${inlineCode(messageId)}。`
+                `Error: 找不到目標訊息ID: ${FormatUtils.inlineCode(messageId)}。`
             );
             return;
         }

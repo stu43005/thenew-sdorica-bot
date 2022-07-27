@@ -1,6 +1,5 @@
 import {
     ChatInputCommandInteraction,
-    codeBlock,
     EmbedBuilder,
     GuildMember,
     PermissionsBitField,
@@ -85,7 +84,9 @@ export default class MemeCommand implements Command {
                 if (memes.length) {
                     await InteractionUtils.send(
                         intr,
-                        codeBlock([...new Set(memes.map(meme => meme.keyword))].join('\n'))
+                        FormatUtils.codeBlock(
+                            [...new Set(memes.map(meme => meme.keyword))].join('\n')
+                        )
                     );
                 } else {
                     await InteractionUtils.send(intr, `尚無任何梗圖。`);

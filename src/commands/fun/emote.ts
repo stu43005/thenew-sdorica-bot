@@ -1,12 +1,12 @@
 import {
     AutocompleteInteraction,
     ChatInputCommandInteraction,
-    inlineCode,
     PermissionsString,
     SlashCommandBuilder,
 } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { EventData } from '../../models/event-data.js';
+import { FormatUtils } from '../../utils/format-utils.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
 import { getMemeEmbed, MemeItem, metchMeme } from '../config/meme.js';
@@ -48,7 +48,11 @@ export class EmoteCommand implements Command {
             const embed = getMemeEmbed(member, match);
             await InteractionUtils.send(intr, embed);
         } else {
-            await InteractionUtils.send(intr, `找不到此關鍵字：${inlineCode(keyword)}`, true);
+            await InteractionUtils.send(
+                intr,
+                `找不到此關鍵字：${FormatUtils.inlineCode(keyword)}`,
+                true
+            );
         }
     }
 
