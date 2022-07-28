@@ -22,6 +22,7 @@ export class EmoteCommand implements Command {
                 .setRequired(true)
                 .setAutocomplete(true)
         )
+        .setDMPermission(false)
         .toJSON();
     public channelCooldown = new RateLimiter(2, 60 * 1000);
     public deferType = CommandDeferType.NONE;

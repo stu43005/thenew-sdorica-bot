@@ -1,3 +1,4 @@
+import { APIPartialEmoji } from 'discord.js';
 import emojiRegex from 'emoji-regex';
 
 export class RegexUtils {
@@ -29,9 +30,14 @@ export class RegexUtils {
         };
     }
 
-    public static guildEmoji(
-        input: string
-    ): { animated?: boolean; name?: string; discordId: string } | undefined {
+    public static guildEmojis(input: string): APIPartialEmoji[] {
+        const match = input.matchAll(/(<a?:[a-zA-Z0-9_]+:[0-9]+>)/g);
+        return [...match]
+            .map(g => this.guildEmoji(g[0]))
+            .filter((emoji): emoji is APIPartialEmoji => !!emoji);
+    }
+
+    public static guildEmoji(input: string): APIPartialEmoji | undefined {
         const match = input.match(/^(?:<(a?):([a-zA-Z0-9_]+):)?(\d{17,20})>?$/);
         if (!match) {
             return;
@@ -39,14 +45,15 @@ export class RegexUtils {
 
         if (!match[2]) {
             return {
-                discordId: match[3],
+                id: match[3],
+                name: null,
             };
         }
 
         return {
-            animated: match[1] === 'a',
+            id: match[3],
             name: match[2],
-            discordId: match[3],
+            animated: match[1] === 'a',
         };
     }
 

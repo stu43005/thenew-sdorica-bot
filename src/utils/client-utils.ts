@@ -115,7 +115,7 @@ export class ClientUtils {
         input: string
     ): Promise<GuildEmoji | null | undefined> {
         try {
-            const { discordId } = RegexUtils.guildEmoji(input) ?? {};
+            const { id: discordId } = RegexUtils.guildEmoji(input) ?? {};
             if (discordId) {
                 return await guild.emojis.fetch(discordId);
             }
