@@ -1,10 +1,12 @@
 import {
     ChatInputCommandInteraction,
-    EmbedBuilder, Message, PermissionsBitField,
+    EmbedBuilder,
+    Message,
+    PermissionsBitField,
     PermissionsString,
     SlashCommandBuilder,
     Snowflake,
-    TextBasedChannel
+    TextBasedChannel,
 } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
 import { Logger } from '../../services/logger.js';
@@ -30,7 +32,10 @@ export default class StarboardAnalyticsCommand implements Command {
     public async execute(intr: ChatInputCommandInteraction, data: EventData): Promise<void> {
         if (!intr.guild || !data.guild?.starboard?.channel) return;
 
-        const channel = await ClientUtils.findTextChannel(intr.guild, data.guild?.starboard?.channel);
+        const channel = await ClientUtils.findTextChannel(
+            intr.guild,
+            data.guild?.starboard?.channel
+        );
         if (channel) {
             await InteractionUtils.send(intr, 'pleace wait...');
 
@@ -58,8 +63,12 @@ export default class StarboardAnalyticsCommand implements Command {
             }
 
             const sortedData: Analytics = {
-                count: values(data.count).sort((a, b) => b.num - a.num).slice(0, 5),
-                max: values(data.max).sort((a, b) => b.num - a.num).slice(0, 5),
+                count: values(data.count)
+                    .sort((a, b) => b.num - a.num)
+                    .slice(0, 5),
+                max: values(data.max)
+                    .sort((a, b) => b.num - a.num)
+                    .slice(0, 5),
             };
 
             const embed = new EmbedBuilder();
@@ -67,18 +76,25 @@ export default class StarboardAnalyticsCommand implements Command {
             embed.addFields([
                 {
                     name: '上榜最多次的使用者',
-                    value: `top5:\n` + sortedData.count.map((e, index) => `\`${index + 1}. ${e.username}: ${e.num}\``).join('\n')
+                    value:
+                        `top5:\n` +
+                        sortedData.count
+                            .map((e, index) => `\`${index + 1}. ${e.username}: ${e.num}\``)
+                            .join('\n'),
                 },
                 {
                     name: '上星數量最多的使用者',
-                    value: `top5:\n` + sortedData.max.map((e, index) => `\`${index + 1}. ${e.username}: ${e.num}\``).join('\n')
+                    value:
+                        `top5:\n` +
+                        sortedData.max
+                            .map((e, index) => `\`${index + 1}. ${e.username}: ${e.num}\``)
+                            .join('\n'),
                 },
             ]);
             await InteractionUtils.editReply(intr, {
                 content: '',
                 embeds: [embed],
             });
-
         } else {
             await InteractionUtils.send(intr, 'Error: 尚未設定 starboard 頻道');
         }
@@ -100,7 +116,11 @@ interface AnalyticsEntry {
     num: number;
 }
 
-async function next(data: AnalyticsMap, channel: TextBasedChannel, before?: Snowflake): Promise<string | false> {
+async function next(
+    data: AnalyticsMap,
+    channel: TextBasedChannel,
+    before?: Snowflake
+): Promise<string | false> {
     const messages = await channel.messages.fetch({
         before,
     });
@@ -154,7 +174,11 @@ function getMessageDataFromSora(message: Message): SoraMessageData {
         if (starcountMatch) {
             data.starcount = Number(starcountMatch[1]);
         }
-        if (message.embeds.length > 0 && message.embeds[0].author && message.embeds[0].author.name) {
+        if (
+            message.embeds.length > 0 &&
+            message.embeds[0].author &&
+            message.embeds[0].author.name
+        ) {
             data.username = message.embeds[0].author.name;
         }
     }

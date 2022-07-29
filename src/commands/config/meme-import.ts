@@ -2,7 +2,7 @@ import {
     ChatInputCommandInteraction,
     PermissionsBitField,
     PermissionsString,
-    SlashCommandBuilder
+    SlashCommandBuilder,
 } from 'discord.js';
 import fetch from 'node-fetch';
 import * as crypto from 'node:crypto';
@@ -42,11 +42,16 @@ export default class MemeImportCommand implements Command {
                 let addCount = 0;
                 json.forEach((item, index) => {
                     if (item.keyword && item.url) {
-                        if (memes.some(meme => item.keyword === meme.keyword && item.url === meme.url)) {
+                        if (
+                            memes.some(
+                                meme => item.keyword === meme.keyword && item.url === meme.url
+                            )
+                        ) {
                             // same keyword and url already exists
                             return;
                         }
-                        const matchtype = item.matchtype && getMatchType(item.matchtype) || MatchType.Normal;
+                        const matchtype =
+                            (item.matchtype && getMatchType(item.matchtype)) || MatchType.Normal;
                         memes.push({
                             uuid: crypto.randomUUID(),
                             keyword: item.keyword,
@@ -61,7 +66,12 @@ export default class MemeImportCommand implements Command {
 
                 data.guild.memes = memes;
                 await data.guild.update();
-                await InteractionUtils.send(intr, `Imported ${addCount} memes.${errors.length ? `\nErrors:\n${errors.join('\n')}` : ''}`);
+                await InteractionUtils.send(
+                    intr,
+                    `Imported ${addCount} memes.${
+                        errors.length ? `\nErrors:\n${errors.join('\n')}` : ''
+                    }`
+                );
             } else {
                 await InteractionUtils.send(intr, 'json is not a array.');
             }

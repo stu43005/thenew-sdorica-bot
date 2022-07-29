@@ -3,7 +3,7 @@ import {
     GuildEmoji,
     PermissionsBitField,
     PermissionsString,
-    SlashCommandBuilder
+    SlashCommandBuilder,
 } from 'discord.js';
 import admin from 'firebase-admin';
 import moment from 'moment';
@@ -18,7 +18,9 @@ export default class CheckEmojiCommand implements Command {
         .setName('check-emoji')
         .setDescription('顯示最不常使用的 30 個表符')
         .setDMPermission(false)
-        .setDefaultMemberPermissions(new PermissionsBitField().add('ManageEmojisAndStickers').valueOf())
+        .setDefaultMemberPermissions(
+            new PermissionsBitField().add('ManageEmojisAndStickers').valueOf()
+        )
         .toJSON();
     public deferType = CommandDeferType.PUBLIC;
     public requireDev = false;
@@ -47,20 +49,21 @@ export default class CheckEmojiCommand implements Command {
                 if (weeklyData['reactions']) {
                     if (!data['emojis']) data['emojis'] = {};
                     Object.keys(weeklyData['reactions']).forEach(key => {
-                        data['emojis'][key] = (+data['emojis'][key] || 0) + +weeklyData['reactions'][key];
+                        data['emojis'][key] =
+                            (+data['emojis'][key] || 0) + +weeklyData['reactions'][key];
                     });
                 }
             }
         }
 
         let data2: {
-            count: number,
-            emoji: GuildEmoji,
+            count: number;
+            emoji: GuildEmoji;
         }[] = [];
-        intr.guild.emojis.cache.forEach((emoji) => {
+        intr.guild.emojis.cache.forEach(emoji => {
             data2.push({
                 count: data.emojis[emoji.id] || 0,
-                emoji
+                emoji,
             });
         });
         data2 = data2.sort((a, b) => b.count - a.count).slice(data2.length - count);
