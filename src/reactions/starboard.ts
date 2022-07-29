@@ -41,7 +41,7 @@ export class StarboardReaction implements Reaction {
             return;
         }
 
-        const count = await getStarCount(msgReaction, msg);
+        const count = await getStarCount(msgReaction, await msg.fetch());
         if (count >= starboard.limit) {
             await sendStarboard(starboard, msg, count);
         }
