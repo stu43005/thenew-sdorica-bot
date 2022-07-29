@@ -103,7 +103,9 @@ export class FormatUtils {
             iconURL: message.author.displayAvatarURL(),
             url: message.url,
         });
-        embed.setDescription(message.content);
+        if (message.content) {
+            embed.setDescription(message.content);
+        }
         if (message.attachments && message.attachments.size > 0) {
             if (
                 'nsfw' in message.channel &&
