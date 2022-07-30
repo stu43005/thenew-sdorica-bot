@@ -38,6 +38,7 @@ async function start(): Promise<void> {
     // Client
     const client = new CustomClient({
         intents: [
+            GatewayIntentBits.MessageContent,
             GatewayIntentBits.Guilds,
             GatewayIntentBits.GuildMessages,
             GatewayIntentBits.GuildMessageReactions,

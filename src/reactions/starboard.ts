@@ -69,7 +69,7 @@ async function sendStarboard(
     const mapping = await StarboardStore.fromGuild(message.guild);
     try {
         await mapping.getTemporarilyTimer(message);
-    } catch (error) { }
+    } catch (error) {}
 
     mapping.setTemporarilyTimer(
         message,
