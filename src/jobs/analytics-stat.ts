@@ -1,5 +1,6 @@
 import admin from 'firebase-admin';
 import moment from 'moment';
+import { Database } from '../database/database.js';
 import { mergeData } from '../database/stat-collection.js';
 import { Job } from './job.js';
 
@@ -14,6 +15,9 @@ export class AnalyticsStatJob implements Job {
     }
 
     private async job(lastday: moment.Moment): Promise<void> {
+        // Make sure DB is initialized
+        await Database.connect();
+
         const lastweek = lastday.format('GGGG-[W]WW');
         const db = admin.firestore();
         const statSnapshot = await db.collection('stat').get();
