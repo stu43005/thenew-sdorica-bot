@@ -41,7 +41,8 @@ export class StarboardReaction implements Reaction {
             return;
         }
 
-        const count = await getStarCount(msgReaction, await msg.fetch());
+        const fullMsg = await msg.fetch(true);
+        const count = await getStarCount(msgReaction, fullMsg);
         if (count >= starboard.limit) {
             await sendStarboard(starboard, msg, count);
         }
@@ -69,7 +70,7 @@ async function sendStarboard(
     const mapping = await StarboardStore.fromGuild(message.guild);
     try {
         await mapping.getTemporarilyTimer(message);
-    } catch (error) {}
+    } catch (error) { }
 
     mapping.setTemporarilyTimer(
         message,
