@@ -1,4 +1,5 @@
-import schedule from 'node-schedule';
+import config from 'config';
+import { CronJob } from 'cron';
 import { createRequire } from 'node:module';
 import { Job } from '../jobs/job.js';
 import { Logger } from './logger.js';
@@ -11,20 +12,25 @@ export class JobService {
 
     public start(): void {
         for (const job of this.jobs) {
-            schedule.scheduleJob(job.schedule, async () => {
-                try {
-                    if (job.log) {
-                        Logger.info(Logs.info.jobRun.replaceAll('{JOB}', job.name));
-                    }
+            new CronJob({
+                cronTime: job.schedule,
+                onTick: async () => {
+                    try {
+                        if (job.log) {
+                            Logger.info(Logs.info.jobRun.replaceAll('{JOB}', job.name));
+                        }
 
-                    await job.run();
+                        await job.run();
 
-                    if (job.log) {
-                        Logger.info(Logs.info.jobCompleted.replaceAll('{JOB}', job.name));
+                        if (job.log) {
+                            Logger.info(Logs.info.jobCompleted.replaceAll('{JOB}', job.name));
+                        }
+                    } catch (error) {
+                        Logger.error(Logs.error.job.replaceAll('{JOB}', job.name), error);
                     }
-                } catch (error) {
-                    Logger.error(Logs.error.job.replaceAll('{JOB}', job.name), error);
-                }
+                },
+                start: true,
+                timeZone: config.get('jobs.timeZone'),
             });
             Logger.info(
                 Logs.info.jobScheduled

@@ -36,6 +36,7 @@
         }
     },
     "jobs": {
+        "timeZone": "Asia/Taipei",
         "updateServerCount": {
             "schedule": "0 */10 * * * *",
             "log": false
