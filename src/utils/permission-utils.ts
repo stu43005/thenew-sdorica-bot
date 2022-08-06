@@ -124,6 +124,29 @@ export class PermissionUtils {
         }
     }
 
+    public static canDeleteMessage(channel: Channel, deleteOld: boolean = false): boolean {
+        if (channel instanceof DMChannel) {
+            return false;
+        } else if (channel instanceof GuildChannel && channel.client.user) {
+            const channelPerms = channel.permissionsFor(channel.client.user);
+            if (!channelPerms) {
+                // This can happen if the guild disconnected while a collector is running
+                return false;
+            }
+
+            // VIEW_CHANNEL - Needed to view the channel
+            // MANAGE_MESSAGES - Needed to delete messages
+            // READ_MESSAGE_HISTORY - Needed to find old message to delete
+            return channelPerms.has([
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.ManageMessages,
+                ...(deleteOld ? [PermissionsBitField.Flags.ReadMessageHistory] : []),
+            ]);
+        } else {
+            return false;
+        }
+    }
+
     public static memberHasPermission(
         channel: Channel,
         member: GuildMember | null | undefined,
