@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import urlRegex from 'url-regex';
+import urlRegex from 'url-regex-safe';
 import { EventData } from '../models/event-data.js';
 import { Logger } from '../services/logger.js';
 import { FormatUtils } from '../utils/format-utils.js';
