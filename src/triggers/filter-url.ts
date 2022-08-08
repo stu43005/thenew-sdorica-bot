@@ -40,13 +40,19 @@ export class FilterUrlTrigger implements Trigger {
                 if (url.endsWith('.webm')) {
                     return true;
                 }
-                const uri = new URL(url);
-                if (
-                    bannedDomains.find(
-                        domain => uri.hostname === domain || uri.hostname.endsWith(`.${domain}`)
-                    )
-                ) {
-                    return true;
+                try {
+                    const uri = new URL(url);
+                    if (
+                        bannedDomains.find(
+                            domain => uri.hostname === domain || uri.hostname.endsWith(`.${domain}`)
+                        )
+                    ) {
+                        return true;
+                    }
+                } catch (error) {
+                    if (bannedDomains.find(domain => url.includes(domain))) {
+                        return true;
+                    }
                 }
             }
         }
