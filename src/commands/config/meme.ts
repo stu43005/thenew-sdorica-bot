@@ -124,7 +124,9 @@ export default class MemeCommand implements Command {
                 const url = intr.options.getString('url');
 
                 const memes: MemeItem[] = data.guild.memes ?? [];
-                const itemIndex = memes.findIndex(m => m.keyword === keyword && m.url === url);
+                const itemIndex = memes.findIndex(
+                    m => m.keyword === keyword && (!url || m.url === url)
+                );
                 if (itemIndex !== -1) {
                     memes.splice(itemIndex, 1);
                     await data.guild.update();
