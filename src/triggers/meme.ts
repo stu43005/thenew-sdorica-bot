@@ -1,6 +1,7 @@
 import { Message } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { getMemeEmbed, MemeItem, metchMeme } from '../commands/config/meme.js';
+import { StatCollection } from '../database/stat-collection.js';
 import { EventData } from '../models/event-data.js';
 import { MessageUtils } from '../utils/message-utils.js';
 import { Trigger } from './trigger.js';
@@ -26,8 +27,8 @@ export class MemeTrigger implements Trigger {
             if (limited) return;
 
             const embed = getMemeEmbed(msg.member ?? msg.author, match);
-            await MessageUtils.send(msg.channel, embed);
-            // StatCollection.fromGuild(msg.guild).addMeme(msg, matches[index].keyword);
+            await MessageUtils.reply(msg, embed, false);
+            StatCollection.fromGuild(msg.guild).addMeme(msg, match.keyword);
         }
     }
 }
