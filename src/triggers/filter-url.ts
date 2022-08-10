@@ -12,6 +12,7 @@ const bannedDomains = [
     'kocpc.blogspot.com',
     'kocpc.com.tw',
     'kocpc.tumblr.com',
+    'sxtwitter.com',
     'twitter64.com',
     'vxtwitter.com',
 ];
