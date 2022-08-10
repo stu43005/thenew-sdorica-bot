@@ -11,11 +11,12 @@ import {
     MessageContextMenuCommandInteraction,
     PermissionsBitField,
     PermissionsString,
-    RESTPostAPIApplicationCommandsJSONBody,
+    RESTPostAPIApplicationCommandsJSONBody
 } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
 import { Logger } from '../../services/logger.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
+import { MessageUtils } from '../../utils/message-utils.js';
 import { CommandDeferType, MessageContextMenu } from '../command.js';
 
 export default class DeleteBetweenCommand implements MessageContextMenu {
@@ -75,8 +76,7 @@ export default class DeleteBetweenCommand implements MessageContextMenu {
                     if (
                         error instanceof Error &&
                         error.name.includes(
-                            `[${
-                                DiscordjsErrorCodes[DiscordjsErrorCodes.InteractionCollectorError]
+                            `[${DiscordjsErrorCodes[DiscordjsErrorCodes.InteractionCollectorError]
                             }]`
                         )
                     ) {
@@ -126,7 +126,7 @@ export default class DeleteBetweenCommand implements MessageContextMenu {
                 message.createdTimestamp > firstMsg.createdTimestamp &&
                 message.createdTimestamp < latestMsg.createdTimestamp
             ) {
-                await message.delete();
+                await MessageUtils.delete(message);
                 count++;
             }
         }

@@ -8,9 +8,10 @@ import {
     InteractionType,
     Message,
     MessageReaction,
+    PartialMessage,
     PartialMessageReaction,
     PartialUser,
-    User,
+    User
 } from 'discord.js';
 import { createRequire } from 'node:module';
 import { customEvents } from '../custom-events/index.js';
@@ -41,7 +42,7 @@ export class Bot {
         private componentHandler: ComponentHandler,
         private reactionHandler: ReactionHandler,
         private jobService: JobService
-    ) {}
+    ) { }
 
     public async start(): Promise<void> {
         this.registerListeners();
@@ -56,6 +57,7 @@ export class Bot {
         this.client.on(Events.GuildCreate, (guild: Guild) => this.onGuildJoin(guild));
         this.client.on(Events.GuildDelete, (guild: Guild) => this.onGuildLeave(guild));
         this.client.on(Events.MessageCreate, (msg: Message) => this.onMessage(msg));
+        this.client.on(Events.MessageUpdate, (oldMsg: Message | PartialMessage, newMsg: Message | PartialMessage) => this.onMessageUpdate(oldMsg, newMsg));
         this.client.on(Events.InteractionCreate, (intr: Interaction) => this.onInteraction(intr));
         this.client.on(
             Events.MessageReactionAdd,
@@ -143,6 +145,27 @@ export class Bot {
 
         try {
             await this.messageHandler.process(fullMsg);
+        } catch (error) {
+            Logger.error(Logs.error.message, error);
+        }
+    }
+
+    private async onMessageUpdate(oldMsg: Message | PartialMessage, newMsg: Message | PartialMessage): Promise<void> {
+        if (!this.ready) {
+            return;
+        }
+
+        const fullMsg = await PartialUtils.fillMessage(newMsg);
+        if (!fullMsg) {
+            return;
+        }
+
+        if (config.get('debug.dummyMode.enabled') && !config.get<string[]>('debug.dummyMode.whitelist').includes(fullMsg.author.id)) {
+            return;
+        }
+
+        try {
+            await this.messageHandler.process(fullMsg, oldMsg);
         } catch (error) {
             Logger.error(Logs.error.message, error);
         }

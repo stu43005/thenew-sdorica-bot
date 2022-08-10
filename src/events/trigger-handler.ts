@@ -1,5 +1,5 @@
 import config from 'config';
-import { Message } from 'discord.js';
+import { Message, PartialMessage } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { getGuildRepository } from '../database/entities/guild.js';
 import { getUserRepository } from '../database/entities/user.js';
@@ -12,9 +12,9 @@ export class TriggerHandler {
         config.get<number>('rateLimiting.triggers.interval') * 1000
     );
 
-    constructor(private triggers: Trigger[]) {}
+    constructor(private triggers: Trigger[]) { }
 
-    public async process(msg: Message): Promise<void> {
+    public async process(msg: Message, oldMsg?: Message | PartialMessage): Promise<void> {
         // Check if user is rate limited
         const limited = this.rateLimiter.take(msg.author.id);
         if (limited) {
@@ -24,6 +24,10 @@ export class TriggerHandler {
         // Find triggers caused by this message
         const triggers = this.triggers.filter(trigger => {
             if (trigger.requireGuild && !msg.guild) {
+                return false;
+            }
+
+            if (oldMsg && !trigger.onUpdate) {
                 return false;
             }
 
@@ -46,7 +50,11 @@ export class TriggerHandler {
 
         // Execute triggers
         for (const trigger of triggers) {
-            await trigger.execute(msg, data);
+            if (oldMsg) {
+                await trigger.onUpdate?.(oldMsg, msg, data);
+            } else {
+                await trigger.execute(msg, data);
+            }
         }
     }
 }

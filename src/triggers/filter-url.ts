@@ -1,4 +1,4 @@
-import { Message } from 'discord.js';
+import { Message, PartialMessage } from 'discord.js';
 import urlRegex from 'url-regex-safe';
 import { EventData } from '../models/event-data.js';
 import { Logger } from '../services/logger.js';
@@ -69,6 +69,18 @@ export class FilterUrlTrigger implements Trigger {
                 '-已封鎖了一條有害連結的訊息。'
             )}`
         );
-        await msg.delete();
+        await MessageUtils.delete(msg);
+    }
+
+    public async onUpdate(oldMsg: Message | PartialMessage, newMsg: Message, _data: EventData): Promise<void> {
+        Logger.debug(`Delete edited message: ${newMsg.id}`);
+        await MessageUtils.reply(
+            newMsg,
+            `${FormatUtils.userMention(newMsg.author.id)}${FormatUtils.codeBlock(
+                'diff',
+                '-已封鎖了一條有害連結的訊息。 (已編輯)'
+            )}`
+        );
+        await MessageUtils.delete(newMsg);
     }
 }
