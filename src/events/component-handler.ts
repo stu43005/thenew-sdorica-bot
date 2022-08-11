@@ -1,5 +1,5 @@
 import config from 'config';
-import { Message, MessageComponentInteraction } from 'discord.js';
+import { Message } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { CommandDeferType } from '../commands/command.js';
 import {
@@ -56,9 +56,7 @@ export class ComponentHandler implements EventHandler {
                 break;
             }
             case MessageComponentDeferType.UPDATE: {
-                if (intr instanceof MessageComponentInteraction) {
-                    await InteractionUtils.deferUpdate(intr);
-                }
+                await InteractionUtils.deferUpdate(intr);
                 break;
             }
             case CommandDeferType.PUBLIC: {

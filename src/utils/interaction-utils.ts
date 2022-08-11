@@ -45,7 +45,7 @@ export class InteractionUtils {
     }
 
     public static async deferUpdate(
-        intr: MessageComponentInteraction
+        intr: MessageComponentInteraction | ModalSubmitInteraction
     ): Promise<InteractionResponse | undefined> {
         try {
             return await intr.deferUpdate();
