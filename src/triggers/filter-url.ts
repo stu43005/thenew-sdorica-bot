@@ -1,4 +1,5 @@
 import { Message, PartialMessage } from 'discord.js';
+import { RateLimiter } from 'discord.js-rate-limiter';
 import urlRegex from 'url-regex-safe';
 import { EventData } from '../models/event-data.js';
 import { Logger } from '../services/logger.js';
@@ -8,17 +9,17 @@ import { PermissionUtils } from '../utils/permission-utils.js';
 import { Trigger } from './trigger.js';
 
 const bannedDomains = [
-    'fxtwitter.com',
+    /^[a-z]{2}twitter\.com$/,
     'kocpc.blogspot.com',
     'kocpc.com.tw',
     'kocpc.tumblr.com',
-    'sxtwitter.com',
     'twitter64.com',
-    'vxtwitter.com',
 ];
 
 export class FilterUrlTrigger implements Trigger {
     public requireGuild = false;
+
+    private cooldown = new RateLimiter(1, 60 * 1000);
 
     public triggered(msg: Message): boolean {
         if (!PermissionUtils.canDeleteMessage(msg.channel)) {
@@ -44,16 +45,19 @@ export class FilterUrlTrigger implements Trigger {
                 try {
                     const uri = new URL(url);
                     if (
-                        bannedDomains.find(
-                            domain => uri.hostname === domain || uri.hostname.endsWith(`.${domain}`)
-                        )
+                        bannedDomains.find(domain => {
+                            if (typeof domain === 'string') {
+                                return (
+                                    uri.hostname === domain || uri.hostname.endsWith(`.${domain}`)
+                                );
+                            }
+                            return domain.test(uri.hostname);
+                        })
                     ) {
                         return true;
                     }
                 } catch (error) {
-                    if (bannedDomains.find(domain => url.includes(domain))) {
-                        return true;
-                    }
+                    // ignore
                 }
             }
         }
@@ -61,6 +65,9 @@ export class FilterUrlTrigger implements Trigger {
     }
 
     public async execute(msg: Message, _data: EventData): Promise<void> {
+        if (this.cooldown.take(msg.id)) {
+            return;
+        }
         Logger.debug(`Delete message: ${msg.id}`);
         await MessageUtils.reply(
             msg,
@@ -77,6 +84,9 @@ export class FilterUrlTrigger implements Trigger {
         newMsg: Message,
         _data: EventData
     ): Promise<void> {
+        if (this.cooldown.take(newMsg.id)) {
+            return;
+        }
         Logger.debug(`Delete edited message: ${newMsg.id}`);
         await MessageUtils.reply(
             newMsg,
