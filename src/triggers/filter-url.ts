@@ -72,7 +72,11 @@ export class FilterUrlTrigger implements Trigger {
         await MessageUtils.delete(msg);
     }
 
-    public async onUpdate(oldMsg: Message | PartialMessage, newMsg: Message, _data: EventData): Promise<void> {
+    public async onUpdate(
+        oldMsg: Message | PartialMessage,
+        newMsg: Message,
+        _data: EventData
+    ): Promise<void> {
         Logger.debug(`Delete edited message: ${newMsg.id}`);
         await MessageUtils.reply(
             newMsg,

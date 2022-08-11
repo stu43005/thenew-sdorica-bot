@@ -11,7 +11,7 @@ import {
     MessageContextMenuCommandInteraction,
     PermissionsBitField,
     PermissionsString,
-    RESTPostAPIApplicationCommandsJSONBody
+    RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
 import { Logger } from '../../services/logger.js';
@@ -76,7 +76,8 @@ export default class DeleteBetweenCommand implements MessageContextMenu {
                     if (
                         error instanceof Error &&
                         error.name.includes(
-                            `[${DiscordjsErrorCodes[DiscordjsErrorCodes.InteractionCollectorError]
+                            `[${
+                                DiscordjsErrorCodes[DiscordjsErrorCodes.InteractionCollectorError]
                             }]`
                         )
                     ) {

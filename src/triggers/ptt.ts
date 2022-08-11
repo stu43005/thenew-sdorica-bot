@@ -78,11 +78,11 @@ export async function getPttMetaline(url: string): Promise<{ [key: string]: stri
 
     const metalinesData: { [key: string]: string } = {};
 
-    const site_name = $('meta[property=\'og:site_name\']').attr('content');
+    const site_name = $(`meta[property="og:site_name"]`).attr('content');
     metalinesData['nsfw'] = site_name ? '' : 'true';
 
-    // const title = r18$('meta[property=\'og:title\']').attr('content');
-    const description = r18$('meta[property=\'og:description\']').attr('content');
+    // const title = r18$(`meta[property="og:title"]`).attr('content');
+    const description = r18$(`meta[property="og:description"]`).attr('content');
     if (description) metalinesData['內文'] = description;
 
     const metalines = r18$('.article-metaline, .article-metaline-right');
