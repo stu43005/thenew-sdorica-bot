@@ -1,4 +1,4 @@
-import { EmbedBuilder, Message, TextBasedChannel, User } from 'discord.js';
+import { Message, MessageOptions, TextBasedChannel, User } from 'discord.js';
 import { EventData } from '../models/event-data.js';
 import { ClientUtils } from '../utils/client-utils.js';
 import { FormatUtils } from '../utils/format-utils.js';
@@ -61,21 +61,11 @@ export async function quoteEmbed(
     msg: Message,
     footer: string = 'Quoted'
 ): Promise<void> {
-    if (msg.content || !msg.author.bot) {
-        await MessageUtils.send(
-            sourceMsg.channel,
-            buildQuoteEmbed(sourceMsg.channel, msg, sourceMsg.author, footer)
-        );
-    }
-    if (msg.embeds && msg.embeds.length > 0 && msg.author.bot) {
-        for (let i = 0; i < msg.embeds.length; i++) {
-            const embed = msg.embeds[i];
-            await MessageUtils.send(sourceMsg.channel, {
-                content: `Raw embed#${i + 1} from \`${msg.author.tag}\` in <#${msg.channel.id}>`,
-                embeds: [embed],
-            });
-        }
-    }
+    await MessageUtils.reply(
+        sourceMsg,
+        buildQuoteEmbed(sourceMsg.channel, msg, sourceMsg.author, footer),
+        false
+    );
 }
 
 export function buildQuoteEmbed(
@@ -83,7 +73,7 @@ export function buildQuoteEmbed(
     message: Message,
     user: User,
     footer: string
-): EmbedBuilder {
+): MessageOptions {
     const embed = FormatUtils.embedTheMessage(message, contextChannel);
     if (message.channel.id != contextChannel.id && 'name' in message.channel) {
         embed.setFooter({
@@ -92,5 +82,7 @@ export function buildQuoteEmbed(
     } else {
         embed.setFooter({ text: `${footer} by: ${user.tag}` });
     }
-    return embed;
+    return {
+        embeds: [embed, ...(message.author.bot ? message.embeds : [])],
+    };
 }

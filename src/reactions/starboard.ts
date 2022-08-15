@@ -112,7 +112,7 @@ function getTemplate(
     const embed = FormatUtils.embedTheMessage(message, contextChannel);
     embed.addFields({
         name: 'Original',
-        value: `[Show me!](${(message as unknown as Message).url})`,
+        value: `[Show me!](${message.url})`,
     });
     return {
         content: `${count} ⭐ in <#${message.channel.id}>`,
