@@ -6,6 +6,7 @@ import { Api } from './api/api.js';
 import { GuildsController } from './api/controllers/guilds-controller.js';
 import { RootController } from './api/controllers/root-controller.js';
 import { ShardsController } from './api/controllers/shards-controller.js';
+import { VideoArchiveController } from './api/controllers/video-archive-controller.js';
 import { managerJobs } from './jobs/index.js';
 import { Manager } from './models/manager.js';
 import { HttpService } from './services/http-service.js';
@@ -70,8 +71,14 @@ async function start(): Promise<void> {
     // API
     const guildsController = new GuildsController(shardManager);
     const shardsController = new ShardsController(shardManager);
+    const videoArchiveController = new VideoArchiveController();
     const rootController = new RootController();
-    const api = new Api([guildsController, shardsController, rootController]);
+    const api = new Api([
+        guildsController,
+        shardsController,
+        videoArchiveController,
+        rootController,
+    ]);
 
     // Start
     await manager.start();
