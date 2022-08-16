@@ -21,13 +21,18 @@ export class Api {
         this.app.use(handleError());
     }
 
+    public static get port(): number {
+        const port = process.env.PORT || config.get<number>('api.port');
+        return +port;
+    }
+
     public async start(): Promise<void> {
         const listen = util.promisify(this.app.listen.bind(this.app)) as (
             port: number
         ) => Promise<http.Server>;
-        const port = process.env.PORT || config.get<number>('api.port');
-        await listen(+port);
-        Logger.info(Logs.info.apiStarted.replaceAll('{PORT}', port));
+
+        await listen(Api.port);
+        Logger.info(Logs.info.apiStarted.replaceAll('{PORT}', Api.port));
     }
 
     private setupControllers(): void {

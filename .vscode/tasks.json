@@ -4,8 +4,8 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "${workspaceFolder}\\node_modules\\.bin\\tsc",
-            "args": ["--project", "${workspaceFolder}\\tsconfig.json"]
+            "command": "${workspaceFolder}/node_modules/.bin/tsc",
+            "args": ["--project", "${workspaceFolder}/tsconfig.json"]
         }
     ],
     "windows": {
