@@ -1,6 +1,8 @@
 {
     "cacheTTLSeconds": 43200,
-    "developers": ["198437688255184897"],
+    "developers": [
+        "198437688255184897"
+    ],
     "client": {
         "id": "",
         "token": "",
@@ -44,19 +46,19 @@
     },
     "rateLimiting": {
         "commands": {
-            "amount": 10,
+            "amount": 100,
             "interval": 30
         },
         "components": {
-            "amount": 10,
+            "amount": 100,
             "interval": 30
         },
         "triggers": {
-            "amount": 10,
+            "amount": 100,
             "interval": 30
         },
         "reactions": {
-            "amount": 10,
+            "amount": 100,
             "interval": 30
         }
     },
@@ -83,7 +85,10 @@
         },
         "dummyMode": {
             "enabled": false,
-            "whitelist": ["212772875793334272", "478288246858711040"]
+            "whitelist": [
+                "212772875793334272",
+                "478288246858711040"
+            ]
         }
     },
     "bot-sites": [
