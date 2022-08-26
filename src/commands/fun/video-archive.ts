@@ -30,7 +30,10 @@ export class VideoArchiveCommand implements Command {
                 authorization: this.authToken,
                 'content-type': 'application/json',
             },
-            body: JSON.stringify({ video }),
+            body: JSON.stringify({
+                video,
+                webhook: intr.webhook.url,
+            }),
         });
         if (res.status === 200) {
             await InteractionUtils.send(intr, `Added ${FormatUtils.inlineCode(video)} to queue.`);

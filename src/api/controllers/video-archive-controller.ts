@@ -13,12 +13,16 @@ export class VideoArchiveController implements Controller {
         this.router.get('/', (req, res) => this.videoArchive(req, res));
     }
 
-    private videos: string[] = [];
+    private videos: VideoArchiveData[] = [];
 
     private async addVideoArchive(req: Request, res: Response): Promise<void> {
-        const video = req.body.video;
+        const video: string = req.body.video;
+        const webhook: string = req.body.webhook;
         if (video) {
-            this.videos.push(video);
+            this.videos.push({
+                video,
+                webhook,
+            });
             res.status(200).json({ ok: 'OK' });
             return;
         }
@@ -29,4 +33,9 @@ export class VideoArchiveController implements Controller {
         res.status(200).json({ videos: this.videos });
         this.videos.length = 0;
     }
+}
+
+export interface VideoArchiveData {
+    video: string;
+    webhook: string;
 }
