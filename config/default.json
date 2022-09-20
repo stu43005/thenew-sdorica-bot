@@ -40,6 +40,14 @@
         "updateServerCount": {
             "schedule": "0 */10 * * * *",
             "log": false
+        },
+        "analyticsStatJob": {
+            "schedule": "0 0 * * *",
+            "log": false
+        },
+        "scraping": {
+            "schedule": "0 */5 * * * *",
+            "log": false
         }
     },
     "rateLimiting": {
@@ -150,5 +158,6 @@
             "authorization": "<TOKEN>",
             "body": "{\"serverCount\":{{SERVER_COUNT}}}"
         }
-    ]
+    ],
+    "scrapings": []
 }

@@ -12,18 +12,19 @@ export class JobService {
 
     public start(): void {
         for (const job of this.jobs) {
+            const log = job.log ? 'info' : 'debug';
             new CronJob({
                 cronTime: job.schedule,
                 onTick: async () => {
                     try {
                         if (job.log) {
-                            Logger.info(Logs.info.jobRun.replaceAll('{JOB}', job.name));
+                            Logger[log](Logs.info.jobRun.replaceAll('{JOB}', job.name));
                         }
 
                         await job.run();
 
                         if (job.log) {
-                            Logger.info(Logs.info.jobCompleted.replaceAll('{JOB}', job.name));
+                            Logger[log](Logs.info.jobCompleted.replaceAll('{JOB}', job.name));
                         }
                     } catch (error) {
                         Logger.error(Logs.error.job.replaceAll('{JOB}', job.name), error);
@@ -32,7 +33,7 @@ export class JobService {
                 start: true,
                 timeZone: config.get('jobs.timeZone'),
             });
-            Logger.info(
+            Logger[log](
                 Logs.info.jobScheduled
                     .replaceAll('{JOB}', job.name)
                     .replaceAll('{SCHEDULE}', job.schedule)

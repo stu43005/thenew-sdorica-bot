@@ -1,3 +1,4 @@
+import config from 'config';
 import admin from 'firebase-admin';
 import moment from 'moment';
 import { Database } from '../database/database.js';
@@ -6,8 +7,8 @@ import { Job } from './job.js';
 
 export class AnalyticsStatJob implements Job {
     public name = 'Analytics Stat job';
-    public schedule = '0 0 * * *'; // At 00:00
-    public log = false;
+    public schedule: string = config.get('jobs.analyticsStatJob.schedule');
+    public log: boolean = config.get('jobs.analyticsStatJob.log');
 
     public async run(): Promise<void> {
         const lastday = moment().subtract(7, 'days');
