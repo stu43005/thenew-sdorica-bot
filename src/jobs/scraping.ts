@@ -1,7 +1,8 @@
 import config from 'config';
-import { APIEmbed, EmbedBuilder, WebhookClient } from 'discord.js';
+import { APIEmbed, WebhookClient, WebhookMessageOptions } from 'discord.js';
 import jsonTemplates from 'json-templates';
 import { cloneDeep, get } from 'lodash-es';
+import mingo from 'mingo';
 import moment from 'moment';
 import fetch, { RequestInit } from 'node-fetch';
 import crypto from 'node:crypto';
@@ -39,21 +40,40 @@ export class ScrapingJob implements Job {
                     ScrapingSource
                 );
 
-                const result = await this.fetch(scraping);
-                for (const item of result) {
-                    const itemKey = this.getItemKey(scraping, item);
-                    const embed = this.itemToEmbeds(scraping, item).toJSON();
+                let items = await this.fetch(scraping);
+                if (items.length) {
+                    if (scraping.filterOutputs) {
+                        items = this.filter(items, {}, scraping.filterOutputs);
+                    }
+                    if (scraping.filter) {
+                        items = this.filter(items, scraping.filter);
+                    }
+                    if (scraping.skip && scraping.skip > 0) {
+                        items = items.slice(scraping.skip, items.length);
+                    }
+                    if (scraping.limit && scraping.limit > 0) {
+                        items = items.slice(0, scraping.limit);
+                    }
+                    for (const item of items) {
+                        let itemKey = this.getItemKey(scraping, item);
+                        if (itemKey.includes('//')) itemKey = this.createContentDigest(itemKey);
+                        const message = this.itemToMessages(scraping, item);
 
-                    const savedItem = await scrapingSource.items?.findById(itemKey);
-                    if (!savedItem) {
-                        Logger.debug(`scraping [${scraping.id}] item: ${itemKey}`, embed);
-                        const newItem = new ScrapingItem();
-                        Object.assign(newItem, embed);
-                        newItem.id = itemKey;
-                        await scrapingSource.items?.create(newItem);
+                        const savedItem = await scrapingSource.items?.findById(itemKey);
+                        if (!savedItem) {
+                            Logger.debug(`scraping [${scraping.id}] item: ${itemKey}`, message);
+                            const newItem = new ScrapingItem();
+                            Object.assign(newItem, message);
+                            newItem.id = itemKey;
+                            await scrapingSource.items?.create(newItem);
 
-                        const subscribes = await scrapingSource.subscriptions?.find();
-                        await this.sendNofitication(subscribes, embed);
+                            const subscribes = await scrapingSource.subscriptions?.find();
+                            await this.sendNofitication(subscribes, message);
+                        } else {
+                            Logger.debug(
+                                `scraping [${scraping.id}] item: ${itemKey} already exist`
+                            );
+                        }
                     }
                 }
             } catch (error) {
@@ -64,7 +84,7 @@ export class ScrapingJob implements Job {
 
     private async sendNofitication(
         subscribes: ScrapingSubscription[] | undefined,
-        embed: APIEmbed
+        message: WebhookMessageOptions
     ): Promise<void> {
         if (!subscribes) return;
         for (const subscribe of subscribes) {
@@ -73,9 +93,7 @@ export class ScrapingJob implements Job {
                 const webhook = new WebhookClient({
                     url: subscribe.url,
                 });
-                await webhook.send({
-                    embeds: [embed],
-                });
+                await webhook.send(message);
             } catch (error) {
                 Logger.error(
                     `post message to [${subscribe.guildId}.${subscribe.id}] error: `,
@@ -104,11 +122,11 @@ export class ScrapingJob implements Job {
             case 'json': {
                 const { itemsPath, requestConfig, shouldIncludeRawBody } = options as JsonOptions;
                 const response = await fetch(scraping.url, requestConfig);
-                const requestResult = (await response.json()) as JsonObject;
+                const requestResult = (await response.json()) as JsonValue;
                 if (requestResult) {
                     let itemsArray: JsonObject[] = itemsPath
-                        ? get(requestResult.data, itemsPath)
-                        : requestResult.data;
+                        ? get(requestResult, itemsPath)
+                        : requestResult;
                     if (!Array.isArray(itemsArray)) {
                         itemsArray = [itemsArray];
                     }
@@ -136,6 +154,7 @@ export class ScrapingJob implements Job {
         const options = scraping.options ?? {};
         switch (scraping.type) {
             case 'rss':
+            default:
                 if (item.guid) return item.guid as string;
                 if (item.link) return this.createContentDigest(item.link);
                 if (item.id) return item.id as string;
@@ -159,7 +178,7 @@ export class ScrapingJob implements Job {
                     if (item.___url) {
                         requestUrl = item.___url as string;
                     }
-                    return requestUrl + '__' + key;
+                    return this.createContentDigest(requestUrl) + '__' + key;
                 }
                 return this.createContentDigest(item);
             }
@@ -174,22 +193,36 @@ export class ScrapingJob implements Job {
         return crypto.createHash('md5').update(JSON.stringify(obj)).digest('hex');
     }
 
-    private itemToEmbeds(scraping: Scraping, item: JsonObject): EmbedBuilder {
-        let templateResult: APIEmbed | undefined;
-        if (scraping.embed) {
-            const template = jsonTemplates(scraping.embed);
+    private filter(
+        items: JsonObject[],
+        condition: JsonObject,
+        projection?: JsonObject
+    ): JsonObject[] {
+        const cursor = mingo.find(items, condition, projection);
+        return cursor.all() as JsonObject[];
+    }
+
+    private itemToMessages(scraping: Scraping, item: JsonObject): WebhookMessageOptions {
+        let templateResult: WebhookMessageOptions | undefined;
+        if (scraping.messageTemplate) {
+            const template = jsonTemplates(scraping.messageTemplate);
             templateResult = template(item);
         }
-        const embed: APIEmbed = {
+        const message: WebhookMessageOptions = {
             ...templateResult,
         };
-        embed.title ||= item.title?.toString() || 'Untitled';
-        embed.description ||= item.contentSnippet?.toString();
-        embed.url ||= item.link?.toString();
-        embed.timestamp ||=
-            item.isoDate?.toString() ||
-            (item.pubDate ? moment(item.pubDate.toString()).toISOString() : void 0);
-        return new EmbedBuilder(embed);
+        if (scraping.defaultEmbed !== false) {
+            message.embeds ??= [];
+            const embed: APIEmbed = (message.embeds[0] as APIEmbed) ?? {};
+            embed.title ||= item.title?.toString() || 'Untitled';
+            embed.description ||= item.contentSnippet?.toString();
+            embed.url ||= item.link?.toString();
+            embed.timestamp ||=
+                item.isoDate?.toString() ||
+                (item.pubDate ? moment(item.pubDate.toString()).toISOString() : void 0);
+            message.embeds[0] ??= embed;
+        }
+        return message;
     }
 }
 
@@ -199,7 +232,12 @@ export interface Scraping {
     type: string;
     url: string;
     options?: JsonObject;
-    embed?: APIEmbed;
+    filter?: JsonObject;
+    filterOutputs?: JsonObject;
+    skip?: number;
+    limit?: number;
+    messageTemplate?: WebhookMessageOptions;
+    defaultEmbed?: boolean;
 }
 
 export interface RssOptions {
