@@ -11,7 +11,7 @@ import {
     ScrapingSource,
     ScrapingSubscription,
 } from '../../database/entities/scraping.js';
-import { Scraping } from '../../jobs/scraping.js';
+import { Scraping } from '../../jobs/scraping/types.js';
 import { FormatUtils } from '../../utils/format-utils.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
