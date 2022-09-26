@@ -89,15 +89,30 @@ export class ScrapingJob implements Job {
         const message: WebhookMessageOptions = {
             ...templateResult,
         };
+        message.content ||= item.link ? `<${item.link}>` : void 0;
         if (scraping.defaultEmbed !== false) {
             message.embeds ??= [];
             const embed: APIEmbed = (message.embeds[0] as APIEmbed) ?? {};
             embed.title ||= item.title?.toString() || 'Untitled';
-            embed.description ||= item.contentSnippet?.toString();
+            embed.description ||= item.contentSnippet?.toString() || item.content?.toString();
             embed.url ||= item.link?.toString();
             embed.timestamp ||=
                 item.isoDate?.toString() ||
                 (item.pubDate ? moment(item.pubDate.toString()).toISOString() : void 0);
+            if (Array.isArray(item.images) && item.images.length > 0) {
+                embed.image = {
+                    url: item.images[0] as string,
+                };
+                if (item.images.length > 1) {
+                    message.embeds.push(
+                        ...item.images.slice(1).map(img => ({
+                            image: {
+                                url: img as string,
+                            },
+                        }))
+                    );
+                }
+            }
             message.embeds[0] ??= embed;
         }
         return message;
