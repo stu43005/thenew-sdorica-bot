@@ -1,1 +1,147 @@
-{}
+{
+    "scrapings": [
+        {
+            "id": "appstore-sdorica",
+            "enabled": true,
+            "type": "json",
+            "url": "https://itunes.apple.com/lookup?id=1079395220&country=tw",
+            "options": {
+                "deduplicationKey": "version",
+                "itemsPath": "results"
+            },
+            "filterOutputs": {
+                "trackName": 1,
+                "version": 1,
+                "trackViewUrl": 1,
+                "releaseNotes": 1
+            },
+            "messageTemplate": {
+                "username": "App Store Update",
+                "avatar_url": "https://cdn.discordapp.com/attachments/543454386873958413/777182480267608114/mi0S5wK.jpg",
+                "content": "**{{trackName}} {{version}} 版本已上架 App Store**\n前往商店查看：{{trackViewUrl}}\n\n更新內容：\n{{releaseNotes}}"
+            },
+            "defaultEmbed": false
+        },
+        {
+            "id": "bilibili-万象物语",
+            "enabled": true,
+            "type": "rss",
+            "url": "https://rsshub.app/bilibili/user/dynamic/350845222",
+            "messageTemplate": {
+                "username": "万象物语 的 bilibili 动态",
+                "embeds": [
+                    {
+                        "author": {
+                            "name": "万象物语",
+                            "url": "https://space.bilibili.com/350845222",
+                            "icon_url": "https://cdn.discordapp.com/attachments/543454386873958413/778648876151865364/3065befd98a6a1a5e513ef8aa3309636716f0f96.png"
+                        },
+                        "footer": {
+                            "text": "Bilibili",
+                            "icon_url": "https://cdn.discordapp.com/attachments/543454386873958413/778648632127127613/39107515-619773e0-46f5-11e8-9fa9-2859816f1c42.png"
+                        }
+                    }
+                ]
+            },
+            "limit": 2
+        },
+        {
+            "id": "facebook-sdorica",
+            "enabled": false,
+            "type": "facebook",
+            "url": "rayark.sdorica",
+            "messageTemplate": {
+                "username": "Sdorica | Facebook",
+                "embeds": [
+                    {
+                        "author": {
+                            "name": "Sdorica (@rayark.sdorica)",
+                            "url": "https://www.facebook.com/rayark.sdorica/",
+                            "icon_url": "https://cdn.discordapp.com/attachments/543454386873958413/777186584000724992/118745707_1600182993519599_5578732041796140826_o.png"
+                        },
+                        "footer": {
+                            "text": "Facebook",
+                            "icon_url": "https://cdn.discordapp.com/attachments/543454386873958413/777182912629309480/m8bb1q5.png"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "id": "facebook-twcdc",
+            "enabled": false,
+            "type": "facebook",
+            "url": "TWCDC",
+            "messageTemplate": {
+                "username": "疾病管制署 - 1922防疫達人 | Facebook",
+                "embeds": [
+                    {
+                        "author": {
+                            "name": "疾病管制署 - 1922防疫達人 (@TWCDC)",
+                            "url": "https://www.facebook.com/TWCDC/"
+                        },
+                        "footer": {
+                            "text": "Facebook",
+                            "icon_url": "https://cdn.discordapp.com/attachments/543454386873958413/777182912629309480/m8bb1q5.png"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "id": "gnn-sdorica",
+            "enabled": true,
+            "type": "rss",
+            "url": "https://gnn.gamer.com.tw/rss.xml",
+            "filter": {
+                "$or": [
+                    {
+                        "title": {
+                            "$regex": "sdorica",
+                            "$options": "i"
+                        }
+                    },
+                    {
+                        "contentSnippet": {
+                            "$regex": "sdorica",
+                            "$options": "i"
+                        }
+                    }
+                ]
+            },
+            "filterOutputs": {
+                "title": 1,
+                "link": 1
+            },
+            "messageTemplate": {
+                "username": "GNN新聞",
+                "avatar_url": "https://cdn.discordapp.com/attachments/543454386873958413/777182478410317834/jcseAjD.png",
+                "content": "{{title}}\n{{link}}"
+            },
+            "defaultEmbed": false
+        },
+        {
+            "id": "weibo-万象物语",
+            "enabled": true,
+            "type": "rss",
+            "url": "https://rsshub.app/weibo/user/5464702529",
+            "messageTemplate": {
+                "username": "万象物语的微博",
+                "embeds": [
+                    {
+                        "author": {
+                            "name": "万象物语",
+                            "url": "https://www.weibo.com/sdorica",
+                            "icon_url": "https://cdn.discordapp.com/attachments/543454386873958413/778653459904987167/005XPkLnly8gik6l3thcnj30sg0sgkjl.png"
+                        },
+                        "footer": {
+                            "text": "微博",
+                            "icon_url": "https://cdn.discordapp.com/attachments/543454386873958413/778653585885495316/1200px-Sina_Weibo_logo.png"
+                        }
+                    }
+                ]
+            },
+            "limit": 2
+        }
+    ]
+}

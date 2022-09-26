@@ -1,1 +1,9 @@
-{}
+{
+    "jobs": {
+        "scraping": {
+            "schedule": "0 * * * * *",
+            "log": false
+        }
+    },
+    "scrapings": []
+}
