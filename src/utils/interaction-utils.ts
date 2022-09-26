@@ -8,7 +8,7 @@ import {
     InteractionUpdateOptions,
     Message,
     MessageComponentInteraction,
-    MessageOptions,
+    MessageCreateOptions,
     ModalSubmitInteraction,
     RESTJSONErrorCodes,
     User,
@@ -60,7 +60,7 @@ export class InteractionUtils {
 
     public static async send(
         intr: CommandInteraction | MessageComponentInteraction | ModalSubmitInteraction,
-        content: string | EmbedBuilder | MessageOptions,
+        content: string | EmbedBuilder | MessageCreateOptions,
         hidden: boolean = false
     ): Promise<Message | undefined> {
         try {
@@ -89,7 +89,7 @@ export class InteractionUtils {
 
     public static async editReply(
         intr: CommandInteraction | MessageComponentInteraction,
-        content: string | EmbedBuilder | MessageOptions
+        content: string | EmbedBuilder | MessageCreateOptions
     ): Promise<Message | undefined> {
         try {
             const msgOptions = MessageUtils.messageOptions(content);
@@ -107,7 +107,7 @@ export class InteractionUtils {
 
     public static async update(
         intr: MessageComponentInteraction,
-        content: string | EmbedBuilder | MessageOptions
+        content: string | EmbedBuilder | MessageCreateOptions
     ): Promise<Message | undefined> {
         try {
             const msgOptions = MessageUtils.messageOptions(content) as InteractionUpdateOptions;

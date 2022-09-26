@@ -1,5 +1,5 @@
 import config from 'config';
-import { APIEmbed, WebhookClient, WebhookMessageOptions } from 'discord.js';
+import { APIEmbed, WebhookClient, WebhookCreateMessageOptions } from 'discord.js';
 import jsonTemplates from 'json-templates';
 import mingo from 'mingo';
 import moment from 'moment';
@@ -80,13 +80,13 @@ export class ScrapingJob implements Job {
         }
     }
 
-    private itemToMessages(scraping: Scraping, item: JsonObject): WebhookMessageOptions {
-        let templateResult: WebhookMessageOptions | undefined;
+    private itemToMessages(scraping: Scraping, item: JsonObject): WebhookCreateMessageOptions {
+        let templateResult: WebhookCreateMessageOptions | undefined;
         if (scraping.messageTemplate) {
             const template = jsonTemplates(scraping.messageTemplate);
             templateResult = template(item);
         }
-        const message: WebhookMessageOptions = {
+        const message: WebhookCreateMessageOptions = {
             ...templateResult,
         };
         message.content ||= item.link ? `<${item.link}>` : void 0;
@@ -120,7 +120,7 @@ export class ScrapingJob implements Job {
 
     private async sendNofitication(
         subscribes: ScrapingSubscription[] | undefined,
-        message: WebhookMessageOptions
+        message: WebhookCreateMessageOptions
     ): Promise<void> {
         if (!subscribes) return;
         for (const subscribe of subscribes) {

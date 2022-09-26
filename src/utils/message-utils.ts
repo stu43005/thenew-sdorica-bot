@@ -5,8 +5,8 @@ import {
     EmojiResolvable,
     GuildMember,
     Message,
+    MessageCreateOptions,
     MessageEditOptions,
-    MessageOptions,
     MessageReaction,
     MessageReactionResolvable,
     RESTJSONErrorCodes,
@@ -29,7 +29,7 @@ const IGNORED_ERRORS: (string | number)[] = [
 export class MessageUtils {
     public static async send(
         target: User | TextBasedChannel,
-        content: string | EmbedBuilder | MessageOptions
+        content: string | EmbedBuilder | MessageCreateOptions
     ): Promise<Message | undefined> {
         try {
             const msgOptions = this.messageOptions(content);
@@ -45,7 +45,7 @@ export class MessageUtils {
 
     public static async reply(
         msg: Message,
-        content: string | EmbedBuilder | MessageOptions,
+        content: string | EmbedBuilder | MessageCreateOptions,
         mentionRepliedUser: boolean = true
     ): Promise<Message | undefined> {
         try {
@@ -66,7 +66,7 @@ export class MessageUtils {
 
     public static async edit(
         msg: Message,
-        content: string | EmbedBuilder | MessageOptions
+        content: string | EmbedBuilder | MessageCreateOptions
     ): Promise<Message | undefined> {
         try {
             const msgOptions = this.messageOptions(content) as MessageEditOptions;
@@ -168,8 +168,10 @@ export class MessageUtils {
         }
     }
 
-    public static messageOptions(content: string | EmbedBuilder | MessageOptions): MessageOptions {
-        let options: MessageOptions = {};
+    public static messageOptions(
+        content: string | EmbedBuilder | MessageCreateOptions
+    ): MessageCreateOptions {
+        let options: MessageCreateOptions = {};
         if (typeof content === 'string') {
             options.content = content;
         } else if (content instanceof EmbedBuilder) {

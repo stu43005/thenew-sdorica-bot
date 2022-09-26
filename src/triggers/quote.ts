@@ -1,4 +1,4 @@
-import { Message, MessageOptions, TextBasedChannel, User } from 'discord.js';
+import { Message, MessageCreateOptions, TextBasedChannel, User } from 'discord.js';
 import { EventData } from '../models/event-data.js';
 import { ClientUtils } from '../utils/client-utils.js';
 import { FormatUtils } from '../utils/format-utils.js';
@@ -73,7 +73,7 @@ export function buildQuoteEmbed(
     message: Message,
     user: User,
     footer: string
-): MessageOptions {
+): MessageCreateOptions {
     const embed = FormatUtils.embedTheMessage(message, contextChannel);
     if (message.channel.id != contextChannel.id && 'name' in message.channel) {
         embed.setFooter({
