@@ -27,6 +27,7 @@
             "enabled": true,
             "type": "rss",
             "url": "https://rsshub.app/bilibili/user/dynamic/350845222",
+            "interval": 7200000,
             "messageTemplate": {
                 "username": "万象物语 的 bilibili 动态",
                 "embeds": [
@@ -125,6 +126,7 @@
             "enabled": true,
             "type": "rss",
             "url": "https://rsshub.app/weibo/user/5464702529",
+            "interval": 7200000,
             "messageTemplate": {
                 "username": "万象物语的微博",
                 "embeds": [

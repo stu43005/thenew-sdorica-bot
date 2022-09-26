@@ -39,6 +39,14 @@ export class ScrapingJob implements Job {
                     ScrapingSource
                 );
 
+                if (
+                    scrapingSource.scrapingTime &&
+                    scraping.interval &&
+                    scrapingSource.scrapingTime + scraping.interval > Date.now()
+                ) {
+                    continue;
+                }
+
                 let items = await this.fetch(scraping);
                 if (items.length) {
                     if (scraping.filterOutputs) {
@@ -73,6 +81,11 @@ export class ScrapingJob implements Job {
                             );
                         }
                     }
+                }
+
+                if (scraping.interval) {
+                    scrapingSource.scrapingTime = Date.now();
+                    await getScrapingSourceRepository().update(scrapingSource);
                 }
             } catch (error) {
                 Logger.error(`scraping [${scraping.id}] error: `, error);

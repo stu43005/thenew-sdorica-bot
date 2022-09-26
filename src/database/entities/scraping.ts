@@ -22,6 +22,8 @@ export class ScrapingSubscription {
 export class ScrapingSource {
     id!: string;
 
+    scrapingTime?: number;
+
     @SubCollection(ScrapingItem, 'items')
     items?: ISubCollection<ScrapingItem>;
 

@@ -7,6 +7,7 @@ export interface Scraping {
     type: string;
     url: string;
     options?: JsonObject;
+    interval?: number;
     filter?: JsonObject;
     filterOutputs?: JsonObject;
     skip?: number;
