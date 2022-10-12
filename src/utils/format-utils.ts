@@ -1,8 +1,10 @@
 import {
     Channel,
     channelMention,
+    cleanCodeBlockContent,
     codeBlock,
     EmbedBuilder,
+    escapeInlineCode,
     Guild,
     GuildMember,
     inlineCode,
@@ -37,15 +39,15 @@ export class FormatUtils {
     }
 
     public static inlineCode(content: string): string {
-        return inlineCode(content.replaceAll('`', '\\`'));
+        return inlineCode(escapeInlineCode(content));
     }
 
     public static codeBlock(content: string): string;
     public static codeBlock(language: string, content: string): string;
     public static codeBlock(language: string, content?: string): string {
         return typeof content === 'undefined'
-            ? codeBlock(language.replaceAll('`', '\\`'))
-            : codeBlock(language, content.replaceAll('`', '\\`'));
+            ? codeBlock(cleanCodeBlockContent(language))
+            : codeBlock(language, cleanCodeBlockContent(content));
     }
 
     public static jsonBlock(obj: any): string {

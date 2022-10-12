@@ -1,6 +1,5 @@
-import discordEscape from 'discord-escape';
+import { escapeMarkdown, EscapeMarkdownOptions } from 'discord.js';
 import crypto from 'node:crypto';
-import removeMarkdown from 'remove-markdown';
 
 export class StringUtils {
     public static truncate(input: string, length: number, addEllipsis: boolean = false): string {
@@ -16,12 +15,8 @@ export class StringUtils {
         return output;
     }
 
-    public static discordEscape(input: string): string {
-        return discordEscape(input);
-    }
-
-    public static stripMarkdown(input: string): string {
-        return removeMarkdown(input);
+    public static discordEscape(input: string, options: EscapeMarkdownOptions): string {
+        return escapeMarkdown(input, options);
     }
 
     public static createContentDigest(obj: unknown): string {
