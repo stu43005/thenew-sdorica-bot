@@ -15,7 +15,7 @@ export class StringUtils {
         return output;
     }
 
-    public static discordEscape(input: string, options: EscapeMarkdownOptions): string {
+    public static discordEscape(input: string, options?: EscapeMarkdownOptions): string {
         return escapeMarkdown(input, options);
     }
 
