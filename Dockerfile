@@ -1,4 +1,10 @@
-FROM node:16
+FROM node:16-bullseye-slim as build
+
+# Add Tini https://github.com/krallin/tini
+RUN set -x \
+    && apt-get update \
+    && apt-get install tini \
+    && rm -rf /var/cache/apt/*
 
 # Create app directory
 WORKDIR /app
@@ -7,7 +13,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install packages
-RUN npm install
+RUN npm ci
 
 # Copy the app code
 COPY . .
@@ -15,8 +21,20 @@ COPY . .
 # Build the project
 RUN npm run build
 
+# Install packages only production dependencies
+RUN npm ci --omit=dev;
+
+FROM gcr.io/distroless/nodejs:16
+
+ENV NODE_ENV production
+
+COPY --from=build /usr/bin/tini /usr/bin/tini
+COPY --from=build /app /app
+WORKDIR /app
+
 # Expose ports
 EXPOSE 8080
 
 # Run the application
-CMD [ "node", "dist/start-manager.js" ]
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD [ "/nodejs/bin/node", "dist/start-manager.js" ]
