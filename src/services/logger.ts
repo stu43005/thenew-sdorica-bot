@@ -107,7 +107,14 @@ export async function discordWebhookTransport(
                 });
             }
 
-            await webhookClient.send({ embeds: [embed] }).catch(webhookError);
+            await webhookClient
+                .send({
+                    embeds: [embed],
+                    threadId: config.has('logging.discordWebhook.threadId')
+                        ? config.get<string>('logging.discordWebhook.threadId')
+                        : undefined,
+                })
+                .catch(webhookError);
             // await webhookClient.send(codeBlock('json', JSON.stringify(obj))).catch(webhookError);
         }
     });

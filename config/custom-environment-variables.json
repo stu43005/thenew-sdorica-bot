@@ -9,7 +9,8 @@
     "logging": {
         "discordWebhook": {
             "id": "LOG_WEBHOOK_ID",
-            "token": "LOG_WEBHOOK_TOKEN"
+            "token": "LOG_WEBHOOK_TOKEN",
+            "threadId": "LOG_WEBHOOK_THREAD"
         }
     },
     "firebaseAdmin": {
