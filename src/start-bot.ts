@@ -40,6 +40,7 @@ async function start(): Promise<void> {
         intents: [
             GatewayIntentBits.MessageContent,
             GatewayIntentBits.Guilds,
+            GatewayIntentBits.GuildMembers,
             GatewayIntentBits.GuildMessages,
             GatewayIntentBits.GuildMessageReactions,
             GatewayIntentBits.DirectMessages,

@@ -1,5 +1,5 @@
 import config from 'config';
-import { APIEmbed, WebhookClient, WebhookCreateMessageOptions } from 'discord.js';
+import { APIEmbed, isJSONEncodable, WebhookClient, WebhookCreateMessageOptions } from 'discord.js';
 import jsonTemplates from 'json-templates';
 import mingo from 'mingo';
 import moment from 'moment';
@@ -105,7 +105,9 @@ export class ScrapingJob implements Job {
         message.content ||= item.link ? `<${item.link}>` : void 0;
         if (scraping.defaultEmbed !== false) {
             message.embeds ??= [];
-            const embed: APIEmbed = (message.embeds[0] as APIEmbed) ?? {};
+            const embed: APIEmbed = isJSONEncodable(message.embeds[0])
+                ? message.embeds[0].toJSON()
+                : message.embeds[0] ?? {};
             embed.title ||= item.title?.toString() || 'Untitled';
             embed.description ||= item.contentSnippet?.toString() || item.content?.toString();
             embed.url ||= item.link?.toString();
