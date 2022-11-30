@@ -3,7 +3,7 @@ import { APIEmbed, WebhookClient, WebhookCreateMessageOptions } from 'discord.js
 import jsonTemplates from 'json-templates';
 import mingo from 'mingo';
 import moment from 'moment';
-import { JsonObject } from 'type-fest';
+import { JsonArray, JsonObject } from 'type-fest';
 import { Database } from '../database/database.js';
 import {
     getScrapingSourceRepository,
@@ -112,13 +112,14 @@ export class ScrapingJob implements Job {
             embed.timestamp ||=
                 item.isoDate?.toString() ||
                 (item.pubDate ? moment(item.pubDate.toString()).toISOString() : void 0);
-            if (Array.isArray(item.images) && item.images.length > 0) {
+            const images = item.images as JsonArray;
+            if (Array.isArray(images) && images.length > 0) {
                 embed.image = {
-                    url: item.images[0] as string,
+                    url: images[0] as string,
                 };
-                if (item.images.length > 1) {
+                if (images.length > 1) {
                     message.embeds.push(
-                        ...item.images.slice(1).map(img => ({
+                        ...images.slice(1).map(img => ({
                             image: {
                                 url: img as string,
                             },
