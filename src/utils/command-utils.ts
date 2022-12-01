@@ -1,5 +1,5 @@
 import config from 'config';
-import { CommandInteraction, GuildChannel, GuildMember, PermissionsBitField } from 'discord.js';
+import { CommandInteraction, GuildMember, PermissionsBitField } from 'discord.js';
 import { Command } from '../commands/command.js';
 import { Permission } from '../models/enum-helpers/permission.js';
 import { EventData } from '../models/event-data.js';
@@ -47,7 +47,8 @@ export class CommandUtils {
         }
 
         if (
-            intr.channel instanceof GuildChannel &&
+            intr.channel &&
+            'permissionsFor' in intr.channel &&
             intr.client.user &&
             !intr.channel.permissionsFor(intr.client.user)?.has(command.requireClientPerms)
         ) {
