@@ -22,9 +22,8 @@ export class FilterUrlTrigger implements Trigger {
     private cooldown = new RateLimiter(1, 60 * 1000);
 
     public triggered(msg: Message): boolean {
-        if (!PermissionUtils.canDeleteMessage(msg.channel)) {
-            return false;
-        }
+        if (!PermissionUtils.canDeleteMessage(msg.channel)) return false;
+
         if (msg.attachments.size) {
             for (const [_id, attach] of msg.attachments) {
                 if (this.filterUrl(attach.url, true)) {

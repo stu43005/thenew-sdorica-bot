@@ -4,6 +4,7 @@ import { getMemeEmbed, MemeItem, metchMeme } from '../commands/config/meme.js';
 import { StatCollection } from '../database/stat-collection.js';
 import { EventData } from '../models/event-data.js';
 import { MessageUtils } from '../utils/message-utils.js';
+import { PermissionUtils } from '../utils/permission-utils.js';
 import { Trigger } from './trigger.js';
 
 export class MemeTrigger implements Trigger {
@@ -13,7 +14,7 @@ export class MemeTrigger implements Trigger {
 
     public triggered(msg: Message): boolean {
         if (msg.author.bot) return false;
-        return true;
+        return PermissionUtils.canSend(msg.channel);
     }
 
     public async execute(msg: Message, data: EventData): Promise<void> {

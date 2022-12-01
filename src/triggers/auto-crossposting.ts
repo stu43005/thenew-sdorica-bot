@@ -6,7 +6,7 @@ export class AutoCrosspostingTrigger implements Trigger {
     public requireGuild = true;
 
     public triggered(msg: Message): boolean {
-        return msg.channel.type === ChannelType.GuildNews;
+        return msg.channel.type === ChannelType.GuildAnnouncement;
     }
 
     public async execute(msg: Message, data: EventData): Promise<void> {

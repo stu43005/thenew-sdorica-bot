@@ -5,6 +5,7 @@ import fetch from 'node-fetch';
 import { EventData } from '../models/event-data.js';
 import { Logger } from '../services/logger.js';
 import { MessageUtils } from '../utils/message-utils.js';
+import { PermissionUtils } from '../utils/permission-utils.js';
 import { Trigger } from './trigger.js';
 
 export class PttTrigger implements Trigger {
@@ -14,6 +15,7 @@ export class PttTrigger implements Trigger {
 
     public triggered(msg: Message): boolean {
         if (msg.author.bot) return false;
+        if (!PermissionUtils.canSend(msg.channel)) return false;
 
         const limited = this.cooldown.take(msg.author.id);
         if (limited) return false;
