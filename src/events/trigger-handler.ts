@@ -4,6 +4,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 import { getGuildRepository } from '../database/entities/guild.js';
 import { getUserRepository } from '../database/entities/user.js';
 import { EventData } from '../models/event-data.js';
+import { Logger } from '../services/logger.js';
 import { Trigger } from '../triggers/trigger.js';
 
 export class TriggerHandler {
@@ -49,6 +50,7 @@ export class TriggerHandler {
         );
 
         // Execute triggers
+        Logger.debug(`Message start process: ${msg.id}`);
         for (const trigger of triggers) {
             if (oldMsg) {
                 await trigger.onUpdate?.(oldMsg, msg, data);
@@ -56,5 +58,6 @@ export class TriggerHandler {
                 await trigger.execute(msg, data);
             }
         }
+        Logger.debug(`Message end process: ${msg.id}`);
     }
 }

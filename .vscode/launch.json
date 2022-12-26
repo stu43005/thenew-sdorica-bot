@@ -32,6 +32,25 @@
             "restart": false
         },
         {
+            "name": "prod",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "preLaunchTask": "build",
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": "node",
+            "args": ["--enable-source-maps", "${workspaceFolder}/dist/start-manager.js"],
+            "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"],
+            "outputCapture": "std",
+            "internalConsoleOptions": "openOnSessionStart",
+            "skipFiles": ["<node_internals>/**"],
+            "restart": false,
+            "env": {
+                "NODE_ENV": "production",
+                "LEVEL": "debug"
+            }
+        },
+        {
             "name": "commands:register",
             "type": "node",
             "request": "launch",
