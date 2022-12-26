@@ -73,6 +73,8 @@ export class Bot {
             (messageReaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) =>
                 this.onReaction(messageReaction, user, true)
         );
+        this.client.on(Events.Debug, message => Logger.debug(message));
+        this.client.on(Events.Warn, message => Logger.warn(message));
         this.client.rest.on(RESTEvents.RateLimited, (rateLimitData: RateLimitData) =>
             this.onRateLimit(rateLimitData)
         );
