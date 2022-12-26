@@ -4,6 +4,7 @@ import { Response } from 'node-fetch';
 import { Transform } from 'node:stream';
 import pino, { DestinationStream, Level, LoggerOptions, StreamEntry } from 'pino';
 import build, { OnUnknown } from 'pino-abstract-transport';
+import { ConfigUtils } from '../utils/config-utils.js';
 import { FormatUtils } from '../utils/format-utils.js';
 
 const loggerOption: LoggerOptions = {
@@ -12,7 +13,7 @@ const loggerOption: LoggerOptions = {
             return { level: label };
         },
     },
-    // level: ConfigUtils.isDevMode() ? 'debug' : 'info',
+    level: process.env.LEVEL || (ConfigUtils.isDevMode() ? 'debug' : 'info'),
 };
 const streams: (DestinationStream | StreamEntry)[] = [
     ...(config.get('logging.pretty')

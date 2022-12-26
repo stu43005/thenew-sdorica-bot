@@ -7,6 +7,8 @@ processes = []
 
 [env]
   NODE_ENV = "production"
+  TINI_SUBREAPER = "true"
+  LEVEL = "debug"
 
 [experimental]
   allowed_public_ports = []
