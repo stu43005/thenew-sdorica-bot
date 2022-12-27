@@ -53,6 +53,7 @@ export class StatCollection {
         const metaRef = db.collection('stat').doc(this.guild.id);
         const metaDoc = await metaRef.get();
         let meta = metaDoc.data() as StatGuild;
+        Logger.debug(`save stat ${this.guild.id}: get meta`);
         if (!metaDoc.exists || !meta) {
             meta = newmeta;
         } else {
@@ -64,18 +65,20 @@ export class StatCollection {
             });
         }
         await metaRef.set(meta, { merge: true });
+        Logger.debug(`save stat ${this.guild.id}: set meta`);
 
         const dateStr = moment().format('YYYY-MM-DD');
         const dailyRef = metaRef.collection('daily').doc(dateStr);
         const dailyDoc = await dailyRef.get();
         let daily = dailyDoc.data() as StatData;
+        Logger.debug(`save stat ${this.guild.id}: get daily`);
         if (!dailyDoc.exists || !daily) {
             daily = temp;
         } else {
             mergeData(daily, temp);
         }
         await dailyRef.set(daily, { merge: true });
-        Logger.debug(`save stat ${this.guild.id}: succeeded`);
+        Logger.debug(`save stat ${this.guild.id}: set daily`);
     }
 
     newTemp(): void {
