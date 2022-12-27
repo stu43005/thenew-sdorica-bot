@@ -76,9 +76,9 @@ export class ScrapingJob implements Job {
                             const subscribes = await scrapingSource.subscriptions?.find();
                             await this.sendNofitication(subscribes, message);
                         } else {
-                            Logger.debug(
-                                `scraping [${scraping.id}] item: ${itemKey} already exist`
-                            );
+                            // Logger.debug(
+                            //     `scraping [${scraping.id}] item: ${itemKey} already exist`
+                            // );
                         }
                     }
                 }
@@ -88,7 +88,7 @@ export class ScrapingJob implements Job {
                     await getScrapingSourceRepository().update(scrapingSource);
                 }
             } catch (error) {
-                Logger.error(`scraping [${scraping.id}] error: `, error);
+                Logger.error(`scraping [${scraping.id}] error: ${error}`);
             }
         }
     }

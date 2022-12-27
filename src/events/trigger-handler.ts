@@ -50,7 +50,7 @@ export class TriggerHandler {
         );
 
         // Execute triggers
-        Logger.debug(`Message start process: ${msg.id}`);
+        Logger.debug(`Message start process: ${msg.url}`);
         for (const trigger of triggers) {
             if (oldMsg) {
                 await trigger.onUpdate?.(oldMsg, msg, data);
@@ -58,6 +58,6 @@ export class TriggerHandler {
                 await trigger.execute(msg, data);
             }
         }
-        Logger.debug(`Message end process: ${msg.id}`);
+        Logger.debug(`Message end process: ${msg.url}`);
     }
 }
