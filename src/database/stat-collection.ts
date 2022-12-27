@@ -63,7 +63,7 @@ export class StatCollection {
                 meta.userNames[key] = newmeta.userNames[key];
             });
         }
-        metaRef.set(meta, { merge: true });
+        await metaRef.set(meta, { merge: true });
 
         const dateStr = moment().format('YYYY-MM-DD');
         const dailyRef = metaRef.collection('daily').doc(dateStr);
@@ -74,7 +74,8 @@ export class StatCollection {
         } else {
             mergeData(daily, temp);
         }
-        dailyRef.set(daily, { merge: true });
+        await dailyRef.set(daily, { merge: true });
+        Logger.debug(`save stat ${this.guild.id}: succeeded`);
     }
 
     newTemp(): void {
