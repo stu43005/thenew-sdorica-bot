@@ -9,7 +9,7 @@ import { groupBy, sumBy } from 'lodash-es';
 import fetch from 'node-fetch';
 import { setTimeout } from 'node:timers/promises';
 import rwc from 'random-weighted-choice';
-import { CacheUtils } from '../../utils/cache-utils.js';
+import { DiskCache } from '../../utils/cache-utils.js';
 import { FormatUtils } from '../../utils/format-utils.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { MessageUtils } from '../../utils/message-utils.js';
@@ -58,7 +58,7 @@ export class GashaponCommand implements Command {
             return;
         }
 
-        const gashapons = await CacheUtils.getOrFetch<Gashapons>('Gashapons', async () => {
+        const gashapons = await DiskCache.wrap<Gashapons>('Gashapons', async () => {
             const resp = await fetch(
                 'https://raw.githubusercontent.com/stu43005/sdorica-wiki-bot/data/wiki/Gashapons.json'
             );
@@ -185,25 +185,22 @@ interface GashaponResult {
 function addHistory(data: GashaponData): void {
     const db = admin.firestore();
     db.collection('gashapon_history').add(data);
-    CacheUtils.del(`gashapon_history/${data.userId}`);
+    DiskCache.del(`gashapon_history/${data.userId}`);
 }
 
 async function getMyHistorys(userId: string): Promise<GashaponData[]> {
-    const data = await CacheUtils.getOrFetch<GashaponData[]>(
-        `gashapon_history/${userId}`,
-        async () => {
-            const db = admin.firestore();
-            const snapshot = await db
-                .collection('gashapon_history')
-                .where('userId', '==', userId)
-                .where('time', '>=', Date.now() - historyTime)
-                .get();
-            if (snapshot.empty) {
-                return [];
-            }
-            return snapshot.docs.map(doc => doc.data()) as GashaponData[];
+    const data = await DiskCache.wrap<GashaponData[]>(`gashapon_history/${userId}`, async () => {
+        const db = admin.firestore();
+        const snapshot = await db
+            .collection('gashapon_history')
+            .where('userId', '==', userId)
+            .where('time', '>=', Date.now() - historyTime)
+            .get();
+        if (snapshot.empty) {
+            return [];
         }
-    );
+        return snapshot.docs.map(doc => doc.data()) as GashaponData[];
+    });
     return data;
 }
 
