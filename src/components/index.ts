@@ -1,4 +1,5 @@
 import { Component } from './component.js';
 import ReportMessageSubmit from './report-message.js';
+import WikiHeroAction from './wiki-hero.js';
 
-export const components: Component[] = [ReportMessageSubmit.getInstance()];
+export const components: Component[] = [ReportMessageSubmit.getInstance(), new WikiHeroAction()];

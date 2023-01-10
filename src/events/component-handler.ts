@@ -34,7 +34,13 @@ export class ComponentHandler implements EventHandler {
         }
 
         // Try to find the component the user wants
-        const component = this.components.find(component => component.ids.includes(intr.customId));
+        const component = this.components.find(component =>
+            component.ids.find(id => {
+                if (id === intr.customId) return true;
+                if (id.endsWith('-') && intr.customId.startsWith(id)) return true;
+                return false;
+            })
+        );
         if (!component) {
             return;
         }
