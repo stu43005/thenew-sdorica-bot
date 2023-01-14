@@ -505,7 +505,7 @@ export function heroFilter(input: string): (hero: Hero) => boolean {
         if (hero.skillSets.find(skillsetMatcher)) return true;
         const alias = [
             ...(charAlias[hero.name] ?? []),
-            ...(hero.name.endsWith('SP') || hero.name.endsWith('MZ')
+            ...(hero.name.endsWith('SP') || hero.name.endsWith('MZ') || hero.name.endsWith('OS')
                 ? charAlias[hero.name.substring(0, hero.name.length - 2)] ?? []
                 : []),
         ];
