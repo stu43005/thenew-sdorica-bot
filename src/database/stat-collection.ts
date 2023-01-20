@@ -23,15 +23,12 @@ export class StatCollection {
         return this.guilds[guild.id];
     }
 
-    private meta: StatGuild;
     private temp: StatData;
     private update$ = new Subject<void>();
 
     constructor(private guild: Guild) {
         this.temp = {
             members: guild.memberCount,
-        };
-        this.meta = {
             userNames: {},
             channelNames: {},
         };
@@ -44,29 +41,12 @@ export class StatCollection {
     }
 
     async save(): Promise<void> {
-        const newmeta = this.meta;
         const temp = this.temp;
         this.newTemp();
 
         Logger.debug(`save stat ${this.guild.id}: ${JSON.stringify(temp)}`);
         const db = admin.firestore();
         const metaRef = db.collection('stat').doc(this.guild.id);
-        const metaDoc = await metaRef.get();
-        let meta = metaDoc.data() as StatGuild;
-        Logger.debug(`save stat ${this.guild.id}: get meta`);
-        if (!metaDoc.exists || !meta) {
-            meta = newmeta;
-        } else {
-            Object.keys(newmeta.channelNames).forEach(key => {
-                meta.channelNames[key] = newmeta.channelNames[key];
-            });
-            Object.keys(newmeta.userNames).forEach(key => {
-                meta.userNames[key] = newmeta.userNames[key];
-            });
-        }
-        await metaRef.set(meta, { merge: true });
-        Logger.debug(`save stat ${this.guild.id}: set meta`);
-
         const dateStr = moment().format('YYYY-MM-DD');
         const dailyRef = metaRef.collection('daily').doc(dateStr);
         const dailyDoc = await dailyRef.get();
@@ -85,8 +65,6 @@ export class StatCollection {
         const prev = this.temp;
         this.temp = {
             members: prev.members,
-        };
-        this.meta = {
             userNames: {},
             channelNames: {},
         };
@@ -127,9 +105,9 @@ export class StatCollection {
             }
         });
 
-        this.meta.userNames[message.author.id] = message.author.tag;
+        this.temp.userNames[message.author.id] = message.author.tag;
         if ('name' in message.channel) {
-            this.meta.channelNames[message.channel.id] = message.channel.name;
+            this.temp.channelNames[message.channel.id] = message.channel.name;
         }
 
         this.update$.next();
@@ -172,6 +150,15 @@ export function mergeData(base: StatData, temp: StatData): void {
     mergeRecordData(base, temp, 'reactions');
     mergeDoubleRecordData(base, temp, 'reactionsByMember');
     mergeRecordData(base, temp, 'memes');
+
+    base.channelNames ??= {};
+    Object.keys(temp.channelNames).forEach(key => {
+        base.channelNames[key] = temp.channelNames[key];
+    });
+    base.userNames ??= {};
+    Object.keys(temp.userNames).forEach(key => {
+        base.userNames[key] = temp.userNames[key];
+    });
 }
 
 export function mergeRecordData(base: any, temp: any, type: string): void {
@@ -196,15 +183,6 @@ function add(obj: any, key: string, value: number = 1): void {
     obj[key] = (+obj[key] || 0) + value;
 }
 
-interface StatGuild {
-    userNames: {
-        [userId: string]: string;
-    };
-    channelNames: {
-        [channelId: string]: string;
-    };
-}
-
 interface StatData {
     members: number;
 
@@ -219,6 +197,13 @@ interface StatData {
     reactionsByMember?: Record<string, Record<string, number>>;
 
     memes?: Record<string, number>;
+
+    userNames: {
+        [userId: string]: string;
+    };
+    channelNames: {
+        [channelId: string]: string;
+    };
 }
 
 /*
