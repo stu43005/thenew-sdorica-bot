@@ -1,6 +1,7 @@
 import config from 'config';
 import { Shard, ShardingManager } from 'discord.js';
 import { createRequire } from 'node:module';
+import pTimeout from 'p-timeout';
 import { JobService } from '../services/job-service.js';
 import { Logger } from '../services/logger.js';
 
@@ -41,6 +42,26 @@ export class Manager {
 
     private registerListeners(): void {
         this.shardManager.on('shardCreate', shard => this.onShardCreate(shard));
+
+        setInterval(async () => {
+            for (const [, shard] of this.shardManager.shards) {
+                try {
+                    if (!shard.ready) continue;
+                    const start = process.hrtime.bigint();
+                    const evalPromise = shard.eval(() => {
+                        return true;
+                    });
+                    await pTimeout(evalPromise, {
+                        milliseconds: 1000
+                    });
+                    const end = process.hrtime.bigint();
+                    Logger.debug(`[Manager] Shard ${shard.id} heartbeat took ${Number(end - start) / 1000000}ms.`);
+                } catch (error) {
+                    Logger.error(`[Manager] Shard ${shard.id} heartbeat timed out.`);
+                    shard.kill();
+                }
+            }
+        }, 60_000).unref();
     }
 
     private onShardCreate(shard: Shard): void {

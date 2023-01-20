@@ -61,6 +61,7 @@
         "mingo": "^6.2.0",
         "moment": "^2.29.4",
         "node-fetch": "^3.3.0",
+        "p-timeout": "^6.0.0",
         "pino": "^8.8.0",
         "pino-abstract-transport": "^1.0.0",
         "pino-pretty": "^9.1.1",
