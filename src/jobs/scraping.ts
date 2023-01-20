@@ -67,7 +67,7 @@ export class ScrapingJob implements Job {
 
                         const savedItem = await scrapingSource.items?.findById(itemKey);
                         if (!savedItem) {
-                            Logger.debug(`scraping [${scraping.id}] item: ${itemKey}`, message);
+                            Logger.debug(`scraping [${scraping.id}] item: ${itemKey}`);
                             const newItem = new ScrapingItem();
                             Object.assign(newItem, message);
                             newItem.id = itemKey;

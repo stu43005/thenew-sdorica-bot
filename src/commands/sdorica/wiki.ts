@@ -113,12 +113,7 @@ export class WikiCommand implements Command {
         });
 
         const data = new InteractionData<SkillsetData>();
-        data.id = intr.id;
-        data.time = intr.createdAt.toISOString();
-        data.guildId = intr.guildId;
-        data.channelId = intr.channelId;
-        data.userId = intr.user.id;
-        data.command = this.metadata.name;
+        data.fillInteraction(intr);
         data.data = skillsetData;
         getInteractionDataRepository()
             .create(data)
