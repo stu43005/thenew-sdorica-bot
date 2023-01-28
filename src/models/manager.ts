@@ -52,13 +52,17 @@ export class Manager {
                         return true;
                     });
                     await pTimeout(evalPromise, {
-                        milliseconds: 1000
+                        milliseconds: 1000,
                     });
                     const end = process.hrtime.bigint();
-                    Logger.debug(`[Manager] Shard ${shard.id} heartbeat took ${Number(end - start) / 1000000}ms.`);
+                    Logger.debug(
+                        `[Manager] Shard ${shard.id} heartbeat took ${
+                            Number(end - start) / 1000000
+                        }ms.`
+                    );
                 } catch (error) {
                     Logger.error(`[Manager] Shard ${shard.id} heartbeat timed out.`);
-                    shard.kill();
+                    shard.respawn();
                 }
             }
         }, 60_000).unref();
