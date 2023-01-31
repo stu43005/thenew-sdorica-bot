@@ -152,11 +152,11 @@ export function mergeData(base: StatData, temp: StatData): void {
     mergeRecordData(base, temp, 'memes');
 
     base.channelNames ??= {};
-    Object.keys(temp.channelNames).forEach(key => {
+    Object.keys(temp.channelNames ?? {}).forEach(key => {
         base.channelNames[key] = temp.channelNames[key];
     });
     base.userNames ??= {};
-    Object.keys(temp.userNames).forEach(key => {
+    Object.keys(temp.userNames ?? {}).forEach(key => {
         base.userNames[key] = temp.userNames[key];
     });
 }
