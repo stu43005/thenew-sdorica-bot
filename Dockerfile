@@ -38,4 +38,5 @@ EXPOSE 8080
 
 # Run the application
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD [ "/nodejs/bin/node", "dist/start-manager.js" ]
+# CMD [ "/nodejs/bin/node", "dist/start-manager.js" ]
+CMD [ "node", "dist/start-manager.js" ]
