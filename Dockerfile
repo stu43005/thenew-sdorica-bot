@@ -22,9 +22,10 @@ COPY . .
 RUN npm run build
 
 # Install packages only production dependencies
-RUN npm ci --omit=dev;
+RUN npm ci --omit=dev
 
-FROM gcr.io/distroless/nodejs:16
+#FROM gcr.io/distroless/nodejs:16
+FROM node:16-bullseye-slim
 
 ENV NODE_ENV production
 

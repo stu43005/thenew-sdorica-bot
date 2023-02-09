@@ -13,6 +13,7 @@ export class Manager {
 
     public async start(): Promise<void> {
         this.registerListeners();
+        // this.lifeCheckLoop();
 
         const shardList = this.shardManager.shardList as number[];
 
@@ -42,7 +43,9 @@ export class Manager {
 
     private registerListeners(): void {
         this.shardManager.on('shardCreate', shard => this.onShardCreate(shard));
+    }
 
+    private lifeCheckLoop(): void {
         setInterval(async () => {
             for (const [, shard] of this.shardManager.shards) {
                 try {
