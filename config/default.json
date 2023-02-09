@@ -48,10 +48,6 @@
         "scraping": {
             "schedule": "0 */5 * * * *",
             "log": false
-        },
-        "cpuprofile": {
-            "schedule": "0 */10 * * * *",
-            "log": false
         }
     },
     "rateLimiting": {
