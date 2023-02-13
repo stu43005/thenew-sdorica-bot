@@ -65,7 +65,7 @@ export class Manager {
                     );
                 } catch (error) {
                     Logger.error(`[Manager] Shard ${shard.id} heartbeat timed out.`);
-                    // shard.respawn();
+                    shard.respawn();
                 }
             }
         }, 60_000).unref();
