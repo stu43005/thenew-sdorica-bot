@@ -7,7 +7,7 @@ import {
 import fetch from 'node-fetch';
 import { setTimeout } from 'node:timers/promises';
 import rwc from 'random-weighted-choice';
-import { DiskCache } from '../../utils/cache-utils.js';
+import { CacheUtils } from '../../utils/cache-utils.js';
 import { FormatUtils } from '../../utils/format-utils.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { Command, CommandDeferType } from '../command.js';
@@ -29,7 +29,7 @@ export class MonsterCommand implements Command {
     public async execute(intr: ChatInputCommandInteraction): Promise<void> {
         const itemName = intr.options.getString('item-name', true);
 
-        const monsterTrap = await DiskCache.wrap<MonsterTrap>('MonsterTrap', async () => {
+        const monsterTrap = await CacheUtils.wrap<MonsterTrap>('MonsterTrap', async () => {
             const resp = await fetch(
                 'https://raw.githubusercontent.com/stu43005/sdorica-wiki-bot/data/wiki/MonsterTrap.json'
             );

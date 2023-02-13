@@ -9,7 +9,7 @@ import {
     StringSelectMenuBuilder,
 } from 'discord.js';
 import fetch from 'node-fetch';
-import { DiskCache } from '../utils/cache-utils.js';
+import { CacheUtils } from '../utils/cache-utils.js';
 import { MathUtils } from '../utils/math-utils.js';
 
 const rankText = ['零階', '一階', '二階', '三階'];
@@ -448,7 +448,7 @@ export interface Skillset {
 }
 
 export async function getWikiSkillsetData(skillsetModel: string): Promise<Skillset | null> {
-    return await DiskCache.wrap(`WikiSkillsetData-${skillsetModel}`, async () => {
+    return await CacheUtils.wrap(`WikiSkillsetData-${skillsetModel}`, async () => {
         try {
             const resp = await fetch(
                 `https://raw.githubusercontent.com/stu43005/sdorica-wiki-bot/data/wiki/Heroes/${skillsetModel}.json`
@@ -485,7 +485,7 @@ export interface HeroSkillset {
 }
 
 export async function getWikiHeroesData(): Promise<Hero[]> {
-    return await DiskCache.wrap('WikiHeroesData', async () => {
+    return await CacheUtils.wrap('WikiHeroesData', async () => {
         const resp = await fetch(
             'https://raw.githubusercontent.com/stu43005/sdorica-wiki-bot/data/wiki/Heroes.json'
         );
@@ -537,7 +537,7 @@ export interface LevelUps {
 }
 
 export async function getWikiLevelUps(): Promise<LevelUps> {
-    return await DiskCache.wrap('WikiLevelUps', async () => {
+    return await CacheUtils.wrap('WikiLevelUps', async () => {
         const resp = await fetch(
             'https://raw.githubusercontent.com/stu43005/sdorica-wiki-bot/data/wiki/LevelUps.json'
         );
@@ -551,7 +551,7 @@ export type Constants = Record<string, number> & {
 };
 
 export async function getWikiConstants(): Promise<Constants> {
-    return await DiskCache.wrap('WikiConstants', async () => {
+    return await CacheUtils.wrap('WikiConstants', async () => {
         const resp = await fetch(
             'https://raw.githubusercontent.com/stu43005/sdorica-wiki-bot/data/wiki/Constants.json'
         );

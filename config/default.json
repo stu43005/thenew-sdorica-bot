@@ -1,5 +1,5 @@
 {
-    "cacheTTLSeconds": 43200,
+    "cacheTTLSeconds": 600,
     "developers": ["198437688255184897"],
     "client": {
         "id": "",

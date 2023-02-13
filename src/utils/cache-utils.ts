@@ -1,23 +1,22 @@
-import { caching, multiCaching } from 'cache-manager';
-import fsStore from 'cache-manager-fs-hash';
 import config from 'config';
+import NodeCache from 'node-cache';
 
-export const MemoryCache = await caching('memory', {
-    max: 100,
-    ttl: 600 * 1000 /* milliseconds */,
-    shouldCloneBeforeSet: false,
+class MyCache extends NodeCache {
+    async wrap<T>(key: string, fetch: () => T | Promise<T>, ttl?: number | string): Promise<T> {
+        let value = this.get<T>(key);
+        if (typeof value === 'undefined') {
+            value = await fetch();
+            if (ttl) {
+                this.set(key, value, ttl);
+            } else {
+                this.set(key, value);
+            }
+        }
+        return value;
+    }
+}
+
+export const CacheUtils = new MyCache({
+    stdTTL: config.get('cacheTTLSeconds'),
+    useClones: false,
 });
-
-// eslint-disable-next-line @typescript-eslint/await-thenable
-export const DiskCache = await caching(
-    fsStore.create({
-        store: fsStore,
-        options: {
-            path: 'cache',
-            ttl: config.get('cacheTTLSeconds') /* seconds */,
-            subdirs: true,
-        },
-    })
-);
-
-export const CacheUtils = multiCaching([MemoryCache, DiskCache]);
