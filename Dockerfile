@@ -25,7 +25,7 @@ RUN npm run build
 RUN npm ci --omit=dev
 
 #FROM gcr.io/distroless/nodejs:16
-FROM node:16-bullseye-slim
+FROM node:16-bullseye
 
 ENV NODE_ENV production
 
