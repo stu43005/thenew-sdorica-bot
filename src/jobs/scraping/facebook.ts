@@ -2,7 +2,7 @@ import * as cheerio from 'cheerio';
 import fetch from 'node-fetch';
 import { JsonObject } from 'type-fest';
 import { Logger } from '../../services/logger.js';
-import { CacheUtils } from '../../utils/cache-utils.js';
+import { DiskCache } from '../../utils/cache-utils.js';
 import { StringUtils } from '../../utils/string-utils.js';
 import { Scraping, TriggerClass } from './types.js';
 
@@ -119,7 +119,7 @@ export class FacebookTriggerClass implements TriggerClass {
     private async fetchStoryPage(linkPath: string): Promise<StoryData> {
         const { cacheKey } = this.getStoryUrl(linkPath);
 
-        const html = await CacheUtils.wrap(cacheKey, () => this.fetchPageHtml(linkPath));
+        const html = await DiskCache.wrap(cacheKey, () => this.fetchPageHtml(linkPath));
         // this.helpers.log.log(`[fetchStoryPage][${linkPath}]: html = ${html}`);
         if (~html.indexOf('You must log in first') || ~html.indexOf('請先登入')) {
             throw new Error(`You must log in first.`);
@@ -216,7 +216,7 @@ export class FacebookTriggerClass implements TriggerClass {
         const { pathname } = new URL(`https://mbasic.facebook.com${linkPath}`);
         const cacheKey = `photos${pathname}`;
 
-        const html = await CacheUtils.wrap(cacheKey, () => this.fetchPageHtml(linkPath));
+        const html = await DiskCache.wrap(cacheKey, () => this.fetchPageHtml(linkPath));
         const $ = cheerio.load(html);
 
         const title = $('#MPhotoContent div.msg > a > strong').first().text();

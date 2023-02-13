@@ -1,5 +1,5 @@
 import { BaseFirestoreRepository, Constructor, IEntity, PartialBy } from 'fireorm';
-import { CacheUtils } from '../../utils/cache-utils.js';
+import { MemoryCache } from '../../utils/cache-utils.js';
 
 const FIND_ALL_KEY = '*';
 
@@ -19,13 +19,13 @@ export class CustomBaseRepository<T extends IEntity> extends BaseFirestoreReposi
     }
 
     async find(): Promise<T[]> {
-        return await CacheUtils.wrap(this.getCacheKey(FIND_ALL_KEY), async () => {
+        return await MemoryCache.wrap(this.getCacheKey(FIND_ALL_KEY), async () => {
             return await super.find();
         });
     }
 
     async findById(id: string): Promise<T> {
-        return await CacheUtils.wrap(this.getCacheKey(id), async () => {
+        return await MemoryCache.wrap(this.getCacheKey(id), async () => {
             return await super.findById(id);
         });
     }
@@ -33,23 +33,23 @@ export class CustomBaseRepository<T extends IEntity> extends BaseFirestoreReposi
     async create(item: PartialBy<T, 'id'>): Promise<T> {
         const result = await super.create(item);
         if (item.id) {
-            await CacheUtils.del(this.getCacheKey(item.id));
+            await MemoryCache.del(this.getCacheKey(item.id));
         }
-        await CacheUtils.del(this.getCacheKey(FIND_ALL_KEY));
+        await MemoryCache.del(this.getCacheKey(FIND_ALL_KEY));
         return result;
     }
 
     async update(item: T): Promise<T> {
         const result = await super.update(item);
-        await CacheUtils.del(this.getCacheKey(item.id));
-        await CacheUtils.del(this.getCacheKey(FIND_ALL_KEY));
+        await MemoryCache.del(this.getCacheKey(item.id));
+        await MemoryCache.del(this.getCacheKey(FIND_ALL_KEY));
         return result;
     }
 
     async delete(id: string): Promise<void> {
         const result = await super.delete(id);
-        await CacheUtils.del(this.getCacheKey(id));
-        await CacheUtils.del(this.getCacheKey(FIND_ALL_KEY));
+        await MemoryCache.del(this.getCacheKey(id));
+        await MemoryCache.del(this.getCacheKey(FIND_ALL_KEY));
         return result;
     }
 }
