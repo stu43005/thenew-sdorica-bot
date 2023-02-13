@@ -64,6 +64,7 @@ async function start(): Promise<void> {
         respawn: true,
         totalShards,
         shardList,
+        execArgv: ['--inspect'],
     });
 
     const manager = new Manager(shardManager, new JobService(managerJobs));
