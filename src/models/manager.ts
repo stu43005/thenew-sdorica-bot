@@ -1,5 +1,6 @@
 import config from 'config';
 import { Shard, ShardingManager } from 'discord.js';
+import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import pTimeout from 'p-timeout';
 import { JobService } from '../services/job-service.js';
@@ -65,10 +66,54 @@ export class Manager {
                     );
                 } catch (error) {
                     Logger.error(`[Manager] Shard ${shard.id} heartbeat timed out.`);
-                    shard.respawn();
+                    if (shard.process?.pid) {
+                        await this.diat(
+                            'cpuprofile',
+                            '-p',
+                            `${shard.process.pid}`,
+                            '--file',
+                            `/app/cache/diat_${shard.process.pid}_${Date.now()}.cpuprofile`
+                        );
+                        await this.diat(
+                            'perf',
+                            '-p',
+                            `${shard.process.pid}`,
+                            '--file',
+                            `/app/cache/diat_perf_${shard.process.pid}_${Date.now()}.svg`
+                        );
+                    }
+                    // shard.respawn();
                 }
             }
         }, 60_000).unref();
+    }
+
+    private diat(...args: string[]): Promise<void> {
+        return new Promise(resolve => {
+            const diat = spawn('diat', args, { timeout: 60_000 });
+
+            diat.on('spawn', () => {
+                console.log(`[diat]: spawn 'diat ${args.join(' ')}' at pid:${diat.pid}`);
+            });
+
+            diat.stdout.on('data', data => {
+                console.log(`[diat][${diat.pid}]: ${data}`);
+            });
+
+            diat.stderr.on('data', data => {
+                console.error(`[diat][${diat.pid}]: ${data}`);
+            });
+
+            diat.on('close', code => {
+                console.log(`[diat][${diat.pid}]: exited with code ${code}`);
+                resolve();
+            });
+
+            diat.on('error', err => {
+                console.error(`[diat][${diat.pid}] error:`, err);
+                resolve();
+            });
+        });
     }
 
     private onShardCreate(shard: Shard): void {

@@ -1,4 +1,4 @@
-FROM node:18-bullseye-slim as build
+FROM node:16-bullseye-slim as build
 
 # Add Tini https://github.com/krallin/tini
 RUN set -x \
@@ -25,9 +25,16 @@ RUN npm run build
 RUN npm ci --omit=dev
 
 #FROM gcr.io/distroless/nodejs:16
-FROM node:18-bullseye
+FROM node:16-bullseye
 
 ENV NODE_ENV production
+
+# https://github.com/bytedance/diat
+RUN set -x \
+    && apt-get update \
+    && apt-get install -y linux-perf python \
+    && rm -rf /var/cache/apt/* \
+    && npm i diat -g
 
 COPY --from=build /usr/bin/tini /usr/bin/tini
 COPY --from=build /app /app

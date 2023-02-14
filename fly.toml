@@ -39,3 +39,7 @@ processes = []
     interval = "15s"
     restart_limit = 0
     timeout = "2s"
+
+[mounts]
+  source="sdorica_bot_cache"
+  destination="/app/cache"
