@@ -74,13 +74,7 @@ export class Manager {
                             '--file',
                             `/app/cache/diat_${shard.process.pid}_${Date.now()}.cpuprofile`
                         );
-                        await this.diat(
-                            'perf',
-                            '-p',
-                            `${shard.process.pid}`,
-                            '--file',
-                            `/app/cache/diat_perf_${shard.process.pid}_${Date.now()}.svg`
-                        );
+                        await this.diat('perf', '-p', `${shard.process.pid}`);
                     }
                     // shard.respawn();
                 }

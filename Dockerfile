@@ -31,8 +31,9 @@ ENV NODE_ENV production
 
 # https://github.com/bytedance/diat
 RUN set -x \
+    && printf "deb http://deb.debian.org/debian bullseye-backports main\ndeb-src http://deb.debian.org/debian bullseye-backports main" > /etc/apt/sources.list.d/backports.list \
     && apt-get update \
-    && apt-get install -y linux-perf python \
+    && apt-get install -y linux-perf/bullseye-backports python \
     && rm -rf /var/cache/apt/* \
     && npm i diat -g
 
