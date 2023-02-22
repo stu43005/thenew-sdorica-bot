@@ -101,7 +101,7 @@ export class StatCollection {
 
             if (emoji.id) {
                 add(this.temp.emojis, emoji.id);
-                add(this.temp.emojisByMember[message.author.id], emoji.id);
+                // add(this.temp.emojisByMember[message.author.id], emoji.id);
             }
         });
 
@@ -123,7 +123,7 @@ export class StatCollection {
             if (!this.temp.reactionsByMember[user.id]) this.temp.reactionsByMember[user.id] = {};
 
             add(this.temp.reactions, messageReaction.emoji.id);
-            add(this.temp.reactionsByMember[user.id], messageReaction.emoji.id);
+            // add(this.temp.reactionsByMember[user.id], messageReaction.emoji.id);
 
             this.update$.next();
         }
