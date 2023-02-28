@@ -34,7 +34,7 @@ export class ReactionHandler implements EventHandler {
 
         // Try to find the reaction the user wants
         const reactions = this.reactions.filter(reaction => {
-            if (reaction.requireGuild && !msg.guild) {
+            if (reaction.requireGuild && !msg.inGuild()) {
                 return false;
             }
 
@@ -68,7 +68,7 @@ export class ReactionHandler implements EventHandler {
 
         const data = new EventData(
             await getUserRepository().findById(reactor.id),
-            msg.guild ? await getGuildRepository().findById(msg.guild.id) : undefined
+            msg.inGuild() ? await getGuildRepository().findById(msg.guild.id) : undefined
         );
 
         // Execute the reactions

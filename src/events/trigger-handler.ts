@@ -23,7 +23,7 @@ export class TriggerHandler {
 
         // Find triggers caused by this message
         const triggers = this.triggers.filter(trigger => {
-            if (trigger.requireGuild && !msg.guild) {
+            if (trigger.requireGuild && !msg.inGuild()) {
                 return false;
             }
 
@@ -45,7 +45,7 @@ export class TriggerHandler {
 
         const data = new EventData(
             await getUserRepository().findById(msg.author.id),
-            msg.guild ? await getGuildRepository().findById(msg.guild.id) : undefined
+            msg.inGuild() ? await getGuildRepository().findById(msg.guild.id) : undefined
         );
 
         // Execute triggers

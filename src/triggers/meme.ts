@@ -18,7 +18,7 @@ export class MemeTrigger implements Trigger {
     }
 
     public async execute(msg: Message, data: EventData): Promise<void> {
-        if (!msg.guild || !data.guild?.memes?.length) return;
+        if (!msg.inGuild() || !data.guild?.memes?.length) return;
 
         const memes: MemeItem[] = data.guild?.memes;
         const match = metchMeme(memes, msg.content);

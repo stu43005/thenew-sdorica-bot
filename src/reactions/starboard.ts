@@ -33,7 +33,7 @@ export class StarboardReaction implements Reaction {
         reactor: User,
         data: EventData
     ): Promise<void> {
-        if (!msg.guild) return;
+        if (!msg.inGuild()) return;
         const starboard = data.guild?.starboard;
         if (!starboard?.channel || !starboard.limit) return;
 

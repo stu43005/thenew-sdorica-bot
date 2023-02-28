@@ -10,7 +10,7 @@ export class AutoCrosspostingTrigger implements Trigger {
     }
 
     public async execute(msg: Message, data: EventData): Promise<void> {
-        if (!msg.guild || !data.guild?.autoCrossposting) return;
+        if (!msg.inGuild() || !data.guild?.autoCrossposting) return;
 
         if (data.guild.autoCrossposting.includes(msg.channelId)) {
             await msg.crosspost();

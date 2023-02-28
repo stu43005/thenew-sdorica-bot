@@ -28,10 +28,9 @@ export class ReactionRoleAdd implements Reaction {
         reactor: User,
         data: EventData
     ): Promise<void> {
-        const guild = msg.guild;
-        if (!guild) return;
+        if (!msg.inGuild()) return;
 
-        const member = await ClientUtils.findMember(guild, reactor.id);
+        const member = await ClientUtils.findMember(msg.guild, reactor.id);
         if (!member) return;
 
         const reactionRoles: ReactionRole[] = data.guild?.reactionRoles ?? [];
@@ -45,7 +44,7 @@ export class ReactionRoleAdd implements Reaction {
         const rrEmoji = rr.emojis.find(emo => emo.emoji == emoji);
         if (!rrEmoji) return;
 
-        const role = await ClientUtils.findRole(guild, rrEmoji.roleId);
+        const role = await ClientUtils.findRole(msg.guild, rrEmoji.roleId);
         if (!role) return;
 
         const roleIds = rr.emojis.map(emo => emo.roleId);

@@ -27,7 +27,7 @@ export class QuoteTrigger implements Trigger {
     }
 
     public async execute(msg: Message, _data: EventData): Promise<void> {
-        if (!msg.guild) return;
+        if (!msg.inGuild()) return;
 
         const strs = msg.content.split(/\s+/);
         for (let i = 0; i < strs.length; i++) {

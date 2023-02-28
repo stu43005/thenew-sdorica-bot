@@ -1,4 +1,4 @@
-import { Message, MessageReaction, User } from 'discord.js';
+import { GuildTextBasedChannel, Message, MessageReaction, User } from 'discord.js';
 import { EventData } from '../models/event-data.js';
 import { ClientUtils } from '../utils/client-utils.js';
 import { MessageUtils } from '../utils/message-utils.js';
@@ -14,9 +14,9 @@ export class AutoPinReaction implements Reaction {
 
     public triggered(msgReaction: MessageReaction, msg: Message, reactor: User): boolean {
         if (reactor.bot) return false;
-        if (!msg.guild) return false;
+        if (!msg.inGuild()) return false;
 
-        return PermissionUtils.canPin(msg.channel);
+        return PermissionUtils.canPin(msg.channel) && msg.pinnable && !msg.pinned;
     }
 
     public async execute(
@@ -25,36 +25,37 @@ export class AutoPinReaction implements Reaction {
         reactor: User,
         data: EventData
     ): Promise<void> {
-        if (!msg.guild) return;
+        if (!msg.inGuild()) return;
         if (typeof data.guild?.autopinCount === 'undefined' || data.guild.autopinCount === 0)
             return;
 
-        const member = await ClientUtils.findMember(msg.guild, reactor.id);
         if (
-            PermissionUtils.memberHasPermission(msg.channel, member, 'ManageMessages') ||
-            msgReaction.count >= data.guild.autopinCount
+            msgReaction.count >= data.guild.autopinCount ||
+            (await AutoPinReaction.checkUserPinPermission(msg.channel, reactor))
         ) {
-            if (msg.pinnable && !msg.pinned) {
-                let x = msg.reactions.valueOf().find(react => react.emoji.name === '❌');
-                if (x) {
-                    if (x.partial) {
-                        x = await x.fetch();
-                    }
-                    for (const [_, user] of x.users.cache) {
-                        const member = await ClientUtils.findMember(msg.guild, user.id);
-                        if (
-                            PermissionUtils.memberHasPermission(
-                                msg.channel,
-                                member,
-                                'ManageMessages'
-                            )
-                        ) {
-                            return;
-                        }
+            const x = msg.reactions.resolve('❌');
+            if (x) {
+                for (const [_, user] of x.users.cache) {
+                    if (await AutoPinReaction.checkUserPinPermission(msg.channel, user)) {
+                        return;
                     }
                 }
-                await MessageUtils.pin(msg);
             }
+            await MessageUtils.pin(msg);
         }
+    }
+
+    public static async checkUserPinPermission(
+        channel: GuildTextBasedChannel,
+        user: User
+    ): Promise<boolean> {
+        const member = await ClientUtils.findMember(channel.guild, user.id);
+        if (
+            PermissionUtils.memberHasPermission(channel, member, 'ManageMessages') ||
+            (channel.isThread() && channel.ownerId === user.id)
+        ) {
+            return true;
+        }
+        return false;
     }
 }
