@@ -85,7 +85,7 @@
         },
         "override": {
             "shardMode": {
-                "enabled": true,
+                "enabled": false,
                 "value": "process"
             }
         },

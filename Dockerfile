@@ -24,18 +24,9 @@ RUN npm run build
 # Install packages only production dependencies
 RUN npm ci --omit=dev
 
-#FROM gcr.io/distroless/nodejs:16
-FROM node:16-bullseye
+FROM gcr.io/distroless/nodejs:16
 
 ENV NODE_ENV production
-
-# https://github.com/bytedance/diat
-RUN set -x \
-    && printf "deb http://deb.debian.org/debian bullseye-backports main\ndeb-src http://deb.debian.org/debian bullseye-backports main" > /etc/apt/sources.list.d/backports.list \
-    && apt-get update \
-    && apt-get install -y linux-perf/bullseye-backports python \
-    && rm -rf /var/cache/apt/* \
-    && npm i diat -g
 
 COPY --from=build /usr/bin/tini /usr/bin/tini
 COPY --from=build /app /app
@@ -46,5 +37,4 @@ EXPOSE 8080
 
 # Run the application
 ENTRYPOINT ["/usr/bin/tini", "--"]
-# CMD [ "/nodejs/bin/node", "dist/start-manager.js" ]
-CMD [ "node", "dist/start-manager.js" ]
+CMD [ "/nodejs/bin/node", "dist/start-manager.js" ]
