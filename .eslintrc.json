@@ -64,7 +64,7 @@
                 },
                 "groups": [
                     ["builtin", "external", "object", "type"],
-                    ["internal", "parent", "sibling", "index"]
+                    "internal", "parent", "sibling", "index"
                 ],
                 "newlines-between": "ignore"
             }
