@@ -1,12 +1,11 @@
 import {
     ChatInputCommandInteraction,
     EmbedBuilder,
+    GuildTextBasedChannel,
     Message,
-    NewsChannel,
     PermissionsBitField,
     PermissionsString,
     SlashCommandBuilder,
-    TextChannel,
 } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
 import { Logger } from '../../services/logger.js';
@@ -261,7 +260,7 @@ export default class ReactionRoleCommand implements Command {
     private async add(
         intr: ChatInputCommandInteraction,
         data: EventData,
-        channel: NewsChannel | TextChannel,
+        channel: GuildTextBasedChannel,
         message: Message,
         emojiId: string,
         roleId: string

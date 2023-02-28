@@ -5,13 +5,14 @@ import {
     Guild,
     GuildEmoji,
     GuildMember,
+    GuildTextBasedChannel,
     NewsChannel,
+    NonThreadGuildBasedChannel,
     RESTJSONErrorCodes,
     Role,
-    StageChannel,
     TextChannel,
     User,
-    VoiceChannel,
+    VoiceBasedChannel,
 } from 'discord.js';
 import { LangCode } from '../enums/lang-code.js';
 
@@ -137,12 +138,12 @@ export class ClientUtils {
     public static async findTextChannel(
         guild: Guild,
         input: string
-    ): Promise<NewsChannel | TextChannel | undefined> {
+    ): Promise<GuildTextBasedChannel | undefined> {
         try {
             const discordId = RegexUtils.discordId(input);
             if (discordId) {
                 const channel = await guild.channels.fetch(discordId);
-                if (channel instanceof NewsChannel || channel instanceof TextChannel) {
+                if (channel?.isTextBased()) {
                     return channel;
                 } else {
                     return;
@@ -151,8 +152,10 @@ export class ClientUtils {
 
             const search = input.toLowerCase().replaceAll(' ', '-');
             return [...(await guild.channels.fetch()).values()]
-                .filter(channel => channel instanceof NewsChannel || channel instanceof TextChannel)
-                .map(channel => channel as NewsChannel | TextChannel)
+                .filter(
+                    (channel): channel is NonThreadGuildBasedChannel & GuildTextBasedChannel =>
+                        channel?.isTextBased() ?? false
+                )
                 .find(channel => channel.name.toLowerCase().includes(search));
         } catch (error) {
             const allowErrors: (string | number)[] = [RESTJSONErrorCodes.UnknownChannel];
@@ -167,12 +170,12 @@ export class ClientUtils {
     public static async findVoiceChannel(
         guild: Guild,
         input: string
-    ): Promise<StageChannel | VoiceChannel | undefined> {
+    ): Promise<VoiceBasedChannel | undefined> {
         try {
             const discordId = RegexUtils.discordId(input);
             if (discordId) {
                 const channel = await guild.channels.fetch(discordId);
-                if (channel instanceof StageChannel || channel instanceof VoiceChannel) {
+                if (channel?.isVoiceBased()) {
                     return channel;
                 } else {
                     return;
@@ -181,10 +184,7 @@ export class ClientUtils {
 
             const search = input.toLowerCase();
             return [...(await guild.channels.fetch()).values()]
-                .filter(
-                    channel => channel instanceof StageChannel || channel instanceof VoiceChannel
-                )
-                .map(channel => channel as StageChannel | VoiceChannel)
+                .filter((channel): channel is VoiceBasedChannel => channel?.isVoiceBased() ?? false)
                 .find(channel => channel.name.toLowerCase().includes(search));
         } catch (error) {
             const allowErrors: (string | number)[] = [RESTJSONErrorCodes.UnknownChannel];
