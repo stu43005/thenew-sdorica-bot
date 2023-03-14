@@ -88,7 +88,7 @@ export class ScrapingJob implements Job {
                     await getScrapingSourceRepository().update(scrapingSource);
                 }
             } catch (error) {
-                Logger.error(`scraping [${scraping.id}] error: ${error}`);
+                Logger.debug(`scraping [${scraping.id}] error: ${error}`);
             }
         }
     }
