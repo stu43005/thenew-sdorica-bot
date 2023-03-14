@@ -1,9 +1,9 @@
-import { REST } from '@discordjs/rest';
 import config from 'config';
 import {
     GatewayIntentBits,
     Options,
     Partials,
+    REST,
     RESTPutAPIApplicationCommandsJSONBody,
     Routes,
 } from 'discord.js';

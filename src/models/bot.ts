@@ -1,4 +1,3 @@
-import { RateLimitData, RESTEvents } from '@discordjs/rest';
 import config from 'config';
 import {
     Client,
@@ -11,6 +10,8 @@ import {
     PartialMessage,
     PartialMessageReaction,
     PartialUser,
+    RateLimitData,
+    RESTEvents,
     User,
 } from 'discord.js';
 import { createRequire } from 'node:module';

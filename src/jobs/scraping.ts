@@ -1,7 +1,7 @@
 import config from 'config';
-import { APIEmbed, isJSONEncodable, WebhookClient, WebhookCreateMessageOptions } from 'discord.js';
+import { APIEmbed, isJSONEncodable, WebhookClient, WebhookMessageCreateOptions } from 'discord.js';
 import jsonTemplates from 'json-templates';
-import mingo from 'mingo';
+import { find as mingoFind } from 'mingo';
 import moment from 'moment';
 import { JsonArray, JsonObject } from 'type-fest';
 import { Database } from '../database/database.js';
@@ -93,13 +93,13 @@ export class ScrapingJob implements Job {
         }
     }
 
-    private itemToMessages(scraping: Scraping, item: JsonObject): WebhookCreateMessageOptions {
-        let templateResult: WebhookCreateMessageOptions | undefined;
+    private itemToMessages(scraping: Scraping, item: JsonObject): WebhookMessageCreateOptions {
+        let templateResult: WebhookMessageCreateOptions | undefined;
         if (scraping.messageTemplate) {
             const template = jsonTemplates(scraping.messageTemplate);
             templateResult = template(item);
         }
-        const message: WebhookCreateMessageOptions = {
+        const message: WebhookMessageCreateOptions = {
             ...templateResult,
         };
         message.content ||= item.link ? `<${item.link}>` : void 0;
@@ -136,7 +136,7 @@ export class ScrapingJob implements Job {
 
     private async sendNofitication(
         subscribes: ScrapingSubscription[] | undefined,
-        message: WebhookCreateMessageOptions
+        message: WebhookMessageCreateOptions
     ): Promise<void> {
         if (!subscribes) return;
         for (const subscribe of subscribes) {
@@ -189,7 +189,7 @@ export class ScrapingJob implements Job {
         condition: JsonObject,
         projection?: JsonObject
     ): JsonObject[] {
-        const cursor = mingo.find(items, condition, projection);
+        const cursor = mingoFind(items, condition, projection);
         return cursor.all() as JsonObject[];
     }
 }

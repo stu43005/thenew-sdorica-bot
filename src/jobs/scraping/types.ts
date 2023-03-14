@@ -1,4 +1,4 @@
-import { WebhookCreateMessageOptions } from 'discord.js';
+import { WebhookMessageCreateOptions } from 'discord.js';
 import { JsonObject } from 'type-fest';
 
 export interface Scraping {
@@ -12,7 +12,7 @@ export interface Scraping {
     filterOutputs?: JsonObject;
     skip?: number;
     limit?: number;
-    messageTemplate?: WebhookCreateMessageOptions;
+    messageTemplate?: WebhookMessageCreateOptions;
     defaultEmbed?: boolean;
 }
 
