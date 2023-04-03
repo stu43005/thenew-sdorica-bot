@@ -39,13 +39,13 @@ export class QuoteTrigger implements Trigger {
             if (listIds.length == 3) {
                 if (listIds[0] !== msg.guild.id) continue;
 
-                const channel = await ClientUtils.findTextChannel(msg.guild, listIds[1]);
-                if (!channel) continue;
-
-                const msgId = RegexUtils.discordId(listIds[2]);
-                if (!msgId) continue;
-
                 try {
+                    const channel = await ClientUtils.findTextChannel(msg.guild, listIds[1]);
+                    if (!channel) continue;
+
+                    const msgId = RegexUtils.discordId(listIds[2]);
+                    if (!msgId) continue;
+
                     const msgFound = await channel.messages.fetch(msgId);
                     await quoteEmbed(msg, msgFound, 'Linked');
                 } catch (error) {
