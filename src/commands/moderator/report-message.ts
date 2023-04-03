@@ -19,7 +19,7 @@ import { CommandDeferType, MessageContextMenu } from '../command.js';
 
 export default class ReportMessageCommand implements MessageContextMenu {
     public metadata: RESTPostAPIApplicationCommandsJSONBody = new ContextMenuCommandBuilder()
-        .setName('report-message')
+        .setName('Report Mmessage')
         .setType(ApplicationCommandType.Message)
         .setDMPermission(false)
         .toJSON();

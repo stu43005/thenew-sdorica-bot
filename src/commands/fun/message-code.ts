@@ -2,6 +2,7 @@ import {
     ApplicationCommandType,
     ContextMenuCommandBuilder,
     MessageContextMenuCommandInteraction,
+    PermissionsBitField,
     PermissionsString,
 } from 'discord.js';
 import { FormatUtils } from '../../utils/format-utils.js';
@@ -12,8 +13,9 @@ const hiddenFalse = ['system', 'pinned', 'tts', 'everyone', 'inline'];
 
 export class MessageCodeCommand implements MessageContextMenu {
     public metadata = new ContextMenuCommandBuilder()
-        .setName('message-code')
+        .setName('Get Message JSON')
         .setType(ApplicationCommandType.Message)
+        .setDefaultMemberPermissions(new PermissionsBitField().add('ManageMessages').valueOf())
         .toJSON();
     public deferType = CommandDeferType.HIDDEN;
     public requireDev = false;

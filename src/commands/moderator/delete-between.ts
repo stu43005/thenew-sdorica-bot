@@ -21,7 +21,7 @@ import { CommandDeferType, MessageContextMenu } from '../command.js';
 
 export default class DeleteBetweenCommand implements MessageContextMenu {
     public metadata: RESTPostAPIApplicationCommandsJSONBody = new ContextMenuCommandBuilder()
-        .setName('delete-between')
+        .setName('Delete Between')
         .setType(ApplicationCommandType.Message)
         .setDMPermission(false)
         .setDefaultMemberPermissions(new PermissionsBitField().add('ManageMessages').valueOf())
