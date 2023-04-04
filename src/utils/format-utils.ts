@@ -3,6 +3,7 @@ import {
     channelMention,
     cleanCodeBlockContent,
     codeBlock,
+    Collection,
     EmbedBuilder,
     escapeInlineCode,
     Guild,
@@ -16,6 +17,7 @@ import {
 import { Duration } from 'luxon';
 import { LangCode } from '../enums/lang-code.js';
 import { Language } from '../models/enum-helpers/language.js';
+import { SerializationMessage } from './serialization-utils.js';
 
 export class FormatUtils {
     public static roleMention(guild: Guild, discordId: string): string {
@@ -93,7 +95,7 @@ export class FormatUtils {
     }
 
     public static embedTheMessage(
-        message: Message,
+        message: Message | SerializationMessage,
         contextChannel: Channel,
         embed?: EmbedBuilder
     ): EmbedBuilder {
@@ -102,13 +104,21 @@ export class FormatUtils {
         }
         embed.setAuthor({
             name: message.author.tag,
-            iconURL: message.author.displayAvatarURL(),
+            iconURL:
+                typeof message.author.displayAvatarURL === 'string'
+                    ? // eslint-disable-next-line @typescript-eslint/unbound-method
+                      message.author.displayAvatarURL
+                    : message.author.displayAvatarURL(),
             url: message.url,
         });
         if (message.content) {
             embed.setDescription(message.content);
         }
-        if (message.attachments && message.attachments.size > 0) {
+        const attachments =
+            message.attachments instanceof Collection
+                ? [...message.attachments.values()]
+                : message.attachments;
+        if (attachments && attachments.length > 0) {
             if (
                 'nsfw' in message.channel &&
                 message.channel.nsfw &&
@@ -122,24 +132,22 @@ export class FormatUtils {
                     },
                 ]);
             } else if (
-                message.attachments.size == 1 &&
-                String(message.attachments.at(0)?.url).match(
-                    /(.jpg|.jpeg|.png|.gif|.gifv|.webp|.bmp)$/i
-                )
+                attachments.length == 1 &&
+                String(attachments.at(0)?.url).match(/(.jpg|.jpeg|.png|.gif|.gifv|.webp|.bmp)$/i)
             ) {
-                embed.setImage(message.attachments.at(0)?.url ?? '');
+                embed.setImage(attachments.at(0)?.url ?? '');
             } else {
                 embed.addFields([
                     {
                         name: 'Attachments',
-                        value: message.attachments
+                        value: attachments
                             .map(attachment => `[${attachment.name}](${attachment.url})`)
                             .join('\n'),
                     },
                 ]);
             }
         }
-        embed.setTimestamp(message.createdAt);
+        embed.setTimestamp(message.createdTimestamp);
         if (message.member && message.member.displayColor != 0) {
             embed.setColor(message.member.displayColor);
         }

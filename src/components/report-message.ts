@@ -1,21 +1,16 @@
 import { EmbedBuilder, Message, ModalSubmitInteraction } from 'discord.js';
 import { CommandDeferType } from '../commands/command.js';
+import { getInteractionDataRepository, InteractionData } from '../database/entities/interaction.js';
 import { EventData } from '../models/event-data.js';
 import { FormatUtils } from '../utils/format-utils.js';
 import { InteractionUtils } from '../utils/interaction-utils.js';
 import { MessageUtils } from '../utils/message-utils.js';
 import { PermissionUtils } from '../utils/permission-utils.js';
-import { RegexUtils } from '../utils/regex-utils.js';
+import { SerializationMessage } from '../utils/serialization-utils.js';
 import { ModelSubmit } from './component.js';
 
 export default class ReportMessageSubmit implements ModelSubmit {
-    static #instance: ReportMessageSubmit;
-
-    public static getInstance(): ReportMessageSubmit {
-        return (this.#instance ??= new ReportMessageSubmit());
-    }
-
-    public ids = ['report_message_submit'];
+    public ids = ['report_message_submit-'];
     public deferType = CommandDeferType.HIDDEN;
     public requireGuild = true;
     public requireEmbedAuthorTag = false;
@@ -26,34 +21,13 @@ export default class ReportMessageSubmit implements ModelSubmit {
         _data: EventData
     ): Promise<void> {
         if (!intr.channel || !intr.guild) return;
-        const messageId = RegexUtils.discordId(intr.fields.getTextInputValue('messageId'));
-        if (!messageId) {
-            await InteractionUtils.send(intr, `Error: 訊息ID格式錯誤。`);
-            return;
-        }
-        const message = await intr.channel.messages.fetch(messageId);
-        if (!message) {
-            await InteractionUtils.send(
-                intr,
-                `Error: 找不到目標訊息ID: ${FormatUtils.inlineCode(messageId)}。`
-            );
-            return;
-        }
+        const [, intrId] = intr.customId.split('-');
+
+        const data = (await getInteractionDataRepository().findById(
+            intrId
+        )) as InteractionData<ReportMessageData>;
+
         const reason = intr.fields.getTextInputValue('reason');
-
-        await ReportMessageSubmit.report(intr, message, reason);
-    }
-
-    public static addId(customId: string): void {
-        ReportMessageSubmit.getInstance().ids.push(customId);
-    }
-
-    public static async report(
-        intr: ModalSubmitInteraction,
-        message: Message,
-        reason: string
-    ): Promise<void> {
-        if (!intr.channel || !intr.guild) return;
 
         const report = new EmbedBuilder();
         report.setAuthor({
@@ -65,7 +39,7 @@ export default class ReportMessageSubmit implements ModelSubmit {
         report.setTitle('檢舉原因');
         report.setDescription(reason);
         report.setTimestamp(intr.createdAt);
-        const embed = FormatUtils.embedTheMessage(message, intr.channel);
+        const embed = FormatUtils.embedTheMessage(data.data.message, intr.channel);
 
         if (
             intr.guild.publicUpdatesChannel &&
@@ -92,5 +66,13 @@ export default class ReportMessageSubmit implements ModelSubmit {
             },
             true
         );
+
+        data.data.reason = reason;
+        await data.update();
     }
+}
+
+export interface ReportMessageData {
+    message: SerializationMessage;
+    reason?: string;
 }

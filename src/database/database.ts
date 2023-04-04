@@ -14,6 +14,7 @@ export class Database {
             databaseURL: config.get('firebaseAdmin.databaseURL'),
         });
         const firestore = admin.firestore();
+        firestore.settings({ ignoreUndefinedProperties: true });
         fireorm.initialize(firestore);
         this.inited = true;
         return firestore;

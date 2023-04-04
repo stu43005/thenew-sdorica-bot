@@ -2,7 +2,6 @@ import {
     ActionRowBuilder,
     ApplicationCommandType,
     ContextMenuCommandBuilder,
-    DiscordjsErrorCodes,
     MessageContextMenuCommandInteraction,
     ModalBuilder,
     PermissionsString,
@@ -10,11 +9,13 @@ import {
     TextInputBuilder,
     TextInputStyle,
 } from 'discord.js';
-import { randomUUID } from 'node:crypto';
-import ReportMessageSubmit from '../../components/report-message.js';
+import { ReportMessageData } from '../../components/report-message.js';
+import {
+    getInteractionDataRepository,
+    InteractionData,
+} from '../../database/entities/interaction.js';
 import { EventData } from '../../models/event-data.js';
-import { Logger } from '../../services/logger.js';
-import { InteractionUtils } from '../../utils/interaction-utils.js';
+import { SerializationUtils } from '../../utils/serialization-utils.js';
 import { CommandDeferType, MessageContextMenu } from '../command.js';
 
 export default class ReportMessageCommand implements MessageContextMenu {
@@ -33,10 +34,16 @@ export default class ReportMessageCommand implements MessageContextMenu {
         intr: MessageContextMenuCommandInteraction,
         _data: EventData
     ): Promise<void> {
-        if (!intr.channel) return;
         const message = intr.targetMessage;
 
-        const customId = `report_message_submit_${randomUUID()}`;
+        const data = new InteractionData<ReportMessageData>();
+        data.fillInteraction(intr);
+        data.data = {
+            message: SerializationUtils.serializationMessage(message),
+        };
+        await getInteractionDataRepository().create(data);
+
+        const customId = `report_message_submit-${intr.id}`;
         const modal = new ModalBuilder()
             .setCustomId(customId)
             .setTitle('向管理員檢舉該訊息')
@@ -47,7 +54,7 @@ export default class ReportMessageCommand implements MessageContextMenu {
                         .setLabel('訊息ID (請勿修改)')
                         .setStyle(TextInputStyle.Short)
                         .setRequired(true)
-                        .setValue(intr.targetMessage.id)
+                        .setValue(message.id)
                 ),
                 new ActionRowBuilder<TextInputBuilder>().addComponents(
                     new TextInputBuilder()
@@ -58,28 +65,5 @@ export default class ReportMessageCommand implements MessageContextMenu {
                 )
             );
         await intr.showModal(modal);
-
-        try {
-            const modelIntr = await intr.awaitModalSubmit({
-                filter: intr => intr.customId === customId,
-                time: 60_000,
-            });
-            const reason = modelIntr.fields.getTextInputValue('reason');
-
-            await InteractionUtils.deferReply(modelIntr, true);
-            await ReportMessageSubmit.report(modelIntr, message, reason);
-        } catch (error) {
-            if (
-                error instanceof Error &&
-                error.name.includes(
-                    `[${DiscordjsErrorCodes[DiscordjsErrorCodes.InteractionCollectorError]}]`
-                )
-            ) {
-                Logger.debug(`Intercation collector error: ${error.message}`);
-                ReportMessageSubmit.addId(customId);
-            } else {
-                throw error;
-            }
-        }
     }
 }
