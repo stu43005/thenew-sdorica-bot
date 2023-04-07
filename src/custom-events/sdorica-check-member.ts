@@ -37,6 +37,7 @@ export class SdoricaCheckMember implements CustomEvent<Events.GuildMemberUpdate>
             }
 
             if (ownRoles.includes(wrongAnswerRole) && newMember.kickable) {
+                await newMember.roles.remove(wrongAnswerRole);
                 await newMember.kick('成員培訓回答錯誤');
             }
         }
