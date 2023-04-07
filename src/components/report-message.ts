@@ -2,10 +2,10 @@ import { EmbedBuilder, Message, ModalSubmitInteraction } from 'discord.js';
 import { CommandDeferType } from '../commands/command.js';
 import { getInteractionDataRepository, InteractionData } from '../database/entities/interaction.js';
 import { EventData } from '../models/event-data.js';
+import { ClientUtils } from '../utils/client-utils.js';
 import { FormatUtils } from '../utils/format-utils.js';
 import { InteractionUtils } from '../utils/interaction-utils.js';
 import { MessageUtils } from '../utils/message-utils.js';
-import { PermissionUtils } from '../utils/permission-utils.js';
 import { SerializationMessage } from '../utils/serialization-utils.js';
 import { ModelSubmit } from './component.js';
 
@@ -41,22 +41,13 @@ export default class ReportMessageSubmit implements ModelSubmit {
         report.setTimestamp(intr.createdAt);
         const embed = FormatUtils.embedTheMessage(data.data.message, intr.channel);
 
-        if (
-            intr.guild.publicUpdatesChannel &&
-            PermissionUtils.canSend(intr.guild.publicUpdatesChannel)
-        ) {
-            await MessageUtils.send(intr.guild.publicUpdatesChannel, {
-                content: `收到回報的訊息：`,
-                embeds: [report, embed],
-            });
-        } else {
-            const owner = await intr.guild.fetchOwner();
-            const dmChannel = await owner.createDM();
-            await MessageUtils.send(dmChannel, {
-                content: `收到從 ${intr.guild.name} 回報的訊息：`,
-                embeds: [report, embed],
-            });
-        }
+        const notifyChannel = await ClientUtils.findNotifyChannel(intr.guild);
+        await MessageUtils.send(notifyChannel, {
+            content: notifyChannel.isDMBased()
+                ? `收到從 ${intr.guild.name} 回報的訊息：`
+                : `收到回報的訊息：`,
+            embeds: [report, embed],
+        });
 
         await InteractionUtils.send(
             intr,

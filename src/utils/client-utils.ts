@@ -2,11 +2,11 @@ import {
     Channel,
     Client,
     DiscordAPIError,
+    DMChannel,
     Guild,
     GuildEmoji,
     GuildMember,
     GuildTextBasedChannel,
-    NewsChannel,
     NonThreadGuildBasedChannel,
     RESTJSONErrorCodes,
     Role,
@@ -14,9 +14,6 @@ import {
     User,
     VoiceBasedChannel,
 } from 'discord.js';
-import { LangCode } from '../enums/lang-code.js';
-
-import { Lang } from '../services/lang.js';
 import { PermissionUtils } from './permission-utils.js';
 import { RegexUtils } from './regex-utils.js';
 
@@ -196,10 +193,7 @@ export class ClientUtils {
         }
     }
 
-    public static async findNotifyChannel(
-        guild: Guild,
-        langCode: LangCode
-    ): Promise<TextChannel | NewsChannel | undefined> {
+    public static async findNotifyChannel(guild: Guild): Promise<TextChannel | DMChannel> {
         // Prefer the public updates channel
         const publicUpdatesChannel = guild.publicUpdatesChannel;
         if (publicUpdatesChannel && PermissionUtils.canSend(publicUpdatesChannel, true)) {
@@ -212,12 +206,9 @@ export class ClientUtils {
             return systemChannel;
         }
 
-        // Otherwise look for a bot channel
-        return (await guild.channels.fetch()).find(
-            channel =>
-                (channel instanceof TextChannel || channel instanceof NewsChannel) &&
-                PermissionUtils.canSend(channel, true) &&
-                Lang.getRegex('channelRegexes.bot', langCode).test(channel.name)
-        ) as TextChannel | NewsChannel;
+        // Otherwise DM server owner
+        const owner = await guild.fetchOwner();
+        const dmChannel = await owner.createDM();
+        return dmChannel;
     }
 }

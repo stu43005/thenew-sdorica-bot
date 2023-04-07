@@ -1,4 +1,6 @@
 import { Events, GuildMember, PartialGuildMember } from 'discord.js';
+import { ClientUtils } from '../utils/client-utils.js';
+import { MessageUtils } from '../utils/message-utils.js';
 import { CustomEvent } from './custom-event.js';
 
 const mee6Roles = [
@@ -39,6 +41,11 @@ export class SdoricaCheckMember implements CustomEvent<Events.GuildMemberUpdate>
             if (ownRoles.includes(wrongAnswerRole) && newMember.kickable) {
                 await newMember.roles.remove(wrongAnswerRole);
                 await newMember.kick('成員培訓回答錯誤');
+
+                const notifyChannel = await ClientUtils.findNotifyChannel(newMember.guild);
+                await MessageUtils.send(notifyChannel, {
+                    content: `【培訓】成員 ${newMember.user.tag} 回答錯誤`,
+                });
             }
         }
     }
