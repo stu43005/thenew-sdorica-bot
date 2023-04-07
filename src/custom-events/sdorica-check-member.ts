@@ -19,6 +19,7 @@ const mee6Roles = [
     '458792329784983572',
 ];
 const assignRole = '622371686502891529';
+const wrongAnswerRole = '1093881059701182554';
 
 export class SdoricaCheckMember implements CustomEvent<Events.GuildMemberUpdate> {
     public readonly event = Events.GuildMemberUpdate;
@@ -28,11 +29,15 @@ export class SdoricaCheckMember implements CustomEvent<Events.GuildMemberUpdate>
         newMember: GuildMember
     ): Promise<void> {
         if (newMember.guild.id === '437330083976445953') {
-            const matchedRoles = Array.from(newMember.roles.cache.keys()).filter(r =>
-                mee6Roles.includes(r)
-            );
+            const ownRoles = Array.from(newMember.roles.cache.keys());
+
+            const matchedRoles = ownRoles.filter(r => mee6Roles.includes(r));
             if (matchedRoles.length > 0 && !newMember.roles.cache.has(assignRole)) {
                 await newMember.roles.add(assignRole);
+            }
+
+            if (ownRoles.includes(wrongAnswerRole) && newMember.kickable) {
+                await newMember.kick('成員培訓回答錯誤');
             }
         }
     }
