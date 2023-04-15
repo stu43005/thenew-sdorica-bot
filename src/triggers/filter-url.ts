@@ -23,6 +23,9 @@ export class FilterUrlTrigger implements Trigger {
     private cooldown = new RateLimiter(1, 60 * 1000);
 
     public triggered(msg: Message): boolean {
+        // only sdorica server
+        if (msg.guildId !== '437330083976445953') return false;
+
         if (!PermissionUtils.canDeleteMessage(msg.channel)) return false;
 
         if (msg.attachments.size) {
