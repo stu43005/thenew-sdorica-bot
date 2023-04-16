@@ -1,6 +1,7 @@
 import config from 'config';
 import {
     Client,
+    ClientEvents,
     Events,
     Guild,
     Interaction,
@@ -15,6 +16,7 @@ import {
     User,
 } from 'discord.js';
 import { createRequire } from 'node:module';
+import { CustomEvent } from '../custom-events/custom-event.js';
 import { customEvents } from '../custom-events/index.js';
 import { CommandHandler } from '../events/command-handler.js';
 import { ComponentHandler } from '../events/component-handler.js';
@@ -81,7 +83,7 @@ export class Bot {
         );
 
         for (const custom of customEvents) {
-            this.client.on(custom.event, (...args) => custom.process(...args));
+            this.client.on(custom.event, (...args) => this.onCustomEvent(custom, args));
         }
     }
 
@@ -265,6 +267,17 @@ export class Bot {
             config.get<number>('logging.rateLimit.minTimeout') * 1000
         ) {
             Logger.error(Logs.error.apiRateLimit, rateLimitData);
+        }
+    }
+
+    private async onCustomEvent<K extends keyof ClientEvents>(
+        custom: CustomEvent<K>,
+        args: ClientEvents[K]
+    ): Promise<void> {
+        try {
+            await custom.process(...args);
+        } catch (error) {
+            Logger.error(Logs.error.unspecified, error);
         }
     }
 }
