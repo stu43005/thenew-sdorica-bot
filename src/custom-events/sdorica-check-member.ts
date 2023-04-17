@@ -20,7 +20,7 @@ const mee6Roles = [
     '457518374688129044',
     '458792329784983572',
 ];
-const assignRole = '622371686502891529';
+const verifiedRole = '622371686502891529';
 const wrongAnswerRole = '1093881059701182554';
 
 export class SdoricaCheckMember implements CustomEvent<Events.GuildMemberUpdate> {
@@ -30,23 +30,31 @@ export class SdoricaCheckMember implements CustomEvent<Events.GuildMemberUpdate>
         oldMember: GuildMember | PartialGuildMember,
         newMember: GuildMember
     ): Promise<void> {
+        const oldRoles = Array.from(oldMember.roles.cache.keys());
+        const newRoles = Array.from(newMember.roles.cache.keys());
         if (newMember.guild.id === '437330083976445953') {
-            const ownRoles = Array.from(newMember.roles.cache.keys());
-
-            const matchedRoles = ownRoles.filter(r => mee6Roles.includes(r));
-            if (matchedRoles.length > 0 && !newMember.roles.cache.has(assignRole)) {
-                await newMember.roles.add(assignRole);
+            const matchedRoles = newRoles.filter(r => mee6Roles.includes(r));
+            if (matchedRoles.length > 0 && !newMember.roles.cache.has(verifiedRole)) {
+                await newMember.roles.add(verifiedRole);
             }
 
-            if (ownRoles.includes(wrongAnswerRole) && newMember.kickable) {
+            if (newRoles.includes(wrongAnswerRole)) {
                 await newMember.roles.remove(wrongAnswerRole);
-                await newMember.kick('成員培訓回答錯誤');
 
-                const notifyChannel = await ClientUtils.findNotifyChannel(newMember.guild);
-                await MessageUtils.send(notifyChannel, {
-                    content: `【培訓】成員 ${newMember.user.tag} 回答錯誤`,
-                });
+                if (!oldRoles.includes(verifiedRole) && newMember.kickable) {
+                    await newMember.kick('成員培訓回答錯誤');
+
+                    const notifyChannel = await ClientUtils.findNotifyChannel(newMember.guild);
+                    await MessageUtils.send(notifyChannel, {
+                        content: `【培訓】成員 ${newMember.user.tag} 回答錯誤`,
+                    });
+                }
             }
+        }
+        // for debug server
+        if (newMember.guild.id === '543454386873958411') {
+            console.log('oldRoles', oldRoles);
+            console.log('newRoles', newRoles);
         }
     }
 }
