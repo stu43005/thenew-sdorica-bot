@@ -75,10 +75,20 @@ export function buildQuoteEmbed(
     footer: string
 ): MessageCreateOptions {
     const embed = FormatUtils.embedTheMessage(message, contextChannel);
-    if (message.channel.id != contextChannel.id && 'name' in message.channel) {
-        embed.setFooter({
-            text: `${footer} by: ${user.tag} | in channel: #${message.channel.name}`,
-        });
+    if (message.channel.id !== contextChannel.id && 'name' in message.channel) {
+        if (message.channel.isThread() && message.channel.parent) {
+            embed.setFooter({
+                text: `${footer} by: ${user.tag} | in channel: #${message.channel.parent.name} > 💬${message.channel.name}`,
+            });
+        } else if (message.channel.isVoiceBased()) {
+            embed.setFooter({
+                text: `${footer} by: ${user.tag} | in channel: 🔊${message.channel.name}`,
+            });
+        } else if (message.channel.isTextBased()) {
+            embed.setFooter({
+                text: `${footer} by: ${user.tag} | in channel: #${message.channel.name}`,
+            });
+        }
     } else {
         embed.setFooter({ text: `${footer} by: ${user.tag}` });
     }
