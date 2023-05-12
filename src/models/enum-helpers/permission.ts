@@ -225,5 +225,30 @@ export class Permission {
                 return Lang.getRef('permissions.VIEW_GUILD_INSIGHTS', langCode);
             },
         },
+        ManageGuildExpressions: {
+            displayName(langCode: LangCode): string {
+                return Lang.getRef('permissions.MANAGE_GUILD_EXPRESSIONS', langCode);
+            },
+        },
+        ViewCreatorMonetizationAnalytics: {
+            displayName(langCode: LangCode): string {
+                return Lang.getRef('permissions.VIEW_CREATOR_MONETIZATION_ANALYTICS', langCode);
+            },
+        },
+        UseSoundboard: {
+            displayName(langCode: LangCode): string {
+                return Lang.getRef('permissions.USE_SOUNDBOARD', langCode);
+            },
+        },
+        UseExternalSounds: {
+            displayName(langCode: LangCode): string {
+                return Lang.getRef('permissions.USE_EXTERNAL_SOUNDS', langCode);
+            },
+        },
+        SendVoiceMessages: {
+            displayName(langCode: LangCode): string {
+                return Lang.getRef('permissions.SEND_VOICE_MESSAGES', langCode);
+            },
+        },
     };
 }

@@ -248,7 +248,12 @@
             "USE_VAD": "Use Voice Activity",
             "VIEW_AUDIT_LOG": "View Audit Log",
             "VIEW_CHANNEL": "View Channel(s)",
-            "VIEW_GUILD_INSIGHTS": "View Server Insights"
+            "VIEW_GUILD_INSIGHTS": "View Server Insights",
+            "MANAGE_GUILD_EXPRESSIONS": "Manage Guild Expressions",
+            "VIEW_CREATOR_MONETIZATION_ANALYTICS": "View Creator Monetization Analytics",
+            "USE_SOUNDBOARD": "Use Soundboard",
+            "USE_EXTERNAL_SOUNDS": "Use External Sounds",
+            "SEND_VOICE_MESSAGES": "Send Voice Messages"
         },
         "other": {
             "na": "N/A"
