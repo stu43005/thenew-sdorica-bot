@@ -16,7 +16,6 @@ import {
 import { EventData } from '../../models/event-data.js';
 import { Logger } from '../../services/logger.js';
 import { InteractionUtils } from '../../utils/interaction-utils.js';
-import { MessageUtils } from '../../utils/message-utils.js';
 import { CommandDeferType, MessageContextMenu } from '../command.js';
 
 export default class DeleteBetweenCommand implements MessageContextMenu {
@@ -38,9 +37,16 @@ export default class DeleteBetweenCommand implements MessageContextMenu {
         intr: MessageContextMenuCommandInteraction,
         _data: EventData
     ): Promise<void> {
-        if (!intr.channel || !intr.guild) return;
+        if (!intr.channel || !intr.guild || !('bulkDelete' in intr.channel)) {
+            await InteractionUtils.send(intr, 'This command does not support this channel.', true);
+            return;
+        }
 
-        if (!this.collecting.has(intr.user.id)) {
+        const intr1 = this.collecting.get(intr.user.id);
+        const message1 = intr1?.targetMessage;
+        const message2 = intr.targetMessage;
+
+        if (!intr1 || !intr1.replied || !message1 || message1.channelId !== message2.channelId) {
             this.collecting.set(intr.user.id, intr);
 
             const msg = await InteractionUtils.send(
@@ -66,11 +72,12 @@ export default class DeleteBetweenCommand implements MessageContextMenu {
                 let reason = 'timeout';
                 try {
                     const btnIntr = await msg.awaitMessageComponent({
-                        filter: i => i.user.id === intr.user.id,
+                        filter: i =>
+                            i.user.id === intr.user.id && i.customId === 'delete-between-cancal',
                         componentType: ComponentType.Button,
                         time: 60_000,
                     });
-                    btnIntr.deferUpdate();
+                    await btnIntr.deferUpdate();
                     reason = 'user-cancel';
                 } catch (error) {
                     if (
@@ -84,7 +91,7 @@ export default class DeleteBetweenCommand implements MessageContextMenu {
                         Logger.debug(`Intercation collector error: ${error.message}`);
                     }
                 }
-                if (this.collecting.has(intr.user.id)) {
+                if (this.collecting.get(intr.user.id) === intr) {
                     this.collecting.delete(intr.user.id);
                     await InteractionUtils.editReply(intr, {
                         content: `已取消。(原因: ${reason})`,
@@ -94,11 +101,6 @@ export default class DeleteBetweenCommand implements MessageContextMenu {
             }
             return;
         }
-
-        const intr1 = this.collecting.get(intr.user.id);
-        if (!intr1) return; // never
-        const message1 = intr1.targetMessage;
-        const message2 = intr.targetMessage;
 
         this.collecting.delete(intr.user.id);
 
@@ -115,23 +117,71 @@ export default class DeleteBetweenCommand implements MessageContextMenu {
                 ? [message1, message2]
                 : [message2, message1];
 
-        const messages = await intr.channel.messages.fetch({
-            before: latestMsg.id,
+        const replyMsg = await InteractionUtils.send(intr, {
+            content: '刪除中…',
+            components: [
+                new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('delete-between-cancal-2')
+                        .setLabel('Cancel')
+                        .setStyle(ButtonStyle.Primary)
+                ),
+            ],
         });
 
-        await InteractionUtils.send(intr, '刪除中…');
-
+        let isCancel = false;
         let count = 0;
-        for (const [_id, message] of messages) {
-            if (
-                message.createdTimestamp > firstMsg.createdTimestamp &&
-                message.createdTimestamp < latestMsg.createdTimestamp
-            ) {
-                await MessageUtils.delete(message);
-                count++;
-            }
+        let reason = '';
+        let error: unknown = null;
+
+        const cancelCollector = replyMsg?.createMessageComponentCollector({
+            filter: i => i.user.id === intr.user.id && i.customId === 'delete-between-cancal-2',
+            componentType: ComponentType.Button,
+            max: 1,
+            time: 60_000,
+        });
+        if (cancelCollector) {
+            cancelCollector.on('collect', async btnIntr => {
+                await btnIntr.deferUpdate();
+                isCancel = true;
+                reason = '(使用者取消)';
+                await InteractionUtils.editReply(intr, {
+                    content: `取消中… 已刪除 ${count} 則訊息。`,
+                    components: [],
+                });
+            });
         }
 
-        await InteractionUtils.editReply(intr, `已刪除 ${count} 則訊息。`);
+        while (!isCancel) {
+            try {
+                const messages = await intr.channel.messages.fetch({
+                    before: latestMsg.id,
+                });
+                if (isCancel) break;
+
+                const deleteMessages = messages.filter(
+                    message =>
+                        message.createdTimestamp > firstMsg.createdTimestamp &&
+                        message.createdTimestamp < latestMsg.createdTimestamp
+                );
+                if (deleteMessages.size === 0) break;
+
+                const deletedMessages = await intr.channel.bulkDelete(deleteMessages);
+                count += deletedMessages.size;
+                if (isCancel) break;
+            } catch (err) {
+                error = err;
+                break;
+            }
+
+            await InteractionUtils.editReply(intr, `刪除中… 已刪除 ${count} 則訊息。`);
+        }
+
+        cancelCollector?.stop();
+        await InteractionUtils.editReply(intr, {
+            content: `已刪除 ${count} 則訊息。${reason}`,
+            components: [],
+        });
+        if (error) throw error;
     }
 }
