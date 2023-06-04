@@ -95,9 +95,9 @@ export class StatCollection {
             if (!guildEmoji) return;
 
             if (!this.temp.emojis) this.temp.emojis = {};
-            if (!this.temp.emojisByMember) this.temp.emojisByMember = {};
-            if (!this.temp.emojisByMember[message.author.id])
-                this.temp.emojisByMember[message.author.id] = {};
+            // if (!this.temp.emojisByMember) this.temp.emojisByMember = {};
+            // if (!this.temp.emojisByMember[message.author.id])
+            //     this.temp.emojisByMember[message.author.id] = {};
 
             if (emoji.id) {
                 add(this.temp.emojis, emoji.id);
@@ -115,12 +115,12 @@ export class StatCollection {
 
     addReaction(
         messageReaction: MessageReaction | PartialMessageReaction,
-        user: User | PartialUser
+        _user: User | PartialUser
     ): void {
         if (messageReaction.emoji.id) {
             if (!this.temp.reactions) this.temp.reactions = {};
-            if (!this.temp.reactionsByMember) this.temp.reactionsByMember = {};
-            if (!this.temp.reactionsByMember[user.id]) this.temp.reactionsByMember[user.id] = {};
+            // if (!this.temp.reactionsByMember) this.temp.reactionsByMember = {};
+            // if (!this.temp.reactionsByMember[user.id]) this.temp.reactionsByMember[user.id] = {};
 
             add(this.temp.reactions, messageReaction.emoji.id);
             // add(this.temp.reactionsByMember[user.id], messageReaction.emoji.id);
@@ -146,9 +146,9 @@ export function mergeData(base: StatData, temp: StatData): void {
     mergeDoubleRecordData(base, temp, 'messagesByMemberByChannel');
     mergeRecordData(base, temp, 'messagesByChannel');
     mergeRecordData(base, temp, 'emojis');
-    mergeDoubleRecordData(base, temp, 'emojisByMember');
+    // mergeDoubleRecordData(base, temp, 'emojisByMember');
     mergeRecordData(base, temp, 'reactions');
-    mergeDoubleRecordData(base, temp, 'reactionsByMember');
+    // mergeDoubleRecordData(base, temp, 'reactionsByMember');
     mergeRecordData(base, temp, 'memes');
 
     base.channelNames ??= {};
@@ -183,7 +183,7 @@ function add(obj: any, key: string, value: number = 1): void {
     obj[key] = (+obj[key] || 0) + value;
 }
 
-interface StatData {
+export interface StatData {
     members: number;
 
     messages?: number;

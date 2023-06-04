@@ -2,7 +2,8 @@ import config from 'config';
 import admin from 'firebase-admin';
 import moment from 'moment';
 import { Database } from '../database/database.js';
-import { mergeData } from '../database/stat-collection.js';
+import { getGuildRepository } from '../database/entities/guild.js';
+import { mergeData, StatData } from '../database/stat-collection.js';
 import { Job } from './job.js';
 
 export class AnalyticsStatJob implements Job {
@@ -12,40 +13,114 @@ export class AnalyticsStatJob implements Job {
     public log: boolean = config.get('jobs.analyticsStatJob.log');
 
     public async run(): Promise<void> {
-        const lastday = moment().subtract(7, 'days');
-        this.job(lastday);
-    }
-
-    private async job(lastday: moment.Moment): Promise<void> {
         // Make sure DB is initialized
         await Database.connect();
 
-        const lastweek = lastday.format('GGGG-[W]WW');
         const db = admin.firestore();
-        const statSnapshot = await db.collection('stat').get();
+        const docs = await db.collection('stat').listDocuments();
 
-        for (let i = 0; i < statSnapshot.docs.length; i++) {
-            const doc = statSnapshot.docs[i];
+        for (const doc of docs) {
             const guildId = doc.id;
 
-            const weeklyRef = db.collection('stat').doc(guildId).collection('weekly').doc(lastweek);
-            const weeklySnapshot = await weeklyRef.get();
-            if (!weeklySnapshot.exists) {
-                const data: any = {
-                    days: [],
-                };
-                for (let i = 1; i <= 7; i++) {
-                    const day = lastday.isoWeekday(i).format('YYYY-MM-DD');
-                    const dayRef = db.collection('stat').doc(guildId).collection('daily').doc(day);
-                    const daySnapshot = await dayRef.get();
-                    const dayData = daySnapshot.data() as any;
-                    if (dayData) {
-                        mergeData(data, dayData);
-                        data.days.push(day);
-                    }
+            for (const [collection, statConfig] of Object.entries(analyticConfigs)) {
+                if (!statConfig.calcFrom) continue;
+
+                let current = moment();
+                for (let index = 0; index < 1; index++) {
+                    current = current.clone().subtract(1, statConfig.durationUnit);
+                    await this.calc(guildId, collection, current);
                 }
-                weeklyRef.set(data);
             }
         }
     }
+
+    private async calc(
+        guildId: string,
+        collection: string,
+        current: moment.Moment
+    ): Promise<StatData> {
+        const db = admin.firestore();
+        const statConfig = analyticConfigs[collection];
+        const name = statConfig.nameFormat(current);
+
+        const currentRef = db.collection('stat').doc(guildId).collection(collection).doc(name);
+        const currentSnapshot = await currentRef.get();
+        if (currentSnapshot.exists) {
+            const currentData = currentSnapshot.data() as StatData;
+            return currentData;
+        } else {
+            const data: any = {
+                days: [],
+            };
+            if (!statConfig.calcFrom) return data;
+            const calcConfig = analyticConfigs[statConfig.calcFrom];
+
+            let startOfTime = current.clone().startOf(statConfig.startOfUnit);
+            const endOfTime = current.clone().endOf(statConfig.startOfUnit);
+
+            const guildData = await getGuildRepository().findById(guildId);
+            if (guildData.joinAt) {
+                const joinAt = moment(guildData.joinAt);
+                if (startOfTime.isBefore(joinAt)) {
+                    startOfTime = joinAt;
+                }
+            }
+
+            for (
+                let time = startOfTime.clone();
+                time.isBefore(endOfTime);
+                time = time.clone().add(1, calcConfig.durationUnit)
+            ) {
+                const timeName = calcConfig.nameFormat(time);
+                const timeData = await this.calc(guildId, statConfig.calcFrom, time);
+                if (timeData) {
+                    mergeData(data, timeData);
+                    data.days.push(timeName);
+                }
+            }
+            if (data.days.length) {
+                await currentRef.set(data);
+            }
+            return data;
+        }
+    }
+}
+
+const analyticConfigs: Record<string, AnalyticConfig> = {
+    daily: {
+        durationUnit: 'day',
+        startOfUnit: 'day',
+        nameFormat: day => day.format('YYYY-MM-DD'),
+    },
+    weekly: {
+        durationUnit: 'week',
+        startOfUnit: 'isoWeek',
+        nameFormat: day => day.format('GGGG-[W]WW'),
+        calcFrom: 'daily',
+    },
+    monthly: {
+        durationUnit: 'month',
+        startOfUnit: 'month',
+        nameFormat: day => day.format('YYYY-MM'),
+        calcFrom: 'daily',
+    },
+    quarterly: {
+        durationUnit: 'quarter',
+        startOfUnit: 'quarter',
+        nameFormat: day => day.format('YYYY-[Q]Q'),
+        calcFrom: 'monthly',
+    },
+    yearly: {
+        durationUnit: 'year',
+        startOfUnit: 'year',
+        nameFormat: day => day.format('YYYY'),
+        calcFrom: 'quarterly',
+    },
+};
+
+interface AnalyticConfig {
+    durationUnit: moment.unitOfTime.DurationConstructor;
+    startOfUnit: moment.unitOfTime.StartOf;
+    nameFormat(day: moment.Moment): string;
+    calcFrom?: string;
 }
