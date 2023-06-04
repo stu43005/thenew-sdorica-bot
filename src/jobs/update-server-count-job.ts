@@ -11,6 +11,7 @@ const require = createRequire(import.meta.url);
 const Logs = require('../../lang/logs.json');
 
 export class UpdateServerCountJob implements Job {
+    public uuid = '304982e4-3812-489e-8bae-2ce553b8d515';
     public name = 'Update Server Count';
     public schedule: string = config.get('jobs.updateServerCount.schedule');
     public log: boolean = config.get('jobs.updateServerCount.log');

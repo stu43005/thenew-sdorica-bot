@@ -18,6 +18,7 @@ import { triggerClasses } from './scraping/index.js';
 import { Scraping, TriggerClass } from './scraping/types.js';
 
 export class ScrapingJob implements Job {
+    public uuid = '7eb7de0c-c7bd-40fe-99d8-1606f2a57869';
     public name = 'Scraping';
     public schedule: string = config.get('jobs.scraping.schedule');
     public log: boolean = config.get('jobs.scraping.log');

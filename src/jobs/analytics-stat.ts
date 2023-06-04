@@ -6,6 +6,7 @@ import { mergeData } from '../database/stat-collection.js';
 import { Job } from './job.js';
 
 export class AnalyticsStatJob implements Job {
+    public uuid = '1fb34860-064b-48ca-8e6d-2105ada3c5d8';
     public name = 'Analytics Stat job';
     public schedule: string = config.get('jobs.analyticsStatJob.schedule');
     public log: boolean = config.get('jobs.analyticsStatJob.log');

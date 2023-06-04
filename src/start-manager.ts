@@ -4,6 +4,7 @@ import { createRequire } from 'node:module';
 import 'reflect-metadata';
 import { Api } from './api/api.js';
 import { GuildsController } from './api/controllers/guilds-controller.js';
+import { JobsController } from './api/controllers/jobs-controller.js';
 import { RootController } from './api/controllers/root-controller.js';
 import { ShardsController } from './api/controllers/shards-controller.js';
 import { VideoArchiveController } from './api/controllers/video-archive-controller.js';
@@ -67,18 +68,21 @@ async function start(): Promise<void> {
         execArgv: [],
     });
 
-    const manager = new Manager(shardManager, new JobService(managerJobs));
+    const jobService = new JobService(managerJobs);
+    const manager = new Manager(shardManager, jobService);
 
     // API
     const guildsController = new GuildsController(shardManager);
     const shardsController = new ShardsController(shardManager);
     const videoArchiveController = new VideoArchiveController();
     const rootController = new RootController();
+    const jobsController = new JobsController(jobService);
     const api = new Api([
         guildsController,
         shardsController,
         videoArchiveController,
         rootController,
+        jobsController,
     ]);
 
     // Start
