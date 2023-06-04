@@ -1,5 +1,6 @@
 import { Guild } from 'discord.js';
 import { createRequire } from 'node:module';
+import { getGuildRepository, GuildData } from '../database/entities/guild.js';
 import { Logger } from '../services/logger.js';
 import { EventHandler } from './event-handler.js';
 
@@ -15,10 +16,9 @@ export class GuildJoinHandler implements EventHandler {
         );
 
         // Get data from database
-        // const data = new EventData(
-        //     undefined,
-        //     await getGuildRepository().findById(guild.id)
-        // );
+        const data = await getGuildRepository().getOrCreate(guild.id, GuildData);
+        data.joinAt ||= new Date().toISOString();
+        await data.update();
 
         // Send welcome message to the server's notify channel
         // const guildLang = data.lang();

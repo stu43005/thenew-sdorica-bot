@@ -12,6 +12,8 @@ export class GuildData {
      */
     guildId!: string;
 
+    joinAt?: string;
+
     language?: LangCode;
 
     autoCrossposting?: string[];
