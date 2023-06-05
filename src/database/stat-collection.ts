@@ -204,6 +204,8 @@ export interface StatData {
     channelNames: {
         [channelId: string]: string;
     };
+
+    days?: string[];
 }
 
 /*

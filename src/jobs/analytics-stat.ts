@@ -23,18 +23,18 @@ export class AnalyticsStatJob implements Job {
             const guildId = doc.id;
 
             for (const [collection, statConfig] of Object.entries(analyticConfigs)) {
-                if (!statConfig.calcFrom) continue;
+                if (!statConfig.calcFrom || !statConfig.scheduled) continue;
 
                 let current = moment();
                 for (let index = 0; index < 1; index++) {
                     current = current.clone().subtract(1, statConfig.durationUnit);
-                    await this.calc(guildId, collection, current);
+                    await AnalyticsStatJob.calc(guildId, collection, current);
                 }
             }
         }
     }
 
-    private async calc(
+    public static async calc(
         guildId: string,
         collection: string,
         current: moment.Moment
@@ -55,8 +55,8 @@ export class AnalyticsStatJob implements Job {
             if (!statConfig.calcFrom) return data;
             const calcConfig = analyticConfigs[statConfig.calcFrom];
 
-            let startOfTime = current.clone().startOf(statConfig.startOfUnit);
-            const endOfTime = current.clone().endOf(statConfig.startOfUnit);
+            let startOfTime = statConfig.startOfTime(current.clone());
+            const endOfTime = statConfig.endOfTime(current.clone());
 
             const guildData = await getGuildRepository().findById(guildId);
             if (guildData.joinAt) {
@@ -89,38 +89,58 @@ export class AnalyticsStatJob implements Job {
 const analyticConfigs: Record<string, AnalyticConfig> = {
     daily: {
         durationUnit: 'day',
-        startOfUnit: 'day',
+        startOfTime: current => current.startOf('day'),
+        endOfTime: current => current.endOf('day'),
         nameFormat: day => day.format('YYYY-MM-DD'),
+        scheduled: false,
     },
     weekly: {
         durationUnit: 'week',
-        startOfUnit: 'isoWeek',
+        startOfTime: current => current.startOf('isoWeek'),
+        endOfTime: current => current.endOf('isoWeek'),
         nameFormat: day => day.format('GGGG-[W]WW'),
         calcFrom: 'daily',
+        scheduled: true,
     },
     monthly: {
         durationUnit: 'month',
-        startOfUnit: 'month',
+        startOfTime: current => current.startOf('month'),
+        endOfTime: current => current.endOf('month'),
         nameFormat: day => day.format('YYYY-MM'),
         calcFrom: 'daily',
+        scheduled: true,
     },
     quarterly: {
         durationUnit: 'quarter',
-        startOfUnit: 'quarter',
+        startOfTime: current => current.startOf('quarter'),
+        endOfTime: current => current.endOf('quarter'),
         nameFormat: day => day.format('YYYY-[Q]Q'),
         calcFrom: 'monthly',
+        scheduled: true,
     },
     yearly: {
         durationUnit: 'year',
-        startOfUnit: 'year',
+        startOfTime: current => current.startOf('year'),
+        endOfTime: current => current.endOf('year'),
         nameFormat: day => day.format('YYYY'),
         calcFrom: 'quarterly',
+        scheduled: true,
+    },
+    last30days: {
+        durationUnit: 'day',
+        startOfTime: current => current.subtract(30, 'day').startOf('day'),
+        endOfTime: current => current.subtract(1, 'day').endOf('day'),
+        nameFormat: day => day.format('YYYY-MM-DD'),
+        calcFrom: 'daily',
+        scheduled: false,
     },
 };
 
 interface AnalyticConfig {
     durationUnit: moment.unitOfTime.DurationConstructor;
-    startOfUnit: moment.unitOfTime.StartOf;
+    startOfTime(current: moment.Moment): moment.Moment;
+    endOfTime(current: moment.Moment): moment.Moment;
     nameFormat(day: moment.Moment): string;
     calcFrom?: string;
+    scheduled: boolean;
 }
