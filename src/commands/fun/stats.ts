@@ -16,7 +16,19 @@ export class StatsCommand implements Command {
     public metadata = new SlashCommandBuilder()
         .setName('stats')
         .setDescription('Server stats.')
-        .addSubcommand(builder => builder.setName('messages').setDescription('Message stats.'))
+        .addSubcommand(builder =>
+            builder
+                .setName('messages')
+                .setDescription('Message stats.')
+                .addUserOption(option =>
+                    option.setName('by-member').setDescription('Message stats for specific member')
+                )
+                .addChannelOption(option =>
+                    option
+                        .setName('by-channel')
+                        .setDescription('Message stats for specific channel')
+                )
+        )
         .addSubcommand(builder =>
             builder
                 .setName('emojis')
@@ -40,61 +52,105 @@ export class StatsCommand implements Command {
 
         const embed = new EmbedBuilder();
         switch (intr.options.getSubcommand()) {
-            case 'messages':
+            case 'messages': {
+                const byMember = intr.options.getUser('by-member');
+                const byChannel = intr.options.getChannel('by-channel');
                 embed.setTitle(`${intr.guild.name} Messages stats`);
-                embed.addFields([
-                    ...(data.messages
-                        ? [
-                              {
-                                  name: 'Total messages',
-                                  value: this.numberFormat(data.messages),
-                                  inline: true,
-                              },
-                          ]
-                        : []),
-                    ...(data.messagesByMember
-                        ? [
-                              {
-                                  name: 'Active members',
-                                  value: this.numberFormat(
-                                      Object.keys(data.messagesByMember).length
-                                  ),
-                                  inline: true,
-                              },
-                              {
-                                  name: 'Top message members',
-                                  value:
-                                      this.getTop(data.messagesByMember)
-                                          .map(
-                                              ([userId, messages], index) =>
-                                                  `${index + 1}. ${userMention(
-                                                      userId
-                                                  )}: ${this.numberFormat(messages)}`
-                                          )
-                                          .join('\n') || 'No data.',
-                              },
-                          ]
-                        : []),
-                    ...(data.messagesByChannel
-                        ? [
-                              {
-                                  name: 'Top message channels',
-                                  value:
-                                      this.getTop(data.messagesByChannel)
-                                          .map(
-                                              ([channelId, messages], index) =>
-                                                  `${index + 1}. ${
-                                                      intr.guild?.channels.resolve(channelId)
-                                                          ? channelMention(channelId)
-                                                          : `#${data.channelNames[channelId]}`
-                                                  }: ${this.numberFormat(messages)}`
-                                          )
-                                          .join('\n') || 'No data.',
-                              },
-                          ]
-                        : []),
-                ]);
+                if (byMember) {
+                    embed.addFields([
+                        {
+                            name: 'Only show message stats for the following member:',
+                            value: `${userMention(byMember.id)}`,
+                        },
+                        {
+                            name: 'Total messages',
+                            value: this.numberFormat(data.messagesByMember?.[byMember.id]),
+                            inline: true,
+                        },
+                        {
+                            name: 'Top message channels',
+                            value: this.getTop(data.messagesByMemberByChannel?.[byMember.id], id =>
+                                intr.guild?.channels.resolve(id)
+                                    ? channelMention(id)
+                                    : `#${data.channelNames[id]}`
+                            ),
+                        },
+                        ...(byChannel
+                            ? [
+                                  {
+                                      name: 'Specific channel',
+                                      value: `${channelMention(byChannel.id)}: ${this.numberFormat(
+                                          data.messagesByMemberByChannel?.[byMember.id]?.[
+                                              byChannel.id
+                                          ]
+                                      )}`,
+                                  },
+                              ]
+                            : []),
+                    ]);
+                } else if (byChannel) {
+                    const messagesByMember = data.messagesByMemberByChannel
+                        ? Object.entries(data.messagesByMemberByChannel)
+                              .map<[string, number]>(([userId, messagesByChannel]) => [
+                                  userId,
+                                  messagesByChannel[byChannel.id],
+                              ])
+                              .filter(([, count]) => count > 0)
+                        : [];
+                    embed.addFields([
+                        {
+                            name: 'Only show message stats for the following channel:',
+                            value: `${channelMention(byChannel.id)}`,
+                        },
+                        {
+                            name: 'Total messages',
+                            value: this.numberFormat(data.messagesByChannel?.[byChannel.id]),
+                            inline: true,
+                        },
+                        {
+                            name: 'Active members',
+                            value: data.messagesByMemberByChannel
+                                ? this.numberFormat(messagesByMember.length)
+                                : 'No data.',
+                            inline: true,
+                        },
+                        {
+                            name: 'Top message members',
+                            value: this.getTop(Object.fromEntries(messagesByMember), id =>
+                                userMention(id)
+                            ),
+                        },
+                    ]);
+                } else {
+                    embed.addFields([
+                        {
+                            name: 'Total messages',
+                            value: this.numberFormat(data.messages),
+                            inline: true,
+                        },
+                        {
+                            name: 'Active members',
+                            value: data.messagesByMember
+                                ? this.numberFormat(Object.keys(data.messagesByMember).length)
+                                : 'No data.',
+                            inline: true,
+                        },
+                        {
+                            name: 'Top message members',
+                            value: this.getTop(data.messagesByMember, id => userMention(id)),
+                        },
+                        {
+                            name: 'Top message channels',
+                            value: this.getTop(data.messagesByChannel, id =>
+                                intr.guild?.channels.resolve(id)
+                                    ? channelMention(id)
+                                    : `#${data.channelNames[id]}`
+                            ),
+                        },
+                    ]);
+                }
                 break;
+            }
             case 'emojis': {
                 const guildEmojis = await intr.guild.emojis.fetch();
                 const showLeast = intr.options.getBoolean('show-least');
@@ -154,13 +210,27 @@ export class StatsCommand implements Command {
         await InteractionUtils.send(intr, embed);
     }
 
-    private numberFormat(n: number): string {
-        return new Intl.NumberFormat('en-US').format(n);
+    private numberFormat(n: number | undefined): string {
+        return typeof n !== 'undefined' ? new Intl.NumberFormat('en-US').format(n) : 'No data.';
     }
 
-    private getTop(obj: Record<string, number>, n: number = 3): [string, number][] {
-        return Object.entries(obj)
-            .sort(([, a], [, b]) => b - a)
-            .slice(0, n);
+    private getTop(
+        obj: Record<string, number> | undefined,
+        idFormator: (id: string) => string,
+        n: number = 3
+    ): string {
+        if (!obj) {
+            return 'No data.';
+        }
+        return (
+            Object.entries(obj)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, n)
+                .map(
+                    ([id, count], index) =>
+                        `${index + 1}. ${idFormator(id)}: ${this.numberFormat(count)}`
+                )
+                .join('\n') || 'No data.'
+        );
     }
 }
