@@ -184,7 +184,7 @@ function add(obj: any, key: string, value: number = 1): void {
 }
 
 export interface StatData {
-    members: number;
+    members?: number;
 
     messages?: number;
     messagesByMember?: Record<string, number>;

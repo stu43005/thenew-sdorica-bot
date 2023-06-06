@@ -37,7 +37,8 @@ export class AnalyticsStatJob implements Job {
     public static async calc(
         guildId: string,
         collection: string,
-        current: moment.Moment
+        current: moment.Moment,
+        force: boolean = false
     ): Promise<StatData> {
         const db = admin.firestore();
         const statConfig = analyticConfigs[collection];
@@ -45,44 +46,78 @@ export class AnalyticsStatJob implements Job {
 
         const currentRef = db.collection('stat').doc(guildId).collection(collection).doc(name);
         const currentSnapshot = await currentRef.get();
-        if (currentSnapshot.exists) {
+        if (currentSnapshot.exists && !force) {
             const currentData = currentSnapshot.data() as StatData;
             return currentData;
         } else {
-            const data: any = {
+            let data: any = {
                 days: [],
             };
             if (!statConfig.calcFrom) return data;
-            const calcConfig = analyticConfigs[statConfig.calcFrom];
 
-            let startOfTime = statConfig.startOfTime(current.clone());
+            const startOfTime = statConfig.startOfTime(current.clone());
             const endOfTime = statConfig.endOfTime(current.clone());
 
-            const guildData = await getGuildRepository().findById(guildId);
-            if (guildData.joinAt) {
-                const joinAt = moment(guildData.joinAt);
-                if (startOfTime.isBefore(joinAt)) {
-                    startOfTime = joinAt;
-                }
-            }
-
-            for (
-                let time = startOfTime.clone();
-                time.isBefore(endOfTime);
-                time = time.clone().add(1, calcConfig.durationUnit)
-            ) {
-                const timeName = calcConfig.nameFormat(time);
-                const timeData = await this.calc(guildId, statConfig.calcFrom, time);
-                if (timeData) {
-                    mergeData(data, timeData);
-                    data.days.push(timeName);
-                }
-            }
-            if (data.days.length) {
+            data = await this.calcRange(guildId, statConfig.calcFrom, startOfTime, endOfTime);
+            if (data.days.length && !force) {
                 await currentRef.set(data);
             }
             return data;
         }
+    }
+
+    public static async calcRange(
+        guildId: string,
+        collection: string,
+        startOfTime: moment.Moment,
+        endOfTime: moment.Moment
+    ): Promise<StatData> {
+        const guildData = await getGuildRepository().findById(guildId);
+        if (guildData.joinAt) {
+            const joinAt = moment(guildData.joinAt);
+            if (startOfTime.isBefore(joinAt)) {
+                startOfTime = joinAt;
+            }
+        }
+
+        const statConfig = analyticConfigs[collection];
+        const data: any = {
+            days: [],
+        };
+        let lastTime: moment.Moment = startOfTime.clone();
+        for (
+            let time = startOfTime.clone();
+            time.isSameOrBefore(endOfTime);
+            time = time.clone().add(1, statConfig.durationUnit)
+        ) {
+            const subrangeStart = statConfig.startOfTime(time.clone());
+            const subrangeEnd = statConfig.endOfTime(time.clone());
+            if (subrangeStart.isBefore(startOfTime) || subrangeEnd.isAfter(endOfTime)) {
+                const newStart = subrangeStart.isBefore(startOfTime)
+                    ? time.clone()
+                    : subrangeStart.clone();
+                const newEnd = subrangeEnd.isAfter(endOfTime)
+                    ? endOfTime.clone()
+                    : subrangeEnd.clone();
+                const subData = await this.calcRange(guildId, 'daily', newStart, newEnd);
+                mergeData(data, subData);
+                data.days.push(...(subData.days ?? []));
+                lastTime = newEnd.clone();
+            } else {
+                const timeName = statConfig.nameFormat(time);
+                const timeData = await this.calc(guildId, collection, time);
+                mergeData(data, timeData);
+                data.days.push(timeName);
+                lastTime = subrangeEnd.clone();
+            }
+        }
+        lastTime = lastTime.clone().add(1, 'day').startOf('day');
+        if (lastTime.isSameOrBefore(endOfTime)) {
+            const subData = await this.calcRange(guildId, 'daily', lastTime, endOfTime);
+            mergeData(data, subData);
+            data.days.push(...(subData.days ?? []));
+        }
+        return data;
     }
 }
 
@@ -107,7 +142,7 @@ const analyticConfigs: Record<string, AnalyticConfig> = {
         startOfTime: current => current.startOf('month'),
         endOfTime: current => current.endOf('month'),
         nameFormat: day => day.format('YYYY-MM'),
-        calcFrom: 'daily',
+        calcFrom: 'weekly',
         scheduled: true,
     },
     quarterly: {
@@ -131,7 +166,7 @@ const analyticConfigs: Record<string, AnalyticConfig> = {
         startOfTime: current => current.subtract(30, 'day').startOf('day'),
         endOfTime: current => current.subtract(1, 'day').endOf('day'),
         nameFormat: day => day.format('YYYY-MM-DD'),
-        calcFrom: 'daily',
+        calcFrom: 'weekly',
         scheduled: false,
     },
 };
