@@ -1,4 +1,12 @@
-import { EmbedBuilder, Message, ModalSubmitInteraction } from 'discord.js';
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    EmbedBuilder,
+    Message,
+    MessageActionRowComponentBuilder,
+    ModalSubmitInteraction,
+} from 'discord.js';
 import { CommandDeferType } from '../commands/command.js';
 import { getInteractionDataRepository, InteractionData } from '../database/entities/interaction.js';
 import { EventData } from '../models/event-data.js';
@@ -47,6 +55,21 @@ export default class ReportMessageSubmit implements ModelSubmit {
                 ? `收到從 ${intr.guild.name} 回報的訊息：`
                 : `收到回報的訊息：`,
             embeds: [report, embed],
+            components: [
+                new ActionRowBuilder<MessageActionRowComponentBuilder>()
+                    .addComponents(
+                        new ButtonBuilder()
+                            .setCustomId(`report_message_action-delete-${intrId}`)
+                            .setLabel('刪除訊息')
+                            .setStyle(ButtonStyle.Primary)
+                    )
+                    .addComponents(
+                        new ButtonBuilder()
+                            .setCustomId(`report_message_action-mute-${intrId}`)
+                            .setLabel('禁言1小時')
+                            .setStyle(ButtonStyle.Danger)
+                    ),
+            ],
         });
 
         await InteractionUtils.send(

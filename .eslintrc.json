@@ -58,10 +58,7 @@
         "import/order": [
             "error",
             {
-                "alphabetize": {
-                    "caseInsensitive": true,
-                    "order": "asc"
-                },
+                "ignoreMemberSort": true,
                 "groups": [
                     ["builtin", "external", "object", "type"],
                     "internal", "parent", "sibling", "index"

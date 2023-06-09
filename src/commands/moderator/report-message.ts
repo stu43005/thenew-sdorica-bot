@@ -50,14 +50,6 @@ export default class ReportMessageCommand implements MessageContextMenu {
             .addComponents(
                 new ActionRowBuilder<TextInputBuilder>().addComponents(
                     new TextInputBuilder()
-                        .setCustomId('messageId')
-                        .setLabel('訊息ID (請勿修改)')
-                        .setStyle(TextInputStyle.Short)
-                        .setRequired(true)
-                        .setValue(message.id)
-                ),
-                new ActionRowBuilder<TextInputBuilder>().addComponents(
-                    new TextInputBuilder()
                         .setCustomId('reason')
                         .setLabel('檢舉原因')
                         .setStyle(TextInputStyle.Paragraph)
