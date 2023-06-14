@@ -55,17 +55,7 @@
         "import/no-extraneous-dependencies": "error",
         "import/no-unresolved": "off",
         "import/no-useless-path-segments": "error",
-        "import/order": [
-            "error",
-            {
-                "ignoreMemberSort": true,
-                "groups": [
-                    ["builtin", "external", "object", "type"],
-                    "internal", "parent", "sibling", "index"
-                ],
-                "newlines-between": "ignore"
-            }
-        ],
+        "import/order": "off",
         "no-empty": [
             "error",
             {
@@ -88,7 +78,7 @@
                 "allowSeparatedGroups": true,
                 "ignoreCase": true,
                 "ignoreDeclarationSort": true,
-                "ignoreMemberSort": false,
+                "ignoreMemberSort": true,
                 "memberSyntaxSortOrder": ["none", "all", "multiple", "single"]
             }
         ],
