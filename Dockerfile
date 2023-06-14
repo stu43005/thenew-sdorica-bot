@@ -1,4 +1,4 @@
-FROM node:18-bullseye as build
+FROM node:18-bullseye@sha256:acb3a9cb558efc8c11dc2a8756e669205a56bf5e7a4d3ed0660b8c117d346b8a as build
 
 # Add Tini https://github.com/krallin/tini
 RUN set -x \
@@ -24,7 +24,7 @@ RUN npm run build
 # Install packages only production dependencies
 RUN npm ci --omit=dev
 
-FROM gcr.io/distroless/nodejs:18
+FROM gcr.io/distroless/nodejs:18@sha256:b534f9b5528e69baa7e8caf7bcc1d93ecf59faa15d289221decf5889a2ed3877
 
 ENV NODE_ENV production
 
