@@ -74,7 +74,7 @@
         "rxjs": "^7.8.1",
         "type-fest": "^3.10.0",
         "url-regex-safe": "^3.0.0",
-        "utf-8-validate": "^5.0.10",
+        "utf-8-validate": "^6.0.3",
         "v8-profiler-next": "^1.9.0",
         "zlib-sync": "^0.1.8"
     },
