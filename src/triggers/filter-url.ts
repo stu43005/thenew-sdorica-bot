@@ -9,8 +9,8 @@ import { PermissionUtils } from '../utils/permission-utils.js';
 import { Trigger } from './trigger.js';
 
 const bannedDomains = [
-    /^[a-z]{2}twitter\.com$/,
-    /\.fxtwitter\.com$/,
+    // /^[a-z]{2}twitter\.com$/,
+    // /\.fxtwitter\.com$/,
     'kocpc.blogspot.com',
     'kocpc.com.tw',
     'kocpc.tumblr.com',
