@@ -8,7 +8,7 @@ import { MessageUtils } from '../utils/message-utils.js';
 import { PermissionUtils } from '../utils/permission-utils.js';
 import { Trigger } from './trigger.js';
 
-const bannedDomains = [
+const bannedDomains: (string | RegExp)[] = [
     // /^[a-z]{2}twitter\.com$/,
     // /\.fxtwitter\.com$/,
     'kocpc.blogspot.com',
