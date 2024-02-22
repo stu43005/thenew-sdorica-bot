@@ -5,6 +5,10 @@ on:
       - master
     paths-ignore:
       - .github/**
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
 
 jobs:
   deploy:
