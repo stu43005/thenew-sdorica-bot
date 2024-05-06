@@ -1,4 +1,4 @@
-import { APIPartialEmoji, resolvePartialEmoji } from 'discord.js';
+import { parseEmoji, type PartialEmoji, type PartialEmojiOnlyId } from 'discord.js';
 import emojiRegex from 'emoji-regex';
 
 export class RegexUtils {
@@ -30,24 +30,19 @@ export class RegexUtils {
         };
     }
 
-    public static guildEmojis(input: string): APIPartialEmoji[] {
+    public static guildEmojis(input: string): PartialEmoji[] {
         const match = input.matchAll(/(<a?:[a-zA-Z0-9_]+:[0-9]+>)/g);
-        return [...match]
-            .map(g => this.guildEmoji(g[0]))
-            .filter((emoji): emoji is APIPartialEmoji => !!emoji);
+        return Array.from(match)
+            .map(g => parseEmoji(g[0]))
+            .filter((emoji): emoji is PartialEmoji => !!emoji);
     }
 
-    public static guildEmoji(input: string): APIPartialEmoji | undefined {
-        const resolve = resolvePartialEmoji(input);
-        if (!resolve || !resolve.id) {
-            return;
+    public static guildEmoji(input: string): PartialEmoji | PartialEmojiOnlyId | null {
+        if (/^\d{17,19}$/.test(input)) {
+            return { id: input };
         }
 
-        return {
-            id: resolve.id,
-            name: resolve.name ?? null,
-            animated: resolve.animated,
-        };
+        return parseEmoji(input);
     }
 
     public static emoji(input: string): string[] {

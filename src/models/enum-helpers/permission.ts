@@ -250,5 +250,20 @@ export class Permission {
                 return Lang.getRef('permissions.SEND_VOICE_MESSAGES', langCode);
             },
         },
+        CreateGuildExpressions: {
+            displayName(langCode: LangCode): string {
+                return Lang.getRef('permissions.CREATE_GUILD_EXPRESSIONS', langCode);
+            },
+        },
+        CreateEvents: {
+            displayName(langCode: LangCode): string {
+                return Lang.getRef('permissions.CREATE_EVENTS', langCode);
+            },
+        },
+        SendPolls: {
+            displayName(langCode: LangCode): string {
+                return Lang.getRef('permissions.SEND_POLLS', langCode);
+            },
+        },
     };
 }

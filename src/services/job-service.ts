@@ -13,7 +13,7 @@ export class JobService {
     public start(): void {
         for (const job of this.jobs) {
             const log = job.log ? 'info' : 'debug';
-            new CronJob({
+            CronJob.from({
                 cronTime: job.schedule,
                 onTick: async () => {
                     try {

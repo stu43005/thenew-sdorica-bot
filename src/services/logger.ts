@@ -2,7 +2,7 @@ import config from 'config';
 import { DiscordAPIError, EmbedBuilder, WebhookClient } from 'discord.js';
 import { Response } from 'node-fetch';
 import { Transform } from 'node:stream';
-import pino, { DestinationStream, Level, LoggerOptions, StreamEntry } from 'pino';
+import { pino, DestinationStream, Level, LoggerOptions, StreamEntry } from 'pino';
 import build, { OnUnknown } from 'pino-abstract-transport';
 import { ConfigUtils } from '../utils/config-utils.js';
 import { FormatUtils } from '../utils/format-utils.js';

@@ -168,10 +168,9 @@ export class StatsCommand implements Command {
                                     .slice(0, 10)
                                     .map(
                                         ([emojiId, count], index) =>
-                                            `${index + 1}. ${formatEmoji(
-                                                emojiId,
-                                                guildEmojis.get(emojiId)?.animated ?? false
-                                            )}: ${this.numberFormat(count)}`
+                                            `${index + 1}. ${
+                                                guildEmojis.get(emojiId) ?? formatEmoji(emojiId)
+                                            }: ${this.numberFormat(count)}`
                                     )
                                     .join('\n') || 'No data.',
                         },
@@ -192,10 +191,7 @@ export class StatsCommand implements Command {
                                     .slice(0, 10)
                                     .map(
                                         ({ emoji, count }, index) =>
-                                            `${index + 1}. ${formatEmoji(
-                                                emoji.id,
-                                                emoji.animated ?? false
-                                            )}: ${this.numberFormat(count)}`
+                                            `${index + 1}. ${emoji}: ${this.numberFormat(count)}`
                                     )
                                     .join('\n') || 'No data.',
                         },

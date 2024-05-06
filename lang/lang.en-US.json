@@ -253,7 +253,10 @@
             "VIEW_CREATOR_MONETIZATION_ANALYTICS": "View Creator Monetization Analytics",
             "USE_SOUNDBOARD": "Use Soundboard",
             "USE_EXTERNAL_SOUNDS": "Use External Sounds",
-            "SEND_VOICE_MESSAGES": "Send Voice Messages"
+            "SEND_VOICE_MESSAGES": "Send Voice Messages",
+            "CREATE_GUILD_EXPRESSIONS": "Create Guild Expressions",
+            "CREATE_EVENTS": "Create Events",
+            "SEND_POLLS": "Send Polls"
         },
         "other": {
             "na": "N/A"

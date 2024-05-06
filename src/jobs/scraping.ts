@@ -103,25 +103,27 @@ export class ScrapingJob implements Job {
         const message: WebhookMessageCreateOptions = {
             ...templateResult,
         };
-        message.content ||= item.link ? `<${item.link}>` : void 0;
+        message.content ||= typeof item.link === 'string' ? `<${item.link}>` : void 0;
         if (scraping.defaultEmbed !== false) {
-            message.embeds ??= [];
-            const embed: APIEmbed = isJSONEncodable(message.embeds[0])
-                ? message.embeds[0].toJSON()
-                : message.embeds[0] ?? {};
+            const embeds = message.embeds ? Array.from(message.embeds) : [];
+            const embed: APIEmbed = isJSONEncodable(embeds[0])
+                ? embeds[0].toJSON()
+                : embeds[0] ?? {};
             embed.title ||= item.title?.toString() || 'Untitled';
             embed.description ||= item.contentSnippet?.toString() || item.content?.toString();
             embed.url ||= item.link?.toString();
             embed.timestamp ||=
                 item.isoDate?.toString() ||
-                (item.pubDate ? moment(item.pubDate.toString()).toISOString() : void 0);
+                (typeof item.pubDate !== 'object'
+                    ? moment(item.pubDate.toString()).toISOString()
+                    : void 0);
             const images = item.images as JsonArray;
             if (Array.isArray(images) && images.length > 0) {
                 embed.image = {
                     url: images[0] as string,
                 };
                 if (images.length > 1) {
-                    message.embeds.push(
+                    embeds.push(
                         ...images.slice(1).map(img => ({
                             image: {
                                 url: img as string,
@@ -130,7 +132,8 @@ export class ScrapingJob implements Job {
                     );
                 }
             }
-            message.embeds[0] ??= embed;
+            embeds[0] = embed;
+            message.embeds = embeds;
         }
         return message;
     }

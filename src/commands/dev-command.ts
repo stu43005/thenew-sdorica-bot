@@ -1,20 +1,17 @@
-import djs, {
+import {
     ChatInputCommandInteraction,
     PermissionsBitField,
     PermissionsString,
     SlashCommandBuilder,
+    version,
 } from 'discord.js';
 import fileSize from 'filesize';
-import { createRequire } from 'node:module';
 import os from 'node:os';
 import { EventData } from '../models/event-data.js';
 import { Lang } from '../services/lang.js';
 import { InteractionUtils } from '../utils/interaction-utils.js';
 import { ShardUtils } from '../utils/shard-utils.js';
 import { Command, CommandDeferType } from './command.js';
-
-const require = createRequire(import.meta.url);
-const TsConfig = require('../../tsconfig.json');
 
 export class DevCommand implements Command {
     public metadata = new SlashCommandBuilder()
@@ -56,8 +53,8 @@ export class DevCommand implements Command {
             Lang.getEmbed('displayEmbeds.dev', data.lang(), {
                 NODE_VERSION: process.version,
                 // TS_VERSION: `v${typescript.version}`,
-                ES_VERSION: TsConfig.compilerOptions.target,
-                DJS_VERSION: `v${djs.version}`,
+                // ES_VERSION: TsConfig.compilerOptions.target,
+                DJS_VERSION: `v${version}`,
                 SHARD_COUNT: shardCount.toLocaleString(),
                 SERVER_COUNT: serverCount.toLocaleString(),
                 SERVER_COUNT_PER_SHARD: Math.round(serverCount / shardCount).toLocaleString(),
