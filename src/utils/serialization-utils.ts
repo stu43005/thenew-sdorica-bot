@@ -126,7 +126,7 @@ export type SerializationAttachment = Jsonify<Except<Attachment, 'toJSON'>>;
 export type SerializationUser = Jsonify<
     Except<
         TransformCollection<FilterManagerKeys<User>>,
-        'toJSON' | 'client' | 'partial' | 'createdAt' | 'dmChannel' | 'partial'
+        'toJSON' | 'client' | 'partial' | 'createdAt' | 'dmChannel'
     >
 > & {
     avatarURL: string;

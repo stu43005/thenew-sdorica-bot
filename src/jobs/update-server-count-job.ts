@@ -18,14 +18,17 @@ export class UpdateServerCountJob implements Job {
 
     private botSites: BotSite[];
 
-    constructor(private shardManager: ShardingManager, private httpService: HttpService) {
+    constructor(
+        private shardManager: ShardingManager,
+        private httpService: HttpService
+    ) {
         this.botSites = config.get<BotSite[]>('bot-sites').filter(botSite => botSite.enabled);
     }
 
     public async run(): Promise<void> {
         const serverCount = await ShardUtils.serverCount(this.shardManager);
 
-        const type = ActivityType.Watching as const;
+        const type = ActivityType.Watching;
         const name = `to ${serverCount.toLocaleString()} servers`;
 
         await this.shardManager.broadcastEval(

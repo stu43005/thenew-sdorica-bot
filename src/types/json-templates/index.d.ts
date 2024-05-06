@@ -3,7 +3,7 @@ declare module 'json-templates' {
         key: string;
         defaultValue?: string;
     }
-    declare function parse<T extends string | JsonObject>(
+    declare function parse<T extends string | object>(
         atemplate: T
     ): { parameters: Parameters[] } & ((parameters?: object) => T);
     export = parse;
