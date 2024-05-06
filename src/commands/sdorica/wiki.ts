@@ -104,7 +104,7 @@ export class WikiCommand implements Command {
         const embed = await generateSkillsetEmbed(skillsetData);
         embed.setAuthor({
             iconURL: intr.user.displayAvatarURL(),
-            name: intr.user.tag,
+            name: intr.user.username,
         });
         const components = generateSkillsetComponent(intr.id, skillsetData);
         await InteractionUtils.send(intr, {

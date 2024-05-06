@@ -43,7 +43,10 @@ export class ReactionHandler implements EventHandler {
             }
 
             // Check if the embeds author equals the reactors tag
-            if (reaction.requireEmbedAuthorTag && msg.embeds[0]?.author?.name !== reactor.tag) {
+            if (
+                reaction.requireEmbedAuthorTag &&
+                msg.embeds[0]?.author?.name !== reactor.username
+            ) {
                 return false;
             }
 

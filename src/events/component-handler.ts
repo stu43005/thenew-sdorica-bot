@@ -50,7 +50,7 @@ export class ComponentHandler implements EventHandler {
         }
 
         // Check if the embeds author equals the users tag
-        if (component.requireEmbedAuthorTag && msg.embeds[0]?.author?.name !== intr.user.tag) {
+        if (component.requireEmbedAuthorTag && msg.embeds[0]?.author?.name !== intr.user.username) {
             return;
         }
 

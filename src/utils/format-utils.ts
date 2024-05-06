@@ -85,7 +85,7 @@ export class FormatUtils {
             embed = new EmbedBuilder(embed);
         }
         embed.setFooter({
-            text: user instanceof GuildMember ? user.user.tag : user.tag,
+            text: user instanceof GuildMember ? user.user.username : user.username,
             iconURL: user.displayAvatarURL(),
         });
         if (user instanceof GuildMember && user.displayColor != 0) {
@@ -103,7 +103,7 @@ export class FormatUtils {
             embed = new EmbedBuilder(embed);
         }
         embed.setAuthor({
-            name: message.author.tag,
+            name: message.author.username,
             iconURL:
                 typeof message.author.displayAvatarURL === 'string'
                     ? // eslint-disable-next-line @typescript-eslint/unbound-method

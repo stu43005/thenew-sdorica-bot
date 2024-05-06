@@ -86,7 +86,7 @@ export default class WikiHeroAction implements Button, StringSelectMenu {
         const embed = await generateSkillsetEmbed(skillsetData);
         embed.setAuthor({
             iconURL: intr.user.displayAvatarURL(),
-            name: intr.user.tag,
+            name: intr.user.username,
         });
         const components = generateSkillsetComponent(intrId, skillsetData);
         await InteractionUtils.editReply(intr, {

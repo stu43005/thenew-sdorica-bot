@@ -39,7 +39,7 @@ export default class ReportMessageSubmit implements ModelSubmit {
 
         const report = new EmbedBuilder();
         report.setAuthor({
-            name: `Report by: ${intr.user.tag} | in channel: #${
+            name: `Report by: ${intr.user.username} | in channel: #${
                 'name' in intr.channel ? intr.channel.name : intr.channel.id
             }`,
             iconURL: intr.user.displayAvatarURL(),

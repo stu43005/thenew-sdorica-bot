@@ -78,19 +78,19 @@ export function buildQuoteEmbed(
     if (message.channel.id !== contextChannel.id && 'name' in message.channel) {
         if (message.channel.isThread() && message.channel.parent) {
             embed.setFooter({
-                text: `${footer} by: ${user.tag} | in channel: #${message.channel.parent.name} > 💬${message.channel.name}`,
+                text: `${footer} by: ${user.username} | in channel: #${message.channel.parent.name} > 💬${message.channel.name}`,
             });
         } else if (message.channel.isVoiceBased()) {
             embed.setFooter({
-                text: `${footer} by: ${user.tag} | in channel: 🔊${message.channel.name}`,
+                text: `${footer} by: ${user.username} | in channel: 🔊${message.channel.name}`,
             });
         } else if (message.channel.isTextBased()) {
             embed.setFooter({
-                text: `${footer} by: ${user.tag} | in channel: #${message.channel.name}`,
+                text: `${footer} by: ${user.username} | in channel: #${message.channel.name}`,
             });
         }
     } else {
-        embed.setFooter({ text: `${footer} by: ${user.tag}` });
+        embed.setFooter({ text: `${footer} by: ${user.username}` });
     }
     return {
         embeds: [embed, ...(message.author.bot ? message.embeds : [])],

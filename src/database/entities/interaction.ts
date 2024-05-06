@@ -21,9 +21,10 @@ export class InteractionData<DataType = unknown> {
         this.guildId = intr.guildId;
         this.guildName = intr.guild?.name ?? null;
         this.channelId = intr.channelId ?? '';
-        this.channelName = intr.channel && 'name' in intr.channel ? intr.channel.name : intr.user.tag;
+        this.channelName =
+            intr.channel && 'name' in intr.channel ? intr.channel.name : intr.user.username;
         this.userId = intr.user.id;
-        this.userTag = intr.user.tag;
+        this.userTag = intr.user.username;
         if (intr.isCommand()) {
             this.command = intr.commandName;
         }

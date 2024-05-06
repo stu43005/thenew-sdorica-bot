@@ -93,7 +93,7 @@ export class CommandHandler implements EventHandler {
                     ? Logs.error.commandGuild
                           .replaceAll('{INTERACTION_ID}', intr.id)
                           .replaceAll('{COMMAND_NAME}', command.metadata.name)
-                          .replaceAll('{USER_TAG}', intr.user.tag)
+                          .replaceAll('{USER_TAG}', intr.user.username)
                           .replaceAll('{USER_ID}', intr.user.id)
                           .replaceAll('{CHANNEL_NAME}', intr.channel.name)
                           .replaceAll('{CHANNEL_ID}', intr.channel.id)
@@ -102,7 +102,7 @@ export class CommandHandler implements EventHandler {
                     : Logs.error.commandOther
                           .replaceAll('{INTERACTION_ID}', intr.id)
                           .replaceAll('{COMMAND_NAME}', command.metadata.name)
-                          .replaceAll('{USER_TAG}', intr.user.tag)
+                          .replaceAll('{USER_TAG}', intr.user.username)
                           .replaceAll('{USER_ID}', intr.user.id),
                 error
             );
@@ -140,7 +140,7 @@ export class CommandHandler implements EventHandler {
                     ? Logs.error.commandGuild
                           .replaceAll('{INTERACTION_ID}', intr.id)
                           .replaceAll('{COMMAND_NAME}', command.metadata.name)
-                          .replaceAll('{USER_TAG}', intr.user.tag)
+                          .replaceAll('{USER_TAG}', intr.user.username)
                           .replaceAll('{USER_ID}', intr.user.id)
                           .replaceAll('{CHANNEL_NAME}', intr.channel.name)
                           .replaceAll('{CHANNEL_ID}', intr.channel.id)
@@ -149,7 +149,7 @@ export class CommandHandler implements EventHandler {
                     : Logs.error.commandOther
                           .replaceAll('{INTERACTION_ID}', intr.id)
                           .replaceAll('{COMMAND_NAME}', command.metadata.name)
-                          .replaceAll('{USER_TAG}', intr.user.tag)
+                          .replaceAll('{USER_TAG}', intr.user.username)
                           .replaceAll('{USER_ID}', intr.user.id),
                 error
             );

@@ -46,7 +46,7 @@ export class SdoricaCheckMember implements CustomEvent<Events.GuildMemberUpdate>
 
                     const notifyChannel = await ClientUtils.findNotifyChannel(newMember.guild);
                     await MessageUtils.send(notifyChannel, {
-                        content: `【培訓】成員 ${newMember.user.tag} 回答錯誤`,
+                        content: `【培訓】成員 ${newMember.user.username} 回答錯誤`,
                     });
                 }
             }

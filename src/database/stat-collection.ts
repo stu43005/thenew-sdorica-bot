@@ -105,7 +105,7 @@ export class StatCollection {
             }
         });
 
-        this.temp.userNames[message.author.id] = message.author.tag;
+        this.temp.userNames[message.author.id] = message.author.username;
         if ('name' in message.channel) {
             this.temp.channelNames[message.channel.id] = message.channel.name;
         }

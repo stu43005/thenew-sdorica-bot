@@ -67,7 +67,7 @@ export class StarboardStore {
                 messageId: message.id,
                 channelId: message.channel.id,
                 senderId: message.author.id,
-                senderName: message.author.tag,
+                senderName: message.author.username,
                 message: message.content,
             };
         }
@@ -95,7 +95,7 @@ export class StarboardStore {
             channelId: message.channel.id,
             starboardMessageId: starboardMessage.id,
             senderId: message.author.id,
-            senderName: message.author.tag,
+            senderName: message.author.username,
             message: message.content,
             count,
         };
