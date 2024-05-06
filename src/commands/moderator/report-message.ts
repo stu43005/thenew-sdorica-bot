@@ -5,21 +5,20 @@ import {
     MessageContextMenuCommandInteraction,
     ModalBuilder,
     PermissionsString,
-    RESTPostAPIApplicationCommandsJSONBody,
     TextInputBuilder,
     TextInputStyle,
 } from 'discord.js';
 import { ReportMessageData } from '../../components/report-message.js';
 import {
-    getInteractionDataRepository,
     InteractionData,
+    getInteractionDataRepository,
 } from '../../database/entities/interaction.js';
 import { EventData } from '../../models/event-data.js';
 import { SerializationUtils } from '../../utils/serialization-utils.js';
 import { CommandDeferType, MessageContextMenu } from '../command.js';
 
 export default class ReportMessageCommand implements MessageContextMenu {
-    public metadata: RESTPostAPIApplicationCommandsJSONBody = new ContextMenuCommandBuilder()
+    public metadata = new ContextMenuCommandBuilder()
         .setName('Report Message')
         .setType(ApplicationCommandType.Message)
         .setDMPermission(false)

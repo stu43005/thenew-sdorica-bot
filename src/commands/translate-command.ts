@@ -1,8 +1,4 @@
-import {
-    ChatInputCommandInteraction,
-    PermissionsString,
-    RESTPostAPIApplicationCommandsJSONBody,
-} from 'discord.js';
+import { ChatInputCommandInteraction, PermissionsString, SlashCommandBuilder } from 'discord.js';
 import { LangCode } from '../enums/lang-code.js';
 import { Language } from '../models/enum-helpers/language.js';
 import { EventData } from '../models/event-data.js';
@@ -11,10 +7,10 @@ import { InteractionUtils } from '../utils/interaction-utils.js';
 import { Command, CommandDeferType } from './command.js';
 
 export class TranslateCommand implements Command {
-    public metadata: RESTPostAPIApplicationCommandsJSONBody = {
-        name: Lang.getCom('commands.translate'),
-        description: Lang.getRef('commandDescs.translate', Lang.Default),
-    };
+    public metadata = new SlashCommandBuilder()
+        .setName(Lang.getCom('commands.translate'))
+        .setDescription(Lang.getRef('commandDescs.translate', Lang.Default))
+        .toJSON();
     public deferType = CommandDeferType.PUBLIC;
     public requireDev = false;
     public requireGuild = false;

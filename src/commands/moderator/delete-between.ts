@@ -11,7 +11,6 @@ import {
     MessageContextMenuCommandInteraction,
     PermissionsBitField,
     PermissionsString,
-    RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord.js';
 import { EventData } from '../../models/event-data.js';
 import { Logger } from '../../services/logger.js';
@@ -19,7 +18,7 @@ import { InteractionUtils } from '../../utils/interaction-utils.js';
 import { CommandDeferType, MessageContextMenu } from '../command.js';
 
 export default class DeleteBetweenCommand implements MessageContextMenu {
-    public metadata: RESTPostAPIApplicationCommandsJSONBody = new ContextMenuCommandBuilder()
+    public metadata = new ContextMenuCommandBuilder()
         .setName('Delete Between')
         .setType(ApplicationCommandType.Message)
         .setDMPermission(false)

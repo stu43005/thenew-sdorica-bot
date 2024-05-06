@@ -1,9 +1,8 @@
 import {
-    ApplicationCommandOptionType,
     ChatInputCommandInteraction,
     EmbedBuilder,
     PermissionsString,
-    RESTPostAPIApplicationCommandsJSONBody,
+    SlashCommandBuilder,
 } from 'discord.js';
 import { EventData } from '../models/event-data.js';
 import { Lang } from '../services/lang.js';
@@ -11,16 +10,15 @@ import { InteractionUtils } from '../utils/interaction-utils.js';
 import { Command, CommandDeferType } from './command.js';
 
 export class LinkCommand implements Command {
-    public metadata: RESTPostAPIApplicationCommandsJSONBody = {
-        name: Lang.getCom('commands.link'),
-        description: Lang.getRef('commandDescs.link', Lang.Default),
-        options: [
-            {
-                name: Lang.getCom('arguments.link'),
-                description: 'Link to display.',
-                required: true,
-                type: ApplicationCommandOptionType.String.valueOf(),
-                choices: [
+    public metadata = new SlashCommandBuilder()
+        .setName(Lang.getCom('commands.link'))
+        .setDescription(Lang.getRef('commandDescs.link', Lang.Default))
+        .addStringOption(builder =>
+            builder
+                .setName(Lang.getCom('arguments.link'))
+                .setDescription('Link to display.')
+                .setRequired(true)
+                .setChoices(
                     {
                         name: 'docs',
                         value: 'docs',
@@ -40,11 +38,10 @@ export class LinkCommand implements Command {
                     {
                         name: 'vote',
                         value: 'vote',
-                    },
-                ],
-            },
-        ],
-    };
+                    }
+                )
+        )
+        .toJSON();
     public deferType = CommandDeferType.PUBLIC;
     public requireDev = false;
     public requireGuild = false;

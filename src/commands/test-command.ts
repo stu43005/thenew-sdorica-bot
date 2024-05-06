@@ -1,8 +1,4 @@
-import {
-    ChatInputCommandInteraction,
-    PermissionsString,
-    RESTPostAPIApplicationCommandsJSONBody,
-} from 'discord.js';
+import { ChatInputCommandInteraction, PermissionsString, SlashCommandBuilder } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { EventData } from '../models/event-data.js';
 import { Lang } from '../services/lang.js';
@@ -10,10 +6,10 @@ import { InteractionUtils } from '../utils/interaction-utils.js';
 import { Command, CommandDeferType } from './command.js';
 
 export class TestCommand implements Command {
-    public metadata: RESTPostAPIApplicationCommandsJSONBody = {
-        name: Lang.getCom('commands.test'),
-        description: Lang.getRef('commandDescs.test', Lang.Default),
-    };
+    public metadata = new SlashCommandBuilder()
+        .setName(Lang.getCom('commands.test'))
+        .setDescription(Lang.getRef('commandDescs.test', Lang.Default))
+        .toJSON();
     public cooldown = new RateLimiter(1, 5000);
     public deferType = CommandDeferType.PUBLIC;
     public requireDev = false;

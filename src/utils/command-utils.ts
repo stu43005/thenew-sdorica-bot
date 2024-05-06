@@ -1,15 +1,15 @@
 import config from 'config';
-import { CommandInteraction, GuildMember, PermissionsBitField } from 'discord.js';
-import { Command } from '../commands/command.js';
+import { PermissionsBitField, type CommandInteraction, type GuildMember } from 'discord.js';
+import { type AppCommand } from '../commands/command.js';
 import { Permission } from '../models/enum-helpers/permission.js';
-import { EventData } from '../models/event-data.js';
+import { type EventData } from '../models/event-data.js';
 import { Lang } from '../services/lang.js';
 import { FormatUtils } from './format-utils.js';
 import { InteractionUtils } from './interaction-utils.js';
 
 export class CommandUtils {
     public static async runChecks(
-        command: Command,
+        command: AppCommand,
         intr: CommandInteraction,
         data: EventData
     ): Promise<boolean> {
@@ -77,7 +77,7 @@ export class CommandUtils {
         return true;
     }
 
-    private static hasPermission(member: GuildMember, command: Command): boolean {
+    private static hasPermission(member: GuildMember, command: AppCommand): boolean {
         // Debug option to bypass permission checks
         if (config.get('debug.skip.checkPerms')) {
             return true;

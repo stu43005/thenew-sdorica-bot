@@ -9,7 +9,7 @@ import {
 } from 'discord.js';
 import { createRequire } from 'node:module';
 import process from 'node:process';
-import { Command } from './commands/command.js';
+import { type AppCommand } from './commands/command.js';
 import { commands } from './commands/index.js';
 import { components } from './components/index.js';
 import { Database } from './database/database.js';
@@ -87,7 +87,7 @@ async function start(): Promise<void> {
     }
 }
 
-async function registerCommands(commands: Command[]): Promise<void> {
+async function registerCommands(commands: AppCommand[]): Promise<void> {
     const cmdDatas: RESTPutAPIApplicationCommandsJSONBody = commands.map(cmd => cmd.metadata);
     const cmdNames = cmdDatas.map(cmdData => cmdData.name);
 

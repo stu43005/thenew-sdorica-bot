@@ -1,18 +1,14 @@
-import {
-    ChatInputCommandInteraction,
-    PermissionsString,
-    RESTPostAPIApplicationCommandsJSONBody,
-} from 'discord.js';
+import { ChatInputCommandInteraction, PermissionsString, SlashCommandBuilder } from 'discord.js';
 import { EventData } from '../models/event-data.js';
 import { Lang } from '../services/lang.js';
 import { InteractionUtils } from '../utils/interaction-utils.js';
 import { Command, CommandDeferType } from './command.js';
 
 export class InfoCommand implements Command {
-    public metadata: RESTPostAPIApplicationCommandsJSONBody = {
-        name: Lang.getCom('commands.info'),
-        description: Lang.getRef('commandDescs.info', Lang.Default),
-    };
+    public metadata = new SlashCommandBuilder()
+        .setName(Lang.getCom('commands.info'))
+        .setDescription(Lang.getRef('commandDescs.info', Lang.Default))
+        .toJSON();
     public deferType = CommandDeferType.PUBLIC;
     public requireDev = false;
     public requireGuild = false;
