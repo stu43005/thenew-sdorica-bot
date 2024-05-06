@@ -17,8 +17,8 @@ export type ComponentDeferType<T extends ComponentIntercation> =
     T extends MessageComponentInteraction
         ? MessageComponentDeferType
         : T extends ModalSubmitInteraction
-        ? CommandDeferType
-        : MessageComponentDeferType | CommandDeferType;
+          ? CommandDeferType
+          : MessageComponentDeferType | CommandDeferType;
 
 export interface Component<T extends ComponentIntercation = ComponentIntercation> {
     ids: string[];

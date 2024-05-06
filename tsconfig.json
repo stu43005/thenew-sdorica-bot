@@ -1,10 +1,10 @@
 {
     "compilerOptions": {
-		"module": "node16",
-		"moduleResolution": "node16",
+        "module": "node16",
+        "moduleResolution": "node16",
         "target": "ES2022",
         "lib": ["ES2022"],
-		"resolveJsonModule": false,
+        "resolveJsonModule": false,
         "declaration": true,
         "sourceMap": true,
         "outDir": "./dist",
