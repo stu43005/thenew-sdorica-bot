@@ -39,7 +39,7 @@
     },
     "dependencies": {
         "bufferutil": "^4.0.8",
-        "cache-manager": "^5.5.2",
+        "cache-manager": "^5.7.3",
         "cache-manager-fs-hash": "^1.0.0",
         "cheerio": "^1.0.0-rc.12",
         "class-transformer": "0.5.1",
