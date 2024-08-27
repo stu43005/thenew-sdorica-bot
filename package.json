@@ -76,7 +76,7 @@
         "url-regex-safe": "^3.0.0",
         "utf-8-validate": "^6.0.4",
         "v8-profiler-next": "^1.10.0",
-        "zlib-sync": "^0.1.8"
+        "zlib-sync": "^0.1.9"
     },
     "devDependencies": {
         "@types/cache-manager-fs-hash": "^0.0.1",
