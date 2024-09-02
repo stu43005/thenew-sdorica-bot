@@ -65,7 +65,7 @@
         "p-timeout": "^6.1.2",
         "pino": "^8.14.1",
         "pino-abstract-transport": "^1.2.0",
-        "pino-pretty": "^10.0.1",
+        "pino-pretty": "^11.2.2",
         "pm2": "^5.3.1",
         "random-weighted-choice": "^0.1.4",
         "re2": "^1.21.3",
