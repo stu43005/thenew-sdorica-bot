@@ -52,7 +52,7 @@
         "emoji-regex": "^10.3.0",
         "express": "^4.21.0",
         "express-promise-router": "4.1.1",
-        "filesize": "^9.0.11",
+        "filesize": "^10.1.6",
         "firebase-admin": "^12.2.0",
         "fireorm": "^0.23.3",
         "json-templates": "^5.1.0",
