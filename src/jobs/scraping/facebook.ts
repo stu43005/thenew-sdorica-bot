@@ -1,4 +1,4 @@
-import * as cheerio from 'cheerio';
+import { load, type Cheerio, type CheerioAPI } from 'cheerio';
 import fetch from 'node-fetch';
 import { JsonObject } from 'type-fest';
 import { Logger } from '../../services/logger.js';
@@ -22,7 +22,7 @@ export class FacebookTriggerClass implements TriggerClass {
         const linkPath = `/${encodeURIComponent(id)}`;
         const html = await this.fetchPageHtml(linkPath, options.lang);
         // this.helpers.log.log(`[run][${linkPath}]: html = ${html}`);
-        const $ = cheerio.load(html);
+        const $ = load(html);
 
         const $recent = $('#recent').first();
         const $items = $recent.find('[data-ft*="story_fbid"]');
@@ -35,7 +35,7 @@ export class FacebookTriggerClass implements TriggerClass {
 
         const pageItems = await Promise.all(
             $items.map(async (index, element) => {
-                const $item = cheerio.load(element).root();
+                const $item = load(element).root();
                 const itemLink =
                     $item.find('div:nth-child(2)>div:nth-child(2)>span+a').first().attr('href') ??
                     $item.find('footer>div>span:nth-child(2)+a').first().attr('href') ??
@@ -128,7 +128,7 @@ export class FacebookTriggerClass implements TriggerClass {
             throw new Error(`You have been temporarily blocked from performing this action.`);
         }
 
-        const $ = cheerio.load(html);
+        const $ = load(html);
         const $story = $('#m_story_permalink_view');
         const $item = $story.find('[data-ft*="story_fbid"]');
         // const $box = $story.find('[data-ft*="story_fbid"] > div').eq(0);
@@ -148,8 +148,8 @@ export class FacebookTriggerClass implements TriggerClass {
     }
 
     private async parseStoryPage(
-        $: cheerio.CheerioAPI,
-        $item: cheerio.Cheerio<cheerio.Element | cheerio.Document>,
+        $: CheerioAPI,
+        $item: Cheerio<any>,
         linkPath: string
     ): Promise<StoryData> {
         const { url, cacheKey } = this.getStoryUrl(linkPath);
@@ -217,7 +217,7 @@ export class FacebookTriggerClass implements TriggerClass {
         const cacheKey = `photos${pathname}`;
 
         const html = await DiskCache.wrap(cacheKey, () => this.fetchPageHtml(linkPath));
-        const $ = cheerio.load(html);
+        const $ = load(html);
 
         const title = $('#MPhotoContent div.msg > a > strong').first().text();
         const url = `https://www.facebook.com${pathname}`;

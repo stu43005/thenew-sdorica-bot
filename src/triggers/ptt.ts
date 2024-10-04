@@ -1,4 +1,4 @@
-import * as cheerio from 'cheerio';
+import { load } from 'cheerio';
 import { EmbedBuilder, Message } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import fetch from 'node-fetch';
@@ -74,9 +74,9 @@ export async function pttAutoEmbed(content: string): Promise<EmbedBuilder | null
 */
 export async function getPttMetaline(url: string): Promise<{ [key: string]: string }> {
     const html = await req(url, false);
-    const $ = cheerio.load(html);
+    const $ = load(html);
     const r18html = await req(url, true);
-    const r18$ = cheerio.load(r18html);
+    const r18$ = load(r18html);
 
     const metalinesData: { [key: string]: string } = {};
 

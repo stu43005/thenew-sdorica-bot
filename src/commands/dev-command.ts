@@ -5,7 +5,7 @@ import {
     SlashCommandBuilder,
     version,
 } from 'discord.js';
-import fileSize from 'filesize';
+import { filesize } from 'filesize';
 import os from 'node:os';
 import { EventData } from '../models/event-data.js';
 import { Lang } from '../services/lang.js';
@@ -58,20 +58,20 @@ export class DevCommand implements Command {
                 SHARD_COUNT: shardCount.toLocaleString(),
                 SERVER_COUNT: serverCount.toLocaleString(),
                 SERVER_COUNT_PER_SHARD: Math.round(serverCount / shardCount).toLocaleString(),
-                RSS_SIZE: fileSize(memory.rss),
+                RSS_SIZE: filesize(memory.rss),
                 RSS_SIZE_PER_SERVER:
                     serverCount > 0
-                        ? fileSize(memory.rss / serverCount)
+                        ? filesize(memory.rss / serverCount)
                         : Lang.getRef('other.na', data.lang()),
-                HEAP_TOTAL_SIZE: fileSize(memory.heapTotal),
+                HEAP_TOTAL_SIZE: filesize(memory.heapTotal),
                 HEAP_TOTAL_SIZE_PER_SERVER:
                     serverCount > 0
-                        ? fileSize(memory.heapTotal / serverCount)
+                        ? filesize(memory.heapTotal / serverCount)
                         : Lang.getRef('other.na', data.lang()),
-                HEAP_USED_SIZE: fileSize(memory.heapUsed),
+                HEAP_USED_SIZE: filesize(memory.heapUsed),
                 HEAP_USED_SIZE_PER_SERVER:
                     serverCount > 0
-                        ? fileSize(memory.heapUsed / serverCount)
+                        ? filesize(memory.heapUsed / serverCount)
                         : Lang.getRef('other.na', data.lang()),
                 HOSTNAME: os.hostname(),
                 SHARD_ID: (intr.guild?.shardId ?? 0).toString(),
