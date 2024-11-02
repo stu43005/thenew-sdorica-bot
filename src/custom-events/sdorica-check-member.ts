@@ -2,6 +2,7 @@ import { Events, GuildMember, PartialGuildMember } from 'discord.js';
 import { ClientUtils } from '../utils/client-utils.js';
 import { MessageUtils } from '../utils/message-utils.js';
 import { CustomEvent } from './custom-event.js';
+import moment from 'moment';
 
 const mee6Roles = [
     '600722580554645512',
@@ -41,7 +42,7 @@ export class SdoricaCheckMember implements CustomEvent<Events.GuildMemberUpdate>
             if (newRoles.includes(wrongAnswerRole)) {
                 await newMember.roles.remove(wrongAnswerRole);
 
-                if (!oldRoles.includes(verifiedRole) && newMember.kickable) {
+                if (moment().diff(newMember.joinedAt, 'days', true) < 7 && newMember.kickable) {
                     await newMember.kick('成員培訓回答錯誤');
 
                     const notifyChannel = await ClientUtils.findNotifyChannel(newMember.guild);
