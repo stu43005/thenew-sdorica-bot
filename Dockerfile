@@ -1,4 +1,4 @@
-FROM node:20-bullseye@sha256:80234aa9669e62c1fb47780d96128127c96fed663bd17dfacfe7bf9e5473884c as build
+FROM node:23-bullseye@sha256:3c9e9123f264e3eee365b71ba4e0090b190ccdfd3b27db4f33411ff4d3b746d0 as build
 
 # Add Tini https://github.com/krallin/tini
 RUN set -x \
