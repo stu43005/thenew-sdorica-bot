@@ -1,23 +1,29 @@
-import { caching, multiCaching } from 'cache-manager';
-import fsStore from 'cache-manager-fs-hash';
+import { createCache, KeyvAdapter } from 'cache-manager';
+import { DiskStore } from 'cache-manager-fs-hash';
+import { CacheableMemory } from 'cacheable';
 import config from 'config';
+import { Keyv } from 'keyv';
 
-export const MemoryCache = await caching('memory', {
-    max: 100,
+const memory = new CacheableMemory({
     ttl: 600 * 1000 /* milliseconds */,
-    shouldCloneBeforeSet: false,
+    lruSize: 100,
+    useClone: false,
 });
 
-// eslint-disable-next-line @typescript-eslint/await-thenable
-export const DiskCache = await caching(
-    fsStore.create({
-        store: fsStore,
-        options: {
-            path: 'cache',
-            ttl: config.get('cacheTTLSeconds') /* seconds */,
-            subdirs: true,
-        },
-    })
-);
+export const MemoryCache = createCache({
+    stores: [new Keyv({ store: memory })],
+});
 
-export const CacheUtils = multiCaching([MemoryCache, DiskCache]);
+const fsStore = new DiskStore({
+    path: 'cache',
+    ttl: config.get<number>('cacheTTLSeconds') * 1000 /* milliseconds */,
+    subdirs: true,
+});
+
+export const DiskCache = createCache({
+    stores: [new Keyv({ store: new KeyvAdapter(fsStore) })],
+});
+
+export const CacheUtils = createCache({
+    stores: [new Keyv({ store: memory }), new Keyv({ store: new KeyvAdapter(fsStore) })],
+});

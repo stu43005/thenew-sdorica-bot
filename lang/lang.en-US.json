@@ -256,7 +256,8 @@
             "SEND_VOICE_MESSAGES": "Send Voice Messages",
             "CREATE_GUILD_EXPRESSIONS": "Create Guild Expressions",
             "CREATE_EVENTS": "Create Events",
-            "SEND_POLLS": "Send Polls"
+            "SEND_POLLS": "Send Polls",
+            "USE_EXTERNAL_APPS": "Use External Apps"
         },
         "other": {
             "na": "N/A"

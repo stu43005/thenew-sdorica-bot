@@ -11,31 +11,21 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.formatOnSave": true
     },
-    "cSpell.enabled": true,
-    "cSpell.words": [
-        "bot's",
-        "cmds",
-        "cooldown",
-        "cooldowns",
-        "datas",
-        "descs",
-        "discordbotlist",
-        "discordjs",
-        "discordlabs",
-        "discordlist",
-        "disforge",
-        "filesize",
-        "luxon",
-        "millis",
-        "Novak",
-        "ondiscord",
-        "parens",
-        "pino",
-        "regexes",
-        "respawn",
-        "restjson",
-        "varchar"
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
     ],
+    "eslint.options": {
+        "flags": [
+            "unstable_ts_config"
+        ]
+    },
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit",
+        "source.fixAll.eslint": "explicit"
+    },
     "typescript.preferences.importModuleSpecifierEnding": "js",
     "prettier.requireConfig": true
 }

@@ -165,7 +165,7 @@ export type SerializationGuildMember = Jsonify<
 export type SerializationTextBasedChannel = Jsonify<
     Except<
         TransformCollection<FilterManagerKeys<TextBasedChannel>>,
-        'toJSON' | 'client' | 'partial' | 'createdAt' | 'lastMessage'
+        'toJSON' | 'client' | 'partial' | 'createdAt'
     >
 >;
 

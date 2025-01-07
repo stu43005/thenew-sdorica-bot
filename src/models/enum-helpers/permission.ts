@@ -265,5 +265,10 @@ export class Permission {
                 return Lang.getRef('permissions.SEND_POLLS', langCode);
             },
         },
+        UseExternalApps: {
+            displayName(langCode: LangCode): string {
+                return Lang.getRef('permissions.USE_EXTERNAL_APPS', langCode);
+            },
+        },
     };
 }

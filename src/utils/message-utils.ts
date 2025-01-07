@@ -11,9 +11,9 @@ import {
     MessageReactionResolvable,
     RESTJSONErrorCodes,
     StartThreadOptions,
-    TextBasedChannel,
     ThreadChannel,
     User,
+    type SendableChannels,
 } from 'discord.js';
 
 const IGNORED_ERRORS: (string | number)[] = [
@@ -28,7 +28,7 @@ const IGNORED_ERRORS: (string | number)[] = [
 
 export class MessageUtils {
     public static async send(
-        target: User | TextBasedChannel,
+        target: User | SendableChannels,
         content: string | EmbedBuilder | MessageCreateOptions
     ): Promise<Message | undefined> {
         try {

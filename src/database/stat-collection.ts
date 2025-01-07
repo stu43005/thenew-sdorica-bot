@@ -106,7 +106,7 @@ export class StatCollection {
         });
 
         this.temp.userNames[message.author.id] = message.author.username;
-        if ('name' in message.channel) {
+        if ('name' in message.channel && message.channel.name) {
             this.temp.channelNames[message.channel.id] = message.channel.name;
         }
 
