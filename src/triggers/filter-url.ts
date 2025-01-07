@@ -1,4 +1,4 @@
-import { Message, PartialMessage } from 'discord.js';
+import { Message, MessageReferenceType, PartialMessage, type MessageSnapshot } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import urlRegex from 'url-regex-safe';
 import { EventData } from '../models/event-data.js';
@@ -28,11 +28,25 @@ export class FilterUrlTrigger implements Trigger {
 
         if (!PermissionUtils.canDeleteMessage(msg.channel)) return false;
 
-        if (msg.attachments.size) {
-            for (const [_id, attach] of msg.attachments) {
-                if (this.filterUrl(attach.url, true)) {
+        if (this.checkMessage(msg)) {
+            return true;
+        }
+
+        if (msg.reference?.type === MessageReferenceType.Forward) {
+            for (const [, snapshot] of msg.messageSnapshots) {
+                if (this.checkMessage(snapshot)) {
                     return true;
                 }
+            }
+        }
+
+        return false;
+    }
+
+    private checkMessage(msg: Message | MessageSnapshot): boolean {
+        for (const [, attach] of msg.attachments) {
+            if (this.filterUrl(attach.url, true)) {
+                return true;
             }
         }
         return this.filterUrl(msg.content);
