@@ -24,7 +24,7 @@ RUN npm run build
 # Install packages only production dependencies
 RUN npm ci --omit=dev
 
-FROM gcr.io/distroless/nodejs20-debian12:latest@sha256:2818fb8cdc25894d9c6b6e6bf72b4033d949f5d6d65173a6d7aeec0266f03037
+FROM gcr.io/distroless/nodejs20-debian12:latest@sha256:a6c0e95f6f70fb21586757a846d8b8d287609f2414bcc2399895adb055768648
 
 ENV NODE_ENV production
 
