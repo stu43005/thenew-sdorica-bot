@@ -108,7 +108,7 @@ export class ScrapingJob implements Job {
             const embeds = message.embeds ? Array.from(message.embeds) : [];
             const embed: APIEmbed = isJSONEncodable(embeds[0])
                 ? embeds[0].toJSON()
-                : embeds[0] ?? {};
+                : (embeds[0] ?? {});
             embed.title ||= item.title?.toString() || 'Untitled';
             embed.description ||= item.contentSnippet?.toString() || item.content?.toString();
             embed.url ||= item.link?.toString();

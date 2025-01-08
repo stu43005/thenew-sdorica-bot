@@ -181,6 +181,6 @@ export default class DeleteBetweenCommand implements MessageContextMenu {
             content: `已刪除 ${count} 則訊息。${reason}`,
             components: [],
         });
-        if (error) throw error;
+        if (error && error instanceof Error) throw error;
     }
 }

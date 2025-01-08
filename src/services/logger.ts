@@ -2,7 +2,7 @@ import config from 'config';
 import { DiscordAPIError, EmbedBuilder, WebhookClient } from 'discord.js';
 import { Response } from 'node-fetch';
 import { Transform } from 'node:stream';
-import { pino, DestinationStream, Level, LoggerOptions, StreamEntry } from 'pino';
+import { DestinationStream, Level, LoggerOptions, pino, StreamEntry } from 'pino';
 import build, { OnUnknown } from 'pino-abstract-transport';
 import { ConfigUtils } from '../utils/config-utils.js';
 import { FormatUtils } from '../utils/format-utils.js';
@@ -124,15 +124,27 @@ export class Logger {
     private static shardId: number;
 
     public static debug(message: string, obj?: any): void {
-        obj ? logger.debug(obj, message) : logger.debug(message);
+        if (obj) {
+            logger.debug(obj, message);
+        } else {
+            logger.debug(message);
+        }
     }
 
     public static info(message: string, obj?: any): void {
-        obj ? logger.info(obj, message) : logger.info(message);
+        if (obj) {
+            logger.info(obj, message);
+        } else {
+            logger.info(message);
+        }
     }
 
     public static warn(message: string, obj?: any): void {
-        obj ? logger.warn(obj, message) : logger.warn(message);
+        if (obj) {
+            logger.warn(obj, message);
+        } else {
+            logger.warn(message);
+        }
     }
 
     public static async error(message: string, obj?: any): Promise<void> {

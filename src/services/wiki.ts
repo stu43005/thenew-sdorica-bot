@@ -506,7 +506,7 @@ export function heroFilter(input: string): (hero: Hero) => boolean {
         const alias = [
             ...(charAlias[hero.name] ?? []),
             ...(hero.name.endsWith('SP') || hero.name.endsWith('MZ') || hero.name.endsWith('OS')
-                ? charAlias[hero.name.substring(0, hero.name.length - 2)] ?? []
+                ? (charAlias[hero.name.substring(0, hero.name.length - 2)] ?? [])
                 : []),
         ];
         if (alias.find(name => name.toLowerCase().includes(input))) return true;

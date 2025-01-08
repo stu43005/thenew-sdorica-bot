@@ -23,6 +23,7 @@ declare module 'cache-manager-fs-hash' {
         ttl(key: string): Promise<number>; // 獲取該鍵的剩餘生命時間
         del(key: string): Promise<void>; // 刪除條目
         reset(): Promise<void>; // 重置所有緩存
+        // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
         mset(...keyValues: (string | any)[]): Promise<void>; // 批量儲存條目
         mget(...keys: string[]): Promise<any[]>; // 批量獲取條目
         mdel(...keys: string[]): Promise<void>; // 批量刪除條目
