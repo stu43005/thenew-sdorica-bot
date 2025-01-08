@@ -14,13 +14,16 @@ export class SerializationUtils {
     public static serializationMessage(message: Message): SerializationMessage {
         return Object.assign(message.toJSON() as SerializationMessage, {
             url: message.url,
-            attachments: [...message.attachments.values()].map(a =>
-                this.serializationAttachment(a)
-            ),
-            author: this.serializationUser(message.author, true),
-            channel: this.serializationTextBasedChannel(message.channel, true),
+            attachments: message.attachments.map(a => this.serializationAttachment(a)),
+            author: message.author ? this.serializationUser(message.author, true) : null,
+            channel: message.channel
+                ? this.serializationTextBasedChannel(message.channel, true)
+                : null,
             guild: message.guild ? this.serializationGuild(message.guild, true) : null,
             member: message.member ? this.serializationGuildMember(message.member) : null,
+            messageSnapshots: message.messageSnapshots.map(s =>
+                this.serializationMessage(s as unknown as Message)
+            ),
         });
     }
 
@@ -119,6 +122,7 @@ export type SerializationMessage = Jsonify<
     channel: Simplification<SerializationTextBasedChannel>;
     guild: Simplification<SerializationGuild>;
     member: SerializationGuildMember;
+    messageSnapshots: SerializationMessage[];
 };
 
 export type SerializationAttachment = Jsonify<Except<Attachment, 'toJSON'>>;
