@@ -74,7 +74,7 @@
         "reflect-metadata": "^0.1.14",
         "rss-parser": "^3.13.0",
         "rxjs": "^7.8.1",
-        "type-fest": "^4.31.0",
+        "type-fest": "^4.32.0",
         "url-regex-safe": "^4.0.0",
         "utf-8-validate": "^6.0.5",
         "v8-profiler-next": "^1.10.0",
