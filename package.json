@@ -98,7 +98,7 @@
         "cross-env": "^7.0.3",
         "eslint": "^9.17.0",
         "eslint-plugin-import": "^2.31.0",
-        "eslint-plugin-unicorn": "^56.0.1",
+        "eslint-plugin-unicorn": "^57.0.0",
         "prettier": "^3.4.2",
         "shx": "^0.3.4",
         "typescript": "^5.7.2"
